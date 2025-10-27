@@ -1077,6 +1077,7 @@
                       "examples/concepts/agent/context_management/datetime_instructions",
                       "examples/concepts/agent/context_management/dynamic_instructions",
                       "examples/concepts/agent/context_management/few_shot_learning",
+                      "examples/concepts/agent/context_management/filter_tool_calls_from_history",
                       "examples/concepts/agent/context_management/instructions",
                       "examples/concepts/agent/context_management/instructions_via_function",
                       "examples/concepts/agent/context_management/location_instructions"
@@ -1267,6 +1268,12 @@
                       "examples/concepts/teams/async/async_coordination_team",
                       "examples/concepts/teams/async/async_delegate_to_all_members",
                       "examples/concepts/teams/async/async_respond_directly"
+                    ]
+                  },
+                  {
+                    "group": "Context Management",
+                    "pages": [
+                      "examples/concepts/teams/context_management/filter_tool_calls_from_history"
                     ]
                   },
                   {
@@ -1766,6 +1773,13 @@
                           "examples/concepts/knowledge/readers/pdf/pdf-reader-async",
                           "examples/concepts/knowledge/readers/pdf/pdf-password-reader",
                           "examples/concepts/knowledge/readers/pdf/pdf-url-password-reader"
+                        ]
+                      },
+                      {
+                        "group": "PPTX Readers",
+                        "pages": [
+                          "examples/concepts/knowledge/readers/pptx/pptx-reader",
+                          "examples/concepts/knowledge/readers/pptx/pptx-reader-async"
                         ]
                       },
                       {
@@ -2958,6 +2972,12 @@
                 ]
               },
               {
+                "group": "Sessions",
+                "pages": [
+                  "reference/session/summary_manager"
+                ]
+              },
+              {
                 "group": "Knowledge",
                 "pages": [
                   "reference/knowledge/knowledge",
@@ -2966,14 +2986,12 @@
                     "pages": [
                       "reference/knowledge/embedder/azure_openai",
                       "reference/knowledge/embedder/cohere",
-                      "reference/knowledge/embedder/aws_bedrock",
                       "reference/knowledge/embedder/fastembed",
                       "reference/knowledge/embedder/fireworks",
                       "reference/knowledge/embedder/gemini",
                       "reference/knowledge/embedder/huggingface",
                       "reference/knowledge/embedder/mistral",
                       "reference/knowledge/embedder/nebius",
-                      "reference/knowledge/embedder/jina",
                       "reference/knowledge/embedder/ollama",
                       "reference/knowledge/embedder/openai",
                       "reference/knowledge/embedder/sentence-transformer",
@@ -2991,6 +3009,7 @@
                       "reference/knowledge/reader/docx",
                       "reference/knowledge/reader/json",
                       "reference/knowledge/reader/pdf",
+                      "reference/knowledge/reader/pptx",
                       "reference/knowledge/reader/text",
                       "reference/knowledge/reader/website",
                       "reference/knowledge/reader/youtube",
