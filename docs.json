@@ -70,7 +70,7 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Introduction",
+            "group": "Get Started",
             "pages": [
               "introduction",
               "introduction/quickstart",
@@ -80,7 +80,7 @@
             ]
           },
           {
-            "group": "Learn",
+            "group": "Concepts",
             "pages": [
               {
                 "group": "Agents",
@@ -89,27 +89,6 @@
                   "concepts/agents/building-agents",
                   "concepts/agents/running-agents",
                   "concepts/agents/debugging-agents",
-                  "concepts/agents/sessions",
-                  "concepts/agents/input-output",
-                  "concepts/agents/context",
-                  "concepts/agents/dependencies",
-                  "concepts/agents/state",
-                  "concepts/agents/storage",
-                  "concepts/agents/memory",
-                  "concepts/agents/knowledge",
-                  "concepts/agents/tools",
-                  "concepts/agents/multimodal",
-                  "concepts/agents/pre-hooks-and-post-hooks",
-                  {
-                    "group": "Guardrails",
-                    "pages": [
-                      "concepts/agents/guardrails/overview",
-                      "concepts/agents/guardrails/prompt-injection",
-                      "concepts/agents/guardrails/pii",
-                      "concepts/agents/guardrails/openai-moderation"
-                    ]
-                  },
-                  "concepts/agents/metrics",
                   "concepts/agents/run-cancel",
                   "concepts/agents/custom-logger"
                 ]
@@ -122,18 +101,6 @@
                   "concepts/teams/running-teams",
                   "concepts/teams/delegation",
                   "concepts/teams/debugging-teams",
-                  "concepts/teams/chat_history",
-                  "concepts/teams/sessions",
-                  "concepts/teams/context",
-                  "concepts/teams/input-output",
-                  "concepts/teams/dependencies",
-                  "concepts/teams/state",
-                  "concepts/teams/storage",
-                  "concepts/teams/memory",
-                  "concepts/teams/knowledge",
-                  "concepts/teams/pre-hooks-and-post-hooks",
-                  "concepts/teams/guardrails",
-                  "concepts/teams/metrics",
                   "concepts/teams/run-cancel",
                   "concepts/teams/custom-logger"
                 ]
@@ -160,10 +127,7 @@
                       "concepts/workflows/workflow-patterns/advanced-workflow-patterns"
                     ]
                   },
-                  "concepts/workflows/input-and-output",
-                  "concepts/workflows/workflow_session_state",
                   "concepts/workflows/additional-data",
-                  "concepts/workflows/workflow_with_history",
                   "concepts/workflows/conversational-workflows",
                   "concepts/workflows/access-previous-steps",
                   "concepts/workflows/early-stop",
@@ -173,96 +137,77 @@
                 ]
               },
               {
-                "group": "Models",
+                "group": "Sessions",
                 "pages": [
-                  "concepts/models/overview",
-                  "concepts/models/model-as-string",
-                  "concepts/models/compatibility",
-                  "concepts/models/cache-response",
+                  "concepts/sessions/overview",
+                  "concepts/sessions/agent",
+                  "concepts/sessions/team",
+                  "concepts/sessions/workflow",
                   {
-                    "group": "Native Model Providers",
+                    "group": "Metrics",
                     "pages": [
-                      "concepts/models/anthropic",
-                      "concepts/models/cohere",
-                      "concepts/models/dashscope",
-                      "concepts/models/deepseek",
-                      "concepts/models/google",
-                      "concepts/models/meta",
-                      "concepts/models/mistral",
-                      {
-                        "group": "OpenAI",
-                        "pages": [
-                          "concepts/models/openai",
-                          "concepts/models/openai-responses"
-                        ]
-                      },
-                      "concepts/models/perplexity",
-                      "concepts/models/vercel",
-                      "concepts/models/xai"
+                      "concepts/sessions/metrics/overview",
+                      "concepts/sessions/metrics/agent",
+                      "concepts/sessions/metrics/team",
+                      "concepts/sessions/metrics/workflow"
                     ]
-                  },
-                  {
-                    "group": "Local Model Providers",
-                    "pages": [
-                      "concepts/models/ollama",
-                      "concepts/models/llama_cpp",
-                      "concepts/models/lmstudio",
-                      "concepts/models/vllm"
-                    ]
-                  },
-                  {
-                    "group": "Cloud Model Providers",
-                    "pages": [
-                      {
-                        "group": "AWS",
-                        "pages": [
-                          "concepts/models/aws-bedrock",
-                          "concepts/models/aws-claude"
-                        ]
-                      },
-                      {
-                        "group": "Azure",
-                        "pages": [
-                          "concepts/models/azure-ai-foundry",
-                          "concepts/models/azure-openai"
-                        ]
-                      },
-                      "concepts/models/ibm-watsonx",
-                      {
-                        "group": "Vertex AI",
-                        "pages": ["concepts/models/vertexai-claude"]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Model Gateways & Aggregators",
-                    "pages": [
-                      "concepts/models/aimlapi",
-                      "concepts/models/cometapi",
-                      "concepts/models/deepinfra",
-                      "concepts/models/fireworks",
-                      "concepts/models/groq",
-                      "concepts/models/huggingface",
-                      "concepts/models/langdb",
-                      {
-                        "group": "LiteLLM",
-                        "pages": [
-                          "concepts/models/litellm",
-                          "concepts/models/litellm_openai"
-                        ]
-                      },
-                      "concepts/models/nebius",
-                      "concepts/models/nexus",
-                      "concepts/models/nvidia",
-                      "concepts/models/openrouter",
-                      "concepts/models/portkey",
-                      "concepts/models/requesty",
-                      "concepts/models/sambanova",
-                      "concepts/models/siliconflow",
-                      "concepts/models/together"
-                    ]
-                  },
-                  "concepts/models/openai-like"
+                  }
+                ]
+              },
+              {
+                "group": "Chat History",
+                "pages": [
+                  "concepts/chat_history/overview",
+                  "concepts/agents/chat_history",
+                  "concepts/teams/chat_history",
+                  "concepts/workflows/workflow_with_history"
+                ]
+              },
+              {
+                "group": "Structured Input & Output",
+                "pages": [
+                  "concepts/structured_input_output/overview",
+                  "concepts/agents/input-output",
+                  "concepts/teams/input-output",
+                  "concepts/workflows/input-and-output"
+                ]
+              },
+              {
+                "group": "Context Engineering",
+                "pages": [
+                  "concepts/context_engineering/overview",
+                  "concepts/agents/context",
+                  "concepts/teams/context"
+                ]
+              },
+              {
+                "group": "State Management",
+                "pages": [
+                  "concepts/state_management/overview",
+                  "concepts/agents/state",
+                  "concepts/teams/state",
+                  "concepts/workflows/workflow_session_state"
+                ]
+              },
+              {
+                "group": "Memory",
+                "pages": [
+                  "concepts/memory/overview",
+                  "concepts/memory/working-with-memories",
+                  "concepts/agents/memory",
+                  "concepts/teams/memory",
+                  "concepts/memory/production-best-practices"
+                ]
+              },
+              {
+                "group": "Reasoning",
+                "pages": [
+                  "concepts/reasoning/overview",
+                  "concepts/agents/reasoning",
+                  "concepts/teams/reasoning",
+                  "concepts/reasoning/reasoning-models",
+                  "concepts/reasoning/reasoning-tools",
+                  "concepts/reasoning/reasoning-agents"
                 ]
               },
               {
@@ -271,6 +216,8 @@
                   "concepts/knowledge/overview",
                   "concepts/knowledge/how-it-works",
                   "concepts/knowledge/getting-started",
+                  "concepts/agents/knowledge",
+                  "concepts/teams/knowledge",
                   {
                     "group": "Core Concepts",
                     "pages": [
@@ -362,185 +309,49 @@
                 ]
               },
               {
-                "group": "Memory",
+                "group": "Dependencies",
                 "pages": [
-                  "concepts/memory/overview",
-                  "concepts/memory/working-with-memories",
-                  "concepts/memory/production-best-practices"
+                  "concepts/dependencies/overview",
+                  "concepts/agents/dependencies",
+                  "concepts/teams/dependencies"
                 ]
               },
               {
-                "group": "Reasoning",
+                "group": "Hooks & Guardrails",
                 "pages": [
-                  "concepts/reasoning/overview",
-                  "concepts/reasoning/reasoning-models",
-                  "concepts/reasoning/reasoning-tools",
-                  "concepts/reasoning/reasoning-agents"
+                  "concepts/hooks/overview",
+                  "concepts/agents/pre-hooks-and-post-hooks",
+                  "concepts/teams/pre-hooks-and-post-hooks",
+                  "concepts/agents/guardrails",
+                  "concepts/teams/guardrails",
+                  {
+                    "group": "Guardrails",
+                    "pages": [
+                      "concepts/guardrails/overview",
+                      "concepts/agents/guardrails/prompt-injection",
+                      "concepts/agents/guardrails/pii",
+                      "concepts/agents/guardrails/openai-moderation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Models",
+                "pages": [
+                  "concepts/models/overview",
+                  "concepts/models/model-as-string",
+                  "concepts/models/compatibility",
+                  "concepts/models/cache-response"
                 ]
               },
               {
                 "group": "Tools",
                 "pages": [
                   "concepts/tools/overview",
+                  "concepts/agents/tools",
+                  "concepts/teams/tools",
                   "concepts/tools/custom-tools",
                   "concepts/tools/hooks",
-                  {
-                    "group": "Toolkits",
-                    "pages": [
-                      "concepts/tools/toolkits/toolkits",
-                      {
-                        "group": "Search",
-                        "pages": [
-                          "concepts/tools/toolkits/search/arxiv",
-                          "concepts/tools/toolkits/search/baidusearch",
-                          "concepts/tools/toolkits/search/duckduckgo",
-                          "concepts/tools/toolkits/search/exa",
-                          "concepts/tools/toolkits/search/googlesearch",
-                          "concepts/tools/toolkits/search/hackernews",
-                          "concepts/tools/toolkits/search/linkup",
-                          "concepts/tools/toolkits/search/pubmed",
-                          "concepts/tools/toolkits/search/searxng",
-                          "concepts/tools/toolkits/search/serpapi",
-                          "concepts/tools/toolkits/search/serper",
-                          "concepts/tools/toolkits/search/tavily",
-                          "concepts/tools/toolkits/search/valyu",
-                          "concepts/tools/toolkits/search/wikipedia",
-                          "concepts/tools/toolkits/search/bravesearch"
-                        ]
-                      },
-                      {
-                        "group": "Social",
-                        "pages": [
-                          "concepts/tools/toolkits/social/discord",
-                          "concepts/tools/toolkits/social/email",
-                          "concepts/tools/toolkits/social/gmail",
-                          "concepts/tools/toolkits/social/reddit",
-                          "concepts/tools/toolkits/social/slack",
-                          "concepts/tools/toolkits/social/telegram",
-                          "concepts/tools/toolkits/social/twilio",
-                          "concepts/tools/toolkits/social/webex",
-                          "concepts/tools/toolkits/social/whatsapp",
-                          "concepts/tools/toolkits/social/x",
-                          "concepts/tools/toolkits/social/zoom"
-                        ]
-                      },
-                      {
-                        "group": "Web Scraping",
-                        "pages": [
-                          "concepts/tools/toolkits/web_scrape/agentql",
-                          "concepts/tools/toolkits/web_scrape/browserbase",
-                          "concepts/tools/toolkits/web_scrape/crawl4ai",
-                          "concepts/tools/toolkits/web_scrape/firecrawl",
-                          "concepts/tools/toolkits/web_scrape/jina_reader",
-                          "concepts/tools/toolkits/web_scrape/newspaper",
-                          "concepts/tools/toolkits/web_scrape/newspaper4k",
-                          "concepts/tools/toolkits/web_scrape/spider",
-                          "concepts/tools/toolkits/web_scrape/trafilatura",
-                          "concepts/tools/toolkits/web_scrape/website",
-                          "concepts/tools/toolkits/web_scrape/scrapegraph",
-                          "concepts/tools/toolkits/web_scrape/oxylabs",
-                          "concepts/tools/toolkits/web_scrape/brightdata"
-                        ]
-                      },
-                      {
-                        "group": "Data",
-                        "pages": [
-                          "concepts/tools/toolkits/database/csv",
-                          "concepts/tools/toolkits/database/duckdb",
-                          "concepts/tools/toolkits/database/google_bigquery",
-                          "concepts/tools/toolkits/database/neo4j",
-                          "concepts/tools/toolkits/database/pandas",
-                          "concepts/tools/toolkits/database/postgres",
-                          "concepts/tools/toolkits/database/sql",
-                          "concepts/tools/toolkits/database/zep"
-                        ]
-                      },
-                      {
-                        "group": "Local",
-                        "pages": [
-                          "concepts/tools/toolkits/local/calculator",
-                          "concepts/tools/toolkits/local/docker",
-                          "concepts/tools/toolkits/local/file",
-                          "concepts/tools/toolkits/local/local_file_system",
-                          "concepts/tools/toolkits/local/python",
-                          "concepts/tools/toolkits/local/shell",
-                          "concepts/tools/toolkits/local/sleep"
-                        ]
-                      },
-                      {
-                        "group": "File Generation",
-                        "pages": [
-                          "concepts/tools/toolkits/file-generation/file-generation"
-                        ]
-                      },
-                      {
-                        "group": "Models",
-                        "pages": [
-                          "concepts/tools/toolkits/models/azure_openai",
-                          "concepts/tools/toolkits/models/gemini",
-                          "concepts/tools/toolkits/models/groq",
-                          "concepts/tools/toolkits/models/morph",
-                          "concepts/tools/toolkits/models/nebius",
-                          "concepts/tools/toolkits/models/openai"
-                        ]
-                      },
-                      {
-                        "group": "Additional Toolkits",
-                        "pages": [
-                          "concepts/tools/toolkits/others/airflow",
-                          "concepts/tools/toolkits/others/apify",
-                          "concepts/tools/toolkits/others/aws_lambda",
-                          "concepts/tools/toolkits/others/aws_ses",
-                          "concepts/tools/toolkits/others/bitbucket",
-                          "concepts/tools/toolkits/others/brandfetch",
-                          "concepts/tools/toolkits/others/calcom",
-                          "concepts/tools/toolkits/others/cartesia",
-                          "concepts/tools/toolkits/others/clickup",
-                          "concepts/tools/toolkits/others/composio",
-                          "concepts/tools/toolkits/others/confluence",
-                          "concepts/tools/toolkits/others/custom_api",
-                          "concepts/tools/toolkits/others/dalle",
-                          "concepts/tools/toolkits/others/daytona",
-                          "concepts/tools/toolkits/others/desi_vocal",
-                          "concepts/tools/toolkits/others/eleven_labs",
-                          "concepts/tools/toolkits/others/e2b",
-                          "concepts/tools/toolkits/others/evm",
-                          "concepts/tools/toolkits/others/fal",
-                          "concepts/tools/toolkits/others/financial_datasets",
-                          "concepts/tools/toolkits/others/giphy",
-                          "concepts/tools/toolkits/others/github",
-                          "concepts/tools/toolkits/others/google_maps",
-                          "concepts/tools/toolkits/others/googlecalendar",
-                          "concepts/tools/toolkits/others/google_sheets",
-                          "concepts/tools/toolkits/others/jira",
-                          "concepts/tools/toolkits/others/knowledge",
-                          "concepts/tools/toolkits/others/linear",
-                          "concepts/tools/toolkits/others/lumalabs",
-                          "concepts/tools/toolkits/others/mem0",
-                          "concepts/tools/toolkits/others/memori",
-                          "concepts/tools/toolkits/others/mlx_transcribe",
-                          "concepts/tools/toolkits/others/models_labs",
-                          "concepts/tools/toolkits/others/moviepy",
-                          "concepts/tools/toolkits/others/notion",
-                          "concepts/tools/toolkits/others/opencv",
-                          "concepts/tools/toolkits/others/openbb",
-                          "concepts/tools/toolkits/others/openweather",
-                          "concepts/tools/toolkits/others/reasoning",
-                          "concepts/tools/toolkits/others/replicate",
-                          "concepts/tools/toolkits/others/resend",
-                          "concepts/tools/toolkits/others/todoist",
-                          "concepts/tools/toolkits/others/trello",
-                          "concepts/tools/toolkits/others/user_control_flow",
-                          "concepts/tools/toolkits/others/visualization",
-                          "concepts/tools/toolkits/others/web-browser",
-                          "concepts/tools/toolkits/others/webtools",
-                          "concepts/tools/toolkits/others/yfinance",
-                          "concepts/tools/toolkits/others/youtube",
-                          "concepts/tools/toolkits/others/zendesk"
-                        ]
-                      }
-                    ]
-                  },
                   {
                     "group": "MCP",
                     "pages": [
@@ -579,6 +390,8 @@
                 "group": "Multimodal",
                 "pages": [
                   "concepts/multimodal/overview",
+                  "concepts/agents/multimodal",
+                  "concepts/teams/multimodal",
                   {
                     "group": "Images",
                     "pages": [
@@ -620,22 +433,29 @@
                 "group": "Storage",
                 "pages": [
                   "concepts/db/overview",
-                  "concepts/db/postgres",
-                  "concepts/db/async_postgres",
-                  "concepts/db/mysql",
-                  "concepts/db/sqlite",
-                  "concepts/db/async_sqlite",
-                  "concepts/db/in_memory",
-                  "concepts/db/dynamodb",
-                  "concepts/db/mongodb",
-                  "concepts/db/async_mongo",
-                  "concepts/db/json",
-                  "concepts/db/singlestore",
-                  "concepts/db/redis",
-                  "concepts/db/gcs",
-                  "concepts/db/firestore",
-                  "concepts/db/supabase",
-                  "concepts/db/neon"
+                  "concepts/agents/storage",
+                  "concepts/teams/storage",
+                  {
+                    "group": "Storage Providers",
+                    "pages": [
+                      "concepts/db/postgres",
+                      "concepts/db/async_postgres",
+                      "concepts/db/mysql",
+                      "concepts/db/sqlite",
+                      "concepts/db/async_sqlite",
+                      "concepts/db/in_memory",
+                      "concepts/db/dynamodb",
+                      "concepts/db/mongodb",
+                      "concepts/db/async_mongo",
+                      "concepts/db/json",
+                      "concepts/db/singlestore",
+                      "concepts/db/redis",
+                      "concepts/db/gcs",
+                      "concepts/db/firestore",
+                      "concepts/db/supabase",
+                      "concepts/db/neon"
+                    ]
+                  }
                 ]
               },
               {
@@ -646,27 +466,278 @@
                   "concepts/evals/performance",
                   "concepts/evals/reliability"
                 ]
+              }
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              {
+                "group": "Model Providers",
+                "pages": [
+                  {
+                    "group": "Native Model Providers",
+                    "pages": [
+                      "concepts/models/anthropic",
+                      "concepts/models/cohere",
+                      "concepts/models/dashscope",
+                      "concepts/models/deepseek",
+                      "concepts/models/google",
+                      "concepts/models/meta",
+                      "concepts/models/mistral",
+                      {
+                        "group": "OpenAI",
+                        "pages": [
+                          "concepts/models/openai",
+                          "concepts/models/openai-responses"
+                        ]
+                      },
+                      "concepts/models/perplexity",
+                      "concepts/models/vercel",
+                      "concepts/models/xai"
+                    ]
+                  },
+                  {
+                    "group": "Local Model Providers",
+                    "pages": [
+                      "concepts/models/ollama",
+                      "concepts/models/llama_cpp",
+                      "concepts/models/lmstudio",
+                      "concepts/models/vllm"
+                    ]
+                  },
+                  {
+                    "group": "Cloud Model Providers",
+                    "pages": [
+                      {
+                        "group": "AWS",
+                        "pages": [
+                          "concepts/models/aws-bedrock",
+                          "concepts/models/aws-claude"
+                        ]
+                      },
+                      {
+                        "group": "Azure",
+                        "pages": [
+                          "concepts/models/azure-ai-foundry",
+                          "concepts/models/azure-openai"
+                        ]
+                      },
+                      "concepts/models/ibm-watsonx",
+                      {
+                        "group": "Vertex AI",
+                        "pages": ["concepts/models/vertexai-claude"]
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Model Gateways & Aggregators",
+                    "pages": [
+                      "concepts/models/aimlapi",
+                      "concepts/models/cometapi",
+                      "concepts/models/deepinfra",
+                      "concepts/models/fireworks",
+                      "concepts/models/groq",
+                      "concepts/models/huggingface",
+                      "concepts/models/langdb",
+                      {
+                        "group": "LiteLLM",
+                        "pages": [
+                          "concepts/models/litellm",
+                          "concepts/models/litellm_openai"
+                        ]
+                      },
+                      "concepts/models/nebius",
+                      "concepts/models/nexus",
+                      "concepts/models/nvidia",
+                      "concepts/models/openrouter",
+                      "concepts/models/portkey",
+                      "concepts/models/requesty",
+                      "concepts/models/sambanova",
+                      "concepts/models/siliconflow",
+                      "concepts/models/together"
+                    ]
+                  },
+                  "concepts/models/openai-like"
+                ]
+              },
+              {
+                "group": "Toolkits",
+                "pages": [
+                  "concepts/tools/toolkits/toolkits",
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "concepts/tools/toolkits/search/arxiv",
+                      "concepts/tools/toolkits/search/baidusearch",
+                      "concepts/tools/toolkits/search/duckduckgo",
+                      "concepts/tools/toolkits/search/exa",
+                      "concepts/tools/toolkits/search/googlesearch",
+                      "concepts/tools/toolkits/search/hackernews",
+                      "concepts/tools/toolkits/search/linkup",
+                      "concepts/tools/toolkits/search/pubmed",
+                      "concepts/tools/toolkits/search/searxng",
+                      "concepts/tools/toolkits/search/serpapi",
+                      "concepts/tools/toolkits/search/serper",
+                      "concepts/tools/toolkits/search/tavily",
+                      "concepts/tools/toolkits/search/valyu",
+                      "concepts/tools/toolkits/search/wikipedia",
+                      "concepts/tools/toolkits/search/bravesearch"
+                    ]
+                  },
+                  {
+                    "group": "Social",
+                    "pages": [
+                      "concepts/tools/toolkits/social/discord",
+                      "concepts/tools/toolkits/social/email",
+                      "concepts/tools/toolkits/social/gmail",
+                      "concepts/tools/toolkits/social/reddit",
+                      "concepts/tools/toolkits/social/slack",
+                      "concepts/tools/toolkits/social/telegram",
+                      "concepts/tools/toolkits/social/twilio",
+                      "concepts/tools/toolkits/social/webex",
+                      "concepts/tools/toolkits/social/whatsapp",
+                      "concepts/tools/toolkits/social/x",
+                      "concepts/tools/toolkits/social/zoom"
+                    ]
+                  },
+                  {
+                    "group": "Web Scraping",
+                    "pages": [
+                      "concepts/tools/toolkits/web_scrape/agentql",
+                      "concepts/tools/toolkits/web_scrape/browserbase",
+                      "concepts/tools/toolkits/web_scrape/crawl4ai",
+                      "concepts/tools/toolkits/web_scrape/firecrawl",
+                      "concepts/tools/toolkits/web_scrape/jina_reader",
+                      "concepts/tools/toolkits/web_scrape/newspaper",
+                      "concepts/tools/toolkits/web_scrape/newspaper4k",
+                      "concepts/tools/toolkits/web_scrape/spider",
+                      "concepts/tools/toolkits/web_scrape/trafilatura",
+                      "concepts/tools/toolkits/web_scrape/website",
+                      "concepts/tools/toolkits/web_scrape/scrapegraph",
+                      "concepts/tools/toolkits/web_scrape/oxylabs",
+                      "concepts/tools/toolkits/web_scrape/brightdata"
+                    ]
+                  },
+                  {
+                    "group": "Data",
+                    "pages": [
+                      "concepts/tools/toolkits/database/csv",
+                      "concepts/tools/toolkits/database/duckdb",
+                      "concepts/tools/toolkits/database/google_bigquery",
+                      "concepts/tools/toolkits/database/neo4j",
+                      "concepts/tools/toolkits/database/pandas",
+                      "concepts/tools/toolkits/database/postgres",
+                      "concepts/tools/toolkits/database/sql",
+                      "concepts/tools/toolkits/database/zep"
+                    ]
+                  },
+                  {
+                    "group": "Local",
+                    "pages": [
+                      "concepts/tools/toolkits/local/calculator",
+                      "concepts/tools/toolkits/local/docker",
+                      "concepts/tools/toolkits/local/file",
+                      "concepts/tools/toolkits/local/local_file_system",
+                      "concepts/tools/toolkits/local/python",
+                      "concepts/tools/toolkits/local/shell",
+                      "concepts/tools/toolkits/local/sleep"
+                    ]
+                  },
+                  {
+                    "group": "File Generation",
+                    "pages": [
+                      "concepts/tools/toolkits/file-generation/file-generation"
+                    ]
+                  },
+                  {
+                    "group": "Models",
+                    "pages": [
+                      "concepts/tools/toolkits/models/azure_openai",
+                      "concepts/tools/toolkits/models/gemini",
+                      "concepts/tools/toolkits/models/groq",
+                      "concepts/tools/toolkits/models/morph",
+                      "concepts/tools/toolkits/models/nebius",
+                      "concepts/tools/toolkits/models/openai"
+                    ]
+                  },
+                  {
+                    "group": "Additional Toolkits",
+                    "pages": [
+                      "concepts/tools/toolkits/others/airflow",
+                      "concepts/tools/toolkits/others/apify",
+                      "concepts/tools/toolkits/others/aws_lambda",
+                      "concepts/tools/toolkits/others/aws_ses",
+                      "concepts/tools/toolkits/others/bitbucket",
+                      "concepts/tools/toolkits/others/brandfetch",
+                      "concepts/tools/toolkits/others/calcom",
+                      "concepts/tools/toolkits/others/cartesia",
+                      "concepts/tools/toolkits/others/clickup",
+                      "concepts/tools/toolkits/others/composio",
+                      "concepts/tools/toolkits/others/confluence",
+                      "concepts/tools/toolkits/others/custom_api",
+                      "concepts/tools/toolkits/others/dalle",
+                      "concepts/tools/toolkits/others/daytona",
+                      "concepts/tools/toolkits/others/desi_vocal",
+                      "concepts/tools/toolkits/others/eleven_labs",
+                      "concepts/tools/toolkits/others/e2b",
+                      "concepts/tools/toolkits/others/evm",
+                      "concepts/tools/toolkits/others/fal",
+                      "concepts/tools/toolkits/others/financial_datasets",
+                      "concepts/tools/toolkits/others/giphy",
+                      "concepts/tools/toolkits/others/github",
+                      "concepts/tools/toolkits/others/google_maps",
+                      "concepts/tools/toolkits/others/googlecalendar",
+                      "concepts/tools/toolkits/others/google_sheets",
+                      "concepts/tools/toolkits/others/jira",
+                      "concepts/tools/toolkits/others/knowledge",
+                      "concepts/tools/toolkits/others/linear",
+                      "concepts/tools/toolkits/others/lumalabs",
+                      "concepts/tools/toolkits/others/mem0",
+                      "concepts/tools/toolkits/others/memori",
+                      "concepts/tools/toolkits/others/mlx_transcribe",
+                      "concepts/tools/toolkits/others/models_labs",
+                      "concepts/tools/toolkits/others/moviepy",
+                      "concepts/tools/toolkits/others/notion",
+                      "concepts/tools/toolkits/others/opencv",
+                      "concepts/tools/toolkits/others/openbb",
+                      "concepts/tools/toolkits/others/openweather",
+                      "concepts/tools/toolkits/others/reasoning",
+                      "concepts/tools/toolkits/others/replicate",
+                      "concepts/tools/toolkits/others/resend",
+                      "concepts/tools/toolkits/others/todoist",
+                      "concepts/tools/toolkits/others/trello",
+                      "concepts/tools/toolkits/others/user_control_flow",
+                      "concepts/tools/toolkits/others/visualization",
+                      "concepts/tools/toolkits/others/web-browser",
+                      "concepts/tools/toolkits/others/webtools",
+                      "concepts/tools/toolkits/others/yfinance",
+                      "concepts/tools/toolkits/others/youtube",
+                      "concepts/tools/toolkits/others/zendesk"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Observability",
+                "pages": [
+                  "integrations/observability/overview",
+                  "integrations/observability/agentops",
+                  "integrations/observability/arize",
+                  "integrations/observability/atla",
+                  "integrations/observability/langdb",
+                  "integrations/observability/langfuse",
+                  "integrations/observability/langsmith",
+                  "integrations/observability/langtrace",
+                  "integrations/observability/maxim",
+                  "integrations/observability/openlit",
+                  "integrations/observability/weave"
+                ]
               },
               {
                 "group": "Other Integrations",
                 "pages": [
                   "integrations/discord/overview",
-                  {
-                    "group": "Observability",
-                    "pages": [
-                      "integrations/observability/overview",
-                      "integrations/observability/agentops",
-                      "integrations/observability/arize",
-                      "integrations/observability/atla",
-                      "integrations/observability/langdb",
-                      "integrations/observability/langfuse",
-                      "integrations/observability/langsmith",
-                      "integrations/observability/langtrace",
-                      "integrations/observability/maxim",
-                      "integrations/observability/openlit",
-                      "integrations/observability/weave"
-                    ]
-                  },
                   {
                     "group": "Testing",
                     "pages": ["integrations/testing/scenario-testing"]
