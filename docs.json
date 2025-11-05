@@ -158,6 +158,16 @@
                   "concepts/memory/team",
                   "concepts/memory/production-best-practices"
                 ]
+              },
+              {
+                "group": "Knowledge",
+                "pages": [
+                  "concepts/knowledge/overview",
+                  "concepts/knowledge/how-it-works",
+                  "concepts/knowledge/getting-started",
+                  "concepts/knowledge/agent",
+                  "concepts/knowledge/team"
+                ]
               }
             ]
           },
@@ -209,21 +219,61 @@
                 ]
               },
               {
-                "group": "Knowledge",
+                "group": "Knowledge Concepts",
                 "pages": [
-                  "concepts/knowledge/overview",
-                  "concepts/knowledge/how-it-works",
-                  "concepts/knowledge/getting-started",
-                  "concepts/agents/knowledge",
-                  "concepts/teams/knowledge",
-                  {
-                    "group": "Core Concepts",
+                  "concepts/knowledge/terminology",
+                  "concepts/knowledge/knowledge-bases",
+                  "concepts/knowledge/content_types",
+                  "concepts/knowledge/content_db",
+                  { 
+                    "group": "Search & Retrieval",
                     "pages": [
-                      "concepts/knowledge/core-concepts/terminology",
-                      "concepts/knowledge/core-concepts/knowledge-bases",
-                      "concepts/knowledge/core-concepts/search-retrieval",
-                      "concepts/knowledge/content_types",
-                      "concepts/knowledge/content_db"
+                      "concepts/knowledge/search-retrieval",
+                      "concepts/knowledge/hybrid-search",
+                      "concepts/knowledge/custom-retriever"
+                    ]
+                  },
+                  "concepts/knowledge/readers",
+                  {
+                    "group": "Chunking",
+                    "pages": [
+                      "concepts/knowledge/chunking/overview",
+                      "concepts/knowledge/chunking/fixed-size-chunking",
+                      "concepts/knowledge/chunking/semantic-chunking",
+                      "concepts/knowledge/chunking/recursive-chunking",
+                      "concepts/knowledge/chunking/document-chunking",
+                      "concepts/knowledge/chunking/csv-row-chunking",
+                      "concepts/knowledge/chunking/markdown-chunking",
+                      "concepts/knowledge/chunking/agentic-chunking",
+                      "concepts/knowledge/chunking/custom-chunking"
+                    ]
+                  },
+                  {
+                    "group": "Embeddings",
+                    "pages": [
+                      "concepts/knowledge/embedder/overview",
+                      "concepts/knowledge/embedder/openai",
+                      "concepts/knowledge/embedder/gemini",
+                      "concepts/knowledge/embedder/ollama",
+                      "concepts/knowledge/embedder/azure_openai",
+                      "concepts/knowledge/embedder/cohere",
+                      "concepts/knowledge/embedder/fireworks",
+                      "concepts/knowledge/embedder/huggingface",
+                      "concepts/knowledge/embedder/mistral",
+                      "concepts/knowledge/embedder/nebius",
+                      "concepts/knowledge/embedder/qdrant_fastembed",
+                      "concepts/knowledge/embedder/sentencetransformers",
+                      "concepts/knowledge/embedder/together",
+                      "concepts/knowledge/embedder/voyageai",
+                      "concepts/knowledge/embedder/aws_bedrock"
+                    ]
+                  },
+                  {
+                    "group": "Filtering Results",
+                    "pages": [
+                      "concepts/knowledge/filters/overview",
+                      "concepts/knowledge/filters/manual-filters",
+                      "concepts/knowledge/filters/agentic-filters"
                     ]
                   },
                   {
@@ -247,71 +297,15 @@
                       "concepts/vectordb/lightrag"
                     ]
                   },
-                  {
-                    "group": "Building Knowledge Bases",
-                    "pages": [
-                      "concepts/knowledge/readers",
-                      {
-                        "group": "Chunking",
-                        "pages": [
-                          "concepts/knowledge/chunking/overview",
-                          "concepts/knowledge/chunking/fixed-size-chunking",
-                          "concepts/knowledge/chunking/semantic-chunking",
-                          "concepts/knowledge/chunking/recursive-chunking",
-                          "concepts/knowledge/chunking/document-chunking",
-                          "concepts/knowledge/chunking/csv-row-chunking",
-                          "concepts/knowledge/chunking/markdown-chunking",
-                          "concepts/knowledge/chunking/agentic-chunking",
-                          "concepts/knowledge/chunking/custom-chunking"
-                        ]
-                      },
-                      {
-                        "group": "Embeddings",
-                        "pages": [
-                          "concepts/knowledge/embedder/overview",
-                          "concepts/knowledge/embedder/openai",
-                          "concepts/knowledge/embedder/gemini",
-                          "concepts/knowledge/embedder/ollama",
-                          "concepts/knowledge/embedder/azure_openai",
-                          "concepts/knowledge/embedder/cohere",
-                          "concepts/knowledge/embedder/fireworks",
-                          "concepts/knowledge/embedder/huggingface",
-                          "concepts/knowledge/embedder/mistral",
-                          "concepts/knowledge/embedder/nebius",
-                          "concepts/knowledge/embedder/qdrant_fastembed",
-                          "concepts/knowledge/embedder/sentencetransformers",
-                          "concepts/knowledge/embedder/together",
-                          "concepts/knowledge/embedder/voyageai",
-                          "concepts/knowledge/embedder/aws_bedrock"
-                        ]
-                      },
-
-                      {
-                        "group": "Knowledge Filters",
-                        "pages": [
-                          "concepts/knowledge/filters/overview",
-                          "concepts/knowledge/filters/manual-filters",
-                          "concepts/knowledge/filters/agentic-filters"
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Advanced",
-                    "pages": [
-                      "concepts/knowledge/advanced/custom-retriever",
-                      "concepts/knowledge/advanced/hybrid-search",
-                      "concepts/knowledge/advanced/performance-tips"
-                    ]
-                  }
+                  "concepts/knowledge/performance-tips"
                 ]
               },
               {
                 "group": "Dependencies",
                 "pages": [
                   "concepts/dependencies/overview",
-                  "concepts/agents/dependencies",
-                  "concepts/teams/dependencies"
+                  "concepts/dependencies/agent",
+                  "concepts/dependencies/team"
                 ]
               },
               {
