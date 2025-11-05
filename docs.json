@@ -2973,6 +2973,14 @@
                 ]
               },
               {
+                "group": "Runs",
+                "pages": ["reference/run/run_context"]
+              },
+              {
+                "group": "Sessions",
+                "pages": ["reference/session/summary_manager"]
+              },
+              {
                 "group": "Models",
                 "pages": [
                   "reference/models/model",
@@ -3007,10 +3015,6 @@
                   "reference/models/openai_like",
                   "reference/models/ibm-watsonx"
                 ]
-              },
-              {
-                "group": "Sessions",
-                "pages": ["reference/session/summary_manager"]
               },
               {
                 "group": "Knowledge",
