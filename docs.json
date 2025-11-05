@@ -74,13 +74,12 @@
             "pages": [
               "introduction",
               "introduction/quickstart",
-              "introduction/performance",
-              "introduction/features",
+              "introduction/agent-engineering",
               "introduction/getting-help"
             ]
           },
           {
-            "group": "Fundamentals",
+            "group": "Basics",
             "pages": [
               {
                 "group": "Agents",
@@ -129,6 +128,90 @@
                   "concepts/workflows/early-stop",
                   "concepts/workflows/workflow-tools",
                   "concepts/workflows/background-execution"
+                ]
+              },
+              {
+                "group": "Input & Output",
+                "pages": [
+                  "concepts/input-output/overview",
+                  "concepts/input-output/type-safety",
+                  "concepts/input-output/agents",
+                  "concepts/input-output/teams",
+                  "concepts/input-output/workflows"
+                ]
+              },
+              {
+                "group": "Database",
+                "pages": [
+                  "concepts/database/overview",
+                  "concepts/database/agents",
+                  "concepts/database/teams",
+                  "concepts/database/workflows"
+                ]
+              },
+              {
+                "group": "Tools",
+                "pages": [
+                  "concepts/tools/overview",
+                  "concepts/agents/tools",
+                  "concepts/teams/tools",
+                  "concepts/tools/custom-tools",
+                  "concepts/tools/hooks",
+                  {
+                    "group": "MCP",
+                    "pages": [
+                      "concepts/tools/mcp/overview",
+                      "concepts/tools/mcp/mcp-toolbox",
+                      "concepts/tools/mcp/multiple-servers",
+                      {
+                        "group": "Transports",
+                        "pages": [
+                          "concepts/tools/mcp/transports/stdio",
+                          "concepts/tools/mcp/transports/streamable_http",
+                          "concepts/tools/mcp/transports/sse"
+                        ]
+                      },
+                      "concepts/tools/mcp/server-params"
+                    ]
+                  },
+                  {
+                    "group": "Reasoning Tools",
+                    "pages": [
+                      "concepts/tools/reasoning-tools/reasoning-tools",
+                      "concepts/tools/reasoning-tools/workflow-tools",
+                      "concepts/tools/reasoning-tools/knowledge-tools",
+                      "concepts/tools/reasoning-tools/memory-tools"
+                    ]
+                  },
+                  "concepts/tools/async-tools",
+                  "concepts/tools/tool-call-limit",
+                  "concepts/tools/exceptions",
+                  "concepts/tools/selecting-tools",
+                  "concepts/tools/caching",
+                  "concepts/tools/attaching-tools"
+                ]
+              },
+              {
+                "group": "Models",
+                "pages": [
+                  "concepts/models/overview",
+                  "concepts/models/model-as-string",
+                  "concepts/models/compatibility",
+                  "concepts/models/cache-response"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Context Engineering",
+            "pages": [
+              {
+                "group": "Overview",
+                "pages": [
+                  "concepts/context-engineering/overview",
+                  "concepts/context-engineering/agents",
+                  "concepts/context-engineering/teams",
+                  "concepts/context-engineering/workflows"
                 ]
               },
               {
@@ -301,7 +384,32 @@
                 ]
               },
               {
-                "group": "Dependencies",
+                "group": "Session State",
+                "pages": [
+                  "concepts/session-state/overview",
+                  "concepts/session-state/agents",
+                  "concepts/session-state/teams",
+                  "concepts/session-state/workflows"
+                ]
+              },
+              {
+                "group": "Session Summary",
+                "pages": [
+                  "concepts/session-summary/overview",
+                  "concepts/session-summary/agents",
+                  "concepts/session-summary/teams",
+                  "concepts/session-summary/workflows"
+                ]
+              },
+              {
+                "group": "Context Compression",
+                "pages": [
+                  "concepts/context-compression/forget-tool-calls",
+                  "concepts/context-compression/summary-plus-history"
+                ]
+              },
+              {
+                "group": "Dependency Injection",
                 "pages": [
                   "concepts/dependencies/overview",
                   "concepts/dependencies/agent",
@@ -309,110 +417,42 @@
                 ]
               },
               {
-                "group": "Hooks & Guardrails",
+                "group": "Culture",
+                "pages": [
+                  "concepts/culture/overview"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Execution Control",
+            "pages": [
+              {
+                "group": "Hooks",
                 "pages": [
                   "concepts/hooks/overview",
-                  "concepts/agents/pre-hooks-and-post-hooks",
-                  "concepts/teams/pre-hooks-and-post-hooks",
-                  "concepts/agents/guardrails",
-                  "concepts/teams/guardrails",
-                  {
-                    "group": "Guardrails",
-                    "pages": [
-                      "concepts/guardrails/overview",
-                      "concepts/agents/guardrails/prompt-injection",
-                      "concepts/agents/guardrails/pii",
-                      "concepts/agents/guardrails/openai-moderation"
-                    ]
-                  }
+                  "concepts/hooks/agents",
+                  "concepts/hooks/teams",
+                  "concepts/hooks/workflows",
+                  "concepts/hooks/tools"
                 ]
               },
               {
-                "group": "Models",
+                "group": "Guardrails",
                 "pages": [
-                  "concepts/models/overview",
-                  "concepts/models/model-as-string",
-                  "concepts/models/compatibility",
-                  "concepts/models/cache-response"
-                ]
-              },
-              {
-                "group": "Tools",
-                "pages": [
-                  "concepts/tools/overview",
-                  "concepts/agents/tools",
-                  "concepts/teams/tools",
-                  "concepts/tools/custom-tools",
-                  "concepts/tools/hooks",
                   {
-                    "group": "MCP",
+                    "group": "Agent Guardrails",
                     "pages": [
-                      "concepts/tools/mcp/overview",
-                      "concepts/tools/mcp/mcp-toolbox",
-                      "concepts/tools/mcp/multiple-servers",
-                      {
-                        "group": "Transports",
-                        "pages": [
-                          "concepts/tools/mcp/transports/stdio",
-                          "concepts/tools/mcp/transports/streamable_http",
-                          "concepts/tools/mcp/transports/sse"
-                        ]
-                      },
-                      "concepts/tools/mcp/server-params"
+                      "concepts/guardrails/agents",
+                      "concepts/guardrails/agents/prompt-injection",
+                      "concepts/guardrails/agents/pii",
+                      "concepts/guardrails/agents/openai-moderation"
                     ]
                   },
                   {
-                    "group": "Reasoning Tools",
+                    "group": "Team Guardrails",
                     "pages": [
-                      "concepts/tools/reasoning_tools/reasoning-tools",
-                      "concepts/tools/reasoning_tools/workflow-tools",
-                      "concepts/tools/reasoning_tools/knowledge-tools",
-                      "concepts/tools/reasoning_tools/memory-tools"
-                    ]
-                  },
-                  "concepts/tools/async-tools",
-                  "concepts/tools/tool-call-limit",
-                  "concepts/tools/exceptions",
-                  "concepts/tools/selecting-tools",
-                  "concepts/tools/caching",
-                  "concepts/tools/attaching-tools"
-                ]
-              },
-              {
-                "group": "Multimodal",
-                "pages": [
-                  "concepts/multimodal/overview",
-                  "concepts/agents/multimodal",
-                  "concepts/teams/multimodal",
-                  {
-                    "group": "Images",
-                    "pages": [
-                      "concepts/multimodal/images/image_input",
-                      "concepts/multimodal/images/image_output",
-                      "concepts/multimodal/images/image_generation"
-                    ]
-                  },
-                  {
-                    "group": "Audio",
-                    "pages": [
-                      "concepts/multimodal/audio/audio_input",
-                      "concepts/multimodal/audio/audio_generation",
-                      "concepts/multimodal/audio/audio_output",
-                      "concepts/multimodal/audio/speech-to-text"
-                    ]
-                  },
-                  {
-                    "group": "Video",
-                    "pages": [
-                      "concepts/multimodal/video/video_input",
-                      "concepts/multimodal/video/video_generation"
-                    ]
-                  },
-                  {
-                    "group": "Files",
-                    "pages": [
-                      "concepts/multimodal/files/file_input",
-                      "concepts/multimodal/files/file_generation"
+                      "concepts/guardrails/teams"
                     ]
                   }
                 ]
@@ -421,47 +461,8 @@
                 "group": "Human-in-the-Loop",
                 "pages": ["concepts/hitl/overview"]
               },
-              {
-                "group": "Storage",
-                "pages": [
-                  "concepts/db/overview",
-                  "concepts/agents/storage",
-                  "concepts/teams/storage",
-                  {
-                    "group": "Storage Providers",
-                    "pages": [
-                      "concepts/db/postgres",
-                      "concepts/db/async_postgres",
-                      "concepts/db/mysql",
-                      "concepts/db/sqlite",
-                      "concepts/db/async_sqlite",
-                      "concepts/db/in_memory",
-                      "concepts/db/dynamodb",
-                      "concepts/db/mongodb",
-                      "concepts/db/async_mongo",
-                      "concepts/db/json",
-                      "concepts/db/singlestore",
-                      "concepts/db/redis",
-                      "concepts/db/gcs",
-                      "concepts/db/firestore",
-                      "concepts/db/supabase",
-                      "concepts/db/neon"
-                    ]
-                  }
-                ]
-              },
-              {
-                "group": "Evals",
-                "pages": [
-                  "concepts/evals/overview",
-                  "concepts/evals/accuracy",
-                  "concepts/evals/performance",
-                  "concepts/evals/reliability"
-                ]
-              },
-              "concepts/run-cancellation",
-              "concepts/custom-logging",
-              "concepts/telemetry"
+              "concepts/pause-and-resume-run",
+              "concepts/cancel-run"
             ]
           },
           {
@@ -742,7 +743,72 @@
             ]
           },
           {
-            "group": "Help",
+            "group": "Other",
+            "pages": [
+              {
+                "group": "Reasoning",
+                "pages": [
+                  "concepts/reasoning/overview",
+                  "concepts/agents/reasoning",
+                  "concepts/teams/reasoning",
+                  "concepts/reasoning/reasoning-models",
+                  "concepts/reasoning/reasoning-tools",
+                  "concepts/reasoning/reasoning-agents"
+                ]
+              },
+              {
+                "group": "Multimodal",
+                "pages": [
+                  "concepts/multimodal/overview",
+                  "concepts/agents/multimodal",
+                  "concepts/teams/multimodal",
+                  {
+                    "group": "Images",
+                    "pages": [
+                      "concepts/multimodal/images/image_input",
+                      "concepts/multimodal/images/image_output",
+                      "concepts/multimodal/images/image_generation"
+                    ]
+                  },
+                  {
+                    "group": "Audio",
+                    "pages": [
+                      "concepts/multimodal/audio/audio_input",
+                      "concepts/multimodal/audio/audio_generation",
+                      "concepts/multimodal/audio/audio_output",
+                      "concepts/multimodal/audio/speech-to-text"
+                    ]
+                  },
+                  {
+                    "group": "Video",
+                    "pages": [
+                      "concepts/multimodal/video/video_input",
+                      "concepts/multimodal/video/video_generation"
+                    ]
+                  },
+                  {
+                    "group": "Files",
+                    "pages": [
+                      "concepts/multimodal/files/file_input",
+                      "concepts/multimodal/files/file_generation"
+                    ]
+                  }
+                ]
+              },
+              {
+                "group": "Evals",
+                "pages": [
+                  "concepts/evals/overview",
+                  "concepts/evals/accuracy",
+                  "concepts/evals/performance",
+                  "concepts/evals/reliability"
+                ]
+              },
+              "concepts/telemetry"
+            ]
+          },
+          {
+            "group": "How To",
             "pages": [
               "how-to/install",
               "how-to/v2-changelog",
