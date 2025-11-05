@@ -9,9 +9,7 @@ When we call `Team.run()`, it creates a stateless, singular Team run.
 
 But what if we want to continue this conversation i.e. have a multi-turn conversation? That's where "Sessions" come in. A session is collection of consecutive runs.
 
-In practice, a session in the context of a Team is a multi-turn conversation between a user and the Team. Using a `session_id`, we can connect the conversation history and state across multiple runs.
-
-See more details in the [Agent Sessions](/concepts/agents/sessions) documentation.
+In practice, a session in the context of a Team is a multi-turn conversation between a user and the Team "leader". Using a `session_id`, we can connect the conversation history and state across multiple runs.
 
 ## Multi-user, multi-session Teams
 
@@ -21,51 +19,53 @@ Set a `user_id` to connect a user to their sessions with the Team.
 
 In the example below, we set a `session_id` to demo how to have multi-turn conversations with multiple users at the same time.
 
-  ```python
-  from agno.team import Team
-  from agno.models.openai import OpenAIChat
-  from agno.db.sqlite import SqliteDb
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
 
-  db = SqliteDb(db_file="tmp/data.db")
+db = SqliteDb(db_file="tmp/data.db")
 
-  team = Team(
-      model=OpenAIChat(id="gpt-5-mini"),
-      members=[
-          Agent(name="Agent 1", role="You answer questions in English"),
-          Agent(name="Agent 2", role="You answer questions in Chinese"),
-          Agent(name="Agent 3", role="You answer questions in French"),
-      ],
-      db=db,
-      respond_directly=True,
-  )
+team = Team(
+    model=OpenAIChat(id="gpt-5-mini"),
+    members=[
+        Agent(name="Agent 1", role="You answer questions in English"),
+        Agent(name="Agent 2", role="You answer questions in Chinese"),
+        Agent(name="Agent 3", role="You answer questions in French"),
+    ],
+    db=db,
+    respond_directly=True,
+    add_history_to_context=True,
+)
 
-  user_1_id = "user_101"
-  user_2_id = "user_102"
+user_1_id = "user_101"
+user_2_id = "user_102"
 
-  user_1_session_id = "session_101"
-  user_2_session_id = "session_102"
+user_1_session_id = "session_101"
+user_2_session_id = "session_102"
 
-  # Start the session with user 1 (This means "how are you?" in French)
-  team.print_response(
-      "comment ça va?",
-      user_id=user_1_id,
-      session_id=user_1_session_id,
-  )
-  # Continue the session with user 1 (This means "tell me a joke" in French)
-  team.print_response("Raconte-moi une blague.", user_id=user_1_id, session_id=user_1_session_id)
+# Start the session with user 1 (This means "how are you?" in French)
+team.print_response(
+    "comment ça va?",
+    user_id=user_1_id,
+    session_id=user_1_session_id,
+)
+# Continue the session with user 1 (This means "tell me a joke" in French)
+team.print_response("Raconte-moi une blague.", user_id=user_1_id, session_id=user_1_session_id)
 
-  # Start the session with user 2
-  team.print_response("Tell me about quantum physics.", user_id=user_2_id, session_id=user_2_session_id)
-  # Continue the session with user 2
-  team.print_response("What is the speed of light?", user_id=user_2_id, session_id=user_2_session_id)
+# Start the session with user 2
+team.print_response("Tell me about quantum physics.", user_id=user_2_id, session_id=user_2_session_id)
+# Continue the session with user 2
+team.print_response("What is the speed of light?", user_id=user_2_id, session_id=user_2_session_id)
 
-  # Ask the agent to give a summary of the conversation, this will use the history from the previous messages (but only for user 1)
-  team.print_response(
-      "Give me a summary of our conversation.",
-      user_id=user_2_id,
-      session_id=user_2_session_id,
-  )
-  ```
+# Ask the agent to give a summary of the conversation, this will use the history from the previous messages (but only for user 1)
+team.print_response(
+    "Give me a summary of our conversation.",
+    user_id=user_2_id,
+    session_id=user_2_session_id,
+)
+```
 
 ## Conversation history
 
@@ -167,7 +167,6 @@ As your sessions grow, you may want to decide what data exactly is persisted. Ag
 - **`store_tool_messages`** - Controls storage of tool calls and their results  
 - **`store_history_messages`** - Controls storage of history messages
 
-<Tip>
 ### How it works
 
 These flags only affect what gets **persisted to the database**. During execution, all data remains available to your team - media, tool results, and history are still accessible in the `RunOutput` object. The data is scrubbed right before saving to the database.
@@ -176,9 +175,14 @@ This means:
 - Your team functionality remains unchanged
 - Tools can access all data they need during execution
 - Only the database storage is optimized
-</Tip>
 
+<Warning>
+**Important considerations when using `store_tool_messages=False`:**
 
+- **Tool message pairs are removed together**: To maintain valid message sequences, when tool messages are removed from storage, the corresponding assistant messages that contains tool calls for that tool message are also removed. Most model providers require a strict "tool call pair"
+
+- **Metrics will still consider the tokens spent on the deleted messages**: Your run metrics will still reflect the **actual tokens used during execution**, including the tool calls and results.
+</Warning>
 
 ## Developer Resources
 

@@ -148,6 +148,16 @@
                     ]
                   }
                 ]
+              },
+              {
+                "group": "Memory",
+                "pages": [
+                  "concepts/memory/overview",
+                  "concepts/memory/working-with-memories",
+                  "concepts/memory/agent",
+                  "concepts/memory/team",
+                  "concepts/memory/production-best-practices"
+                ]
               }
             ]
           },
@@ -158,53 +168,41 @@
                 "group": "Chat History",
                 "pages": [
                   "concepts/chat_history/overview",
-                  "concepts/agents/chat_history",
-                  "concepts/teams/chat_history",
-                  "concepts/workflows/workflow_with_history"
+                  "concepts/chat_history/agent",
+                  "concepts/chat_history/team",
+                  "concepts/chat_history/workflow"
                 ]
               },
               {
                 "group": "Structured Input & Output",
                 "pages": [
-                  "concepts/structured_input_output/overview",
-                  "concepts/agents/input-output",
-                  "concepts/teams/input-output",
-                  "concepts/workflows/input-and-output"
+                  "concepts/input_output/overview",
+                  "concepts/input_output/agent",
+                  "concepts/input_output/team",
+                  "concepts/input_output/workflow"
                 ]
               },
               {
                 "group": "Context Engineering",
                 "pages": [
-                  "concepts/context_engineering/overview",
-                  "concepts/agents/context",
-                  "concepts/teams/context"
+                  "concepts/context/overview",
+                  "concepts/context/agent",
+                  "concepts/context/team"
                 ]
               },
               {
                 "group": "State Management",
                 "pages": [
-                  "concepts/state_management/overview",
-                  "concepts/agents/state",
-                  "concepts/teams/state",
-                  "concepts/workflows/workflow_session_state"
-                ]
-              },
-              {
-                "group": "Memory",
-                "pages": [
-                  "concepts/memory/overview",
-                  "concepts/memory/working-with-memories",
-                  "concepts/agents/memory",
-                  "concepts/teams/memory",
-                  "concepts/memory/production-best-practices"
+                  "concepts/state/overview",
+                  "concepts/state/agent",
+                  "concepts/state/team",
+                  "concepts/state/workflow"
                 ]
               },
               {
                 "group": "Reasoning",
                 "pages": [
                   "concepts/reasoning/overview",
-                  "concepts/agents/reasoning",
-                  "concepts/teams/reasoning",
                   "concepts/reasoning/reasoning-models",
                   "concepts/reasoning/reasoning-tools",
                   "concepts/reasoning/reasoning-agents"
