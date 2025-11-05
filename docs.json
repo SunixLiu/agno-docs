@@ -80,7 +80,7 @@
             ]
           },
           {
-            "group": "Concepts",
+            "group": "Fundamentals",
             "pages": [
               {
                 "group": "Agents",
@@ -88,9 +88,7 @@
                   "concepts/agents/overview",
                   "concepts/agents/building-agents",
                   "concepts/agents/running-agents",
-                  "concepts/agents/debugging-agents",
-                  "concepts/agents/run-cancel",
-                  "concepts/agents/custom-logger"
+                  "concepts/agents/debugging-agents"
                 ]
               },
               {
@@ -100,9 +98,7 @@
                   "concepts/teams/building-teams",
                   "concepts/teams/running-teams",
                   "concepts/teams/delegation",
-                  "concepts/teams/debugging-teams",
-                  "concepts/teams/run-cancel",
-                  "concepts/teams/custom-logger"
+                  "concepts/teams/debugging-teams"
                 ]
               },
               {
@@ -131,7 +127,6 @@
                   "concepts/workflows/conversational-workflows",
                   "concepts/workflows/access-previous-steps",
                   "concepts/workflows/early-stop",
-                  "concepts/workflows/cancel-workflow",
                   "concepts/workflows/workflow-tools",
                   "concepts/workflows/background-execution"
                 ]
@@ -153,7 +148,12 @@
                     ]
                   }
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "group": "Learn",
+            "pages": [
               {
                 "group": "Chat History",
                 "pages": [
@@ -466,7 +466,10 @@
                   "concepts/evals/performance",
                   "concepts/evals/reliability"
                 ]
-              }
+              },
+              "concepts/run-cancellation",
+              "concepts/custom-logging",
+              "concepts/telemetry"
             ]
           },
           {
@@ -743,8 +746,7 @@
                     "pages": ["integrations/testing/scenario-testing"]
                   }
                 ]
-              },
-              "concepts/telemetry"
+              }
             ]
           },
           {
