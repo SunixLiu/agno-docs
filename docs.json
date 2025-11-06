@@ -268,7 +268,14 @@
                   "concepts/tools/overview",
                   "concepts/tools/agent",
                   "concepts/tools/team",
-                  "concepts/tools/custom-tools",
+                  {
+                    "group": "Creating Tools",
+                    "pages": [
+                      "concepts/tools/creating-tools/overview",
+                      "concepts/tools/creating-tools/python-functions",
+                      "concepts/tools/creating-tools/toolkits"
+                    ]
+                  },
                   "concepts/tools/hooks",
                   {
                     "group": "MCP",
@@ -296,12 +303,11 @@
                       "concepts/tools/reasoning_tools/memory-tools"
                     ]
                   },
-                  "concepts/tools/async-tools",
                   "concepts/tools/tool-call-limit",
-                  "concepts/tools/exceptions",
                   "concepts/tools/selecting-tools",
                   "concepts/tools/caching",
-                  "concepts/tools/attaching-tools"
+                  "concepts/tools/attaching-tools",
+                  "concepts/tools/exceptions"
                 ]
               }
             ]
@@ -1035,12 +1041,6 @@
             ]
           },
           {
-            "group": "AgentUI",
-            "pages": [
-              "agent-os/agent-ui/overview"
-            ]
-          },
-          {
             "group": "Examples",
             "pages": [
               "examples/agent-os/demo",
@@ -1102,6 +1102,12 @@
                   }
                 ]
               }
+            ]
+          },
+          {
+            "group": "AgentUI",
+            "pages": [
+              "agent-os/agent-ui/overview"
             ]
           }
         ]
@@ -3190,6 +3196,13 @@
                 ]
               },
               {
+                "group": "Tools",
+                "pages": [
+                  "reference/tools/decorator",
+                  "reference/tools/toolkit"
+                ]
+              },
+              {
                 "group": "Knowledge",
                 "pages": [
                   "reference/knowledge/knowledge",
@@ -3357,11 +3370,11 @@
     },
     {
       "source": "/agents/structured-output",
-      "destination": "/concepts/agents/input-output"
+      "destination": "/concepts/input_output/agent"
     },
     {
       "source": "/agents/context",
-      "destination": "/concepts/agents/context"
+      "destination": "/concepts/context/agent"
     },
     {
       "source": "/agents/multimodal",
@@ -3389,7 +3402,7 @@
     },
     {
       "source": "/applications/fastapi/introduction",
-      "destination": "/agent-os/customize/custom-fastapi"
+      "destination": "/agent-os/custom-fastapi/overview"
     },
     {
       "source": "/applications/playground/introduction",
@@ -3433,7 +3446,7 @@
     },
     {
       "source": "/embedder/nebius",
-      "destination": "/concepts/knowledge/embedder/aws_bedrock"
+      "destination": "/concepts/knowledge/embedder/nebius"
     },
     {
       "source": "/embedder/openai",
@@ -3493,11 +3506,11 @@
     },
     {
       "source": "/agent-os/configuration",
-      "destination": "/agent-os/customize/config"
+      "destination": "/agent-os/config"
     },
     {
       "source": "/agent-ui/introduction",
-      "destination": "/agent-os/agent-ui"
+      "destination": "/agent-os/agent-ui/overview"
     },
     {
       "source": "/concepts/knowledge/vectordb/lightrag",

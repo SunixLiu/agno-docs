@@ -1,16 +1,10 @@
 ---
-title: Creating your own tools
-description: Learn how to write your own tools and how to use the `@tool` decorator to modify the behavior of a tool.
+title: Python Functions as Tools
+sidebarTitle: Python Functions as Tools
+description: Learn how to create tools with python functions.
 ---
 
-In most production cases, you will need to write your own tools. Which is why we're focused on provide the best tool-use experience in Agno.
-
-The rule is simple:
-
-- Any Python function can be used as a tool by an Agent.
-- Use the `@tool` decorator to modify what happens before and after this tool is called.
-
-## Python Functions as Tools
+Any python function can be used as a tool by an Agent.
 
 For example, here's how to use a `get_top_hackernews_stories` function as a tool:
 
@@ -113,73 +107,4 @@ agent = Agent(tools=[get_top_hackernews_stories])
 agent.print_response("Show me the top news from Hacker News")
 ```
 
-### @tool Parameters Reference
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `name` | `str` | Override for the function name |
-| `description` | `str` | Override for the function description |
-| `stop_after_tool_call` | `bool` | If True, the agent will stop after the function call |
-| `tool_hooks` | `list[Callable]` | List of hooks that wrap the function execution |
-| `pre_hook` | `Callable` | Hook to run before the function is executed |
-| `post_hook` | `Callable` | Hook to run after the function is executed |
-| `requires_confirmation` | `bool` | If True, requires user confirmation before execution |
-| `requires_user_input` | `bool` | If True, requires user input before execution |
-| `user_input_fields` | `list[str]` | List of fields that require user input |
-| `external_execution` | `bool` | If True, the tool will be executed outside of the agent's control |
-| `cache_results` | `bool` | If True, enable caching of function results |
-| `cache_dir` | `str` | Directory to store cache files |
-| `cache_ttl` | `int` | Time-to-live for cached results in seconds (default: 3600) |
-
-
-## Writing your own Toolkit
-
-Many advanced use-cases will require writing custom Toolkits. Here's the general flow:
-
-1. Create a class inheriting the `agno.tools.Toolkit` class.
-2. Add your functions to the class.
-3. **Important:** Include all the functions in the `tools` argument to the `Toolkit` constructor.
-
-Now your Toolkit is ready to use with an Agent. For example:
-
-```python shell_toolkit.py
-from typing import List
-
-from agno.agent import Agent
-from agno.tools import Toolkit
-from agno.utils.log import logger
-
-class ShellTools(Toolkit):
-    def __init__(self, **kwargs):
-        super().__init__(name="shell_tools", tools=[self.run_shell_command], **kwargs)
-
-    def run_shell_command(self, args: List[str], tail: int = 100) -> str:
-        """
-        Runs a shell command and returns the output or error.
-
-        Args:
-            args (List[str]): The command to run as a list of strings.
-            tail (int): The number of lines to return from the output.
-        Returns:
-            str: The output of the command.
-        """
-        import subprocess
-
-        logger.info(f"Running shell command: {args}")
-        try:
-            logger.info(f"Running shell command: {args}")
-            result = subprocess.run(args, capture_output=True, text=True)
-            logger.debug(f"Result: {result}")
-            logger.debug(f"Return code: {result.returncode}")
-            if result.returncode != 0:
-                return f"Error: {result.stderr}"
-            # return only the last n lines of the output
-            return "\n".join(result.stdout.split("\n")[-tail:])
-        except Exception as e:
-            logger.warning(f"Failed to run shell command: {e}")
-            return f"Error: {e}"
-
-agent = Agent(tools=[ShellTools()], markdown=True)
-agent.print_response("List all the files in my home directory.")
-
-```
+See the [@tool Decorator Reference](/reference/tools/decorator) for more details.
