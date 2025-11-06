@@ -199,8 +199,8 @@
                 "group": "Tools",
                 "pages": [
                   "concepts/tools/overview",
-                  "concepts/agents/tools",
-                  "concepts/teams/tools",
+                  "concepts/tools/agent",
+                  "concepts/tools/team",
                   "concepts/tools/custom-tools",
                   "concepts/tools/hooks",
                   {
@@ -394,27 +394,25 @@
               {
                 "group": "Hooks",
                 "pages": [
-                  "concepts/hooks/overview",
-                  "concepts/agents/pre-hooks-and-post-hooks",
-                  "concepts/teams/pre-hooks-and-post-hooks"
+                  "concepts/hooks/overview"
                 ]
               },
               {
                 "group": "Guardrails",
                 "pages": [
                   "concepts/guardrails/overview",
-                  "concepts/agents/guardrails",
-                  "concepts/teams/guardrails",
-                  "concepts/agents/guardrails/prompt-injection",
-                  "concepts/agents/guardrails/pii",
-                  "concepts/agents/guardrails/openai-moderation"
+                  "concepts/guardrails/included/prompt-injection",
+                  "concepts/guardrails/included/pii",
+                  "concepts/guardrails/included/openai-moderation"
                 ]
               },
               {
                 "group": "Human-in-the-Loop",
                 "pages": ["concepts/hitl/overview"]
               },
-              "concepts/run-cancellation"
+              "concepts/run-cancellation",
+              "concepts/custom-logging",
+              "concepts/telemetry"
             ]
           },
           {
@@ -433,8 +431,8 @@
                 "group": "Multimodal",
                 "pages": [
                   "concepts/multimodal/overview",
-                  "concepts/agents/multimodal",
-                  "concepts/teams/multimodal",
+                  "concepts/multimodal/agent",
+                  "concepts/multimodal/team",
                   {
                     "group": "Images",
                     "pages": [
@@ -476,9 +474,7 @@
                   "concepts/evals/performance",
                   "concepts/evals/reliability"
                 ]
-              },
-              "concepts/custom-logging",
-              "concepts/telemetry"
+              }
             ]
           },
           {
