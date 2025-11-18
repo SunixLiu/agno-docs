@@ -817,8 +817,8 @@
                   },
                   "basics/knowledge/terminology",
                   "basics/knowledge/knowledge-bases",
-                  "basics/knowledge/content_types",
-                  "basics/knowledge/content_db",
+                  "basics/knowledge/content-types",
+                  "basics/knowledge/content-db",
                   { 
                     "group": "Search & Retrieval",
                     "pages": [
@@ -1049,7 +1049,7 @@
                       {
                         "group": "Azure OpenAI",
                         "pages": [
-                          "basics/knowledge/embedder/azure_openai",
+                          "basics/knowledge/embedder/azure-openai",
                           "examples/basics/knowledge/embedders/azure-embedder"
                         ]
                       },
@@ -1105,7 +1105,7 @@
                       {
                         "group": "Qdrant FastEmbed",
                         "pages": [
-                          "basics/knowledge/embedder/qdrant_fastembed",
+                          "basics/knowledge/embedder/qdrant-fastembed",
                           "examples/basics/knowledge/embedders/qdrant-fastembed"
                         ]
                       },
@@ -1133,8 +1133,8 @@
                       {
                         "group": "AWS Bedrock",
                         "pages": [
-                          "basics/knowledge/embedder/aws_bedrock",
-                          "examples/basics/knowledge/embedders/aws-bedrock-embedder"
+                          "basics/knowledge/embedder/aws-bedrock",
+                          "examples/basicss/knowledge/embedders/aws-bedrock-embedder"
                         ]
                       },
                       {
