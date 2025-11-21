@@ -195,7 +195,7 @@ export const codeTabs = [
 <div className="relative mx-[calc(50%-50vw)] bg-[#f6f7f9] dark:bg-[#111113] py-16 md:py-16 border-y border-[#e5e7eb] dark:border-zinc-800 overflow-hidden">
   {/* Background Grid Pattern */}
   <div
-    className="absolute inset-0 pointer-events-none opacity-30 dark:opacity-10"
+    className="absolute inset-0 pointer-events-none opacity-30 dark:opacity-0"
     style={{
       backgroundImage:
         'linear-gradient(#d1d5db 1px, transparent 1px), linear-gradient(90deg, #d1d5db 1px, transparent 1px)',
@@ -268,7 +268,7 @@ export const codeTabs = [
       <div className="mt-12 grid w-full max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
         {/* Getting Started Card */}
         <a
-          href="/getting-started/quickstart"
+          href="/introduction"
           className="group relative flex flex-col gap-2 rounded-xl bg-[#f6f7f9] dark:bg-zinc-900 border border-[#e5e7eb] dark:border-zinc-700 p-5 transition hover:border-[#e5e7eb] dark:hover:border-zinc-600"
         >
           <span className="pointer-events-none absolute -left-2 -top-2 h-4 w-4 border-l-2 border-t-2 border-[#ff4017] opacity-0 transition-opacity group-hover:opacity-100" />
@@ -338,7 +338,6 @@ export const codeTabs = [
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Get Started</h3>
           <ul className="space-y-3">
             <li><a href="/getting-started/quickstart" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Quickstart</a></li>
-            <li><a href="/getting-started/agent-engineering" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Agent Engineering</a></li>
             <li><a href="/getting-started/getting-help" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Getting Help</a></li>
           </ul>
         </div>
