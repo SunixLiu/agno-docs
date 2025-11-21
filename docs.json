@@ -3239,8 +3239,13 @@
             "group": "Help",
             "pages": [
               "how-to/install",
-              "how-to/v2-changelog",
-              "how-to/v2-migration",
+              {
+                "group": "Migrate to Agno v2",
+                "pages": [
+                  "how-to/v2-changelog",
+                  "how-to/v2-migration"
+                ]
+              },
               "how-to/workflows-migration",
               "how-to/cursor-rules",
               "how-to/contribute"
