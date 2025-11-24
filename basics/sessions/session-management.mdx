@@ -46,6 +46,38 @@ team.run("Hello", session_id="user_123_session_789")
 ```
 </CodeGroup>
 
+## Access to Messages & Chat History
+
+You can access the messages in a session using the `get_messages` method:
+
+<CodeGroup>
+```python Agent
+session = agent.get_session(session_id="session_123")
+messages = session.get_messages()
+```
+
+```python Team
+session = team.get_session(session_id="session_456")
+messages = session.get_messages()
+```
+</CodeGroup>
+
+This gives you all messages for all runs in the session, including tool calls and system messages.
+
+For a simpler list of only user and assistant messages, you can use the `get_chat_history` method:
+
+<CodeGroup>
+```python Agent
+messages = agent.get_chat_history(session_id="session_123")
+```
+
+```python Team
+messages = team.get_chat_history(session_id="session_456")
+```
+</CodeGroup>
+
+See the detailed [AgentSession reference](/reference/agents/session) and [TeamSession reference](/reference/teams/session) for more information.
+
 ## Session Naming
 
 Session names are human-readable labels that make it easier to identify and manage conversations—perfect for inbox-style UIs, support queues, or linking a conversation back to an external ticket.
