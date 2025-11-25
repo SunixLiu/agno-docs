@@ -1595,6 +1595,8 @@
                               "integrations/models/native/anthropic/usage/skills",
                               "integrations/models/native/anthropic/usage/tool-use",
                               "integrations/models/native/anthropic/usage/structured-output",
+                              "integrations/models/native/anthropic/usage/structured-output-stream",
+                              "integrations/models/native/anthropic/usage/structured-output-strict-tools",
                               "integrations/models/native/anthropic/usage/knowledge",
                               "integrations/models/native/anthropic/usage/file-upload",
                               "integrations/models/native/anthropic/usage/image-input-bytes",
