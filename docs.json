@@ -629,7 +629,10 @@
               },
               {
                 "group": "Context Compression",
-                "pages": ["basics/context-compression/overview"]
+                "tag": "beta",
+                "pages": [
+                  "basics/context-compression/overview"
+                ]
               },
               {
                 "group": "Knowledge",
@@ -1102,6 +1105,7 @@
               },
               {
                 "group": "Culture",
+                "tag": "experimental",
                 "pages": ["basics/culture/overview"]
               },
               {
@@ -3413,6 +3417,12 @@
               {
                 "group": "Memory",
                 "pages": ["reference/memory/memory"]
+              },
+              {
+                "group": "Context Compression",
+                "pages": [
+                  "reference/compression/compression-manager"
+                ]
               },
               {
                 "group": "Database",
