@@ -314,6 +314,31 @@ print(f"Final session state: {agent.get_session_state()}")
 
 See more in [Agent State](/basics/state/agent).
 
+### Using the Agent or Team
+
+You can access the `Agent` or `Team` instance directly in your tool function by adding `agent` or `team` as a parameter. This gives you full access to the agent's or team's properties like model, instructions, etc.
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+def get_agent_instructions(agent: Agent) -> str:
+    """Get the model of the agent."""
+    return agent.instructions
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions="You are a helpful assistant that can answer questions about the model.",
+    tools=[get_agent_instructions],
+)
+
+agent.print_response("What is the instructions of the agent?", stream=True)
+```
+
+<Note>
+When using `team` as a parameter, make sure the tool is being used within a Team context. Similarly, use `agent` when the tool is used with an Agent.
+</Note>
+
 ### Media Parameters
 
 The built-in parameter `images`, `videos`, `audio`, and `files` allows tools to access and modify the input media to an agent.

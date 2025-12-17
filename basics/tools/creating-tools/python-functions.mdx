@@ -43,6 +43,39 @@ agent = Agent(tools=[get_top_hackernews_stories], markdown=True)
 agent.print_response("Summarize the top 5 stories on hackernews?", stream=True)
 ```
 
+## Accessing built-in parameters in Tools
+
+Agno automatically injects some built-in parameters into your tool functions, so you can easily gain access to important information and objects in your tools.
+
+These built-in parameters are:
+- `run_context`: The run context object from where you can access the session state, dependencies, metadata, etc.
+- `agent`: The agent object.
+- `team`: The team object.
+- `images`: The images object.
+- `videos`: The videos object.
+- `audio`: The audio object.
+- `files`: The files object.
+
+For example to access agent in a tool, you can do:
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+def get_agent_model(agent: Agent) -> str:
+    """Get the model of the agent."""
+    return agent.model.id
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[get_agent_model],
+)
+
+agent.print_response("What is the model of the agent?", stream=True)
+```
+
+See [Tool Built-in Parameters](/basics/tools/overview#tool-built-in-parameters) for more details on `run_context`, `agent`, `team`, and media parameters.
+
 ## Magic of the @tool decorator
 
 To modify the behavior of a tool, use the `@tool` decorator. Some notable features:
