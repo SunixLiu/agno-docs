@@ -5,18 +5,45 @@ description: "Secure your AgentOS instance with Role-Based Access Control (RBAC)
 keywords: [security, authorization, rbac, jwt, scopes, role-based access control]
 ---
 
-## Overview
+Securing your agentic system is critical and AgentOS comes with built-in support for 2 security mechanisms:
+- Basic Authentication -> Simple key validation for development or for use during the MVP stage of your product. Not recommended for production systems.
+- Role-Based Access Control (RBAC): JWT powered validation that ensures only users authorized to make a request, are able to.
 
-AgentOS provides built-in Role-Based Access Control (RBAC) to secure your entire agentic system. RBAC validates uses [JWT tokens](https://www.jwt.io/introduction) as a way to represent the identity of the user making the request.
-Whether this user is coming from the AgentOS Control Plane or your own application, the JWT token is validated and the scopes are checked against the required permissions for each endpoint.
+## Basic Authentication
 
-<Tip>
-RBAC is the recommended way to secure your AgentOS instance. It provides fine-grained permissions and per-resource access control.
-</Tip>
+Basic authentication provides simple bearer-token authentication for securing your AgentOS instance. This is also refered to as "Security Key Authentication".
+
+### Configuration
+
+Set the `OS_SECURITY_KEY` environment variable:
+
+```bash
+export OS_SECURITY_KEY="OSK_...your_key..."
+```
+
+And run your AgentOS application:
+
+```python agent_os.py
+from agno.os import AgentOS
+
+agent_os = AgentOS(
+    id="my-agent-os",
+    agents=[my_agent],
+)
+
+if __name__ == "__main__":
+    agent_os.serve(app="agent_os:app", reload=True)
+```
+
+<Note>
+When `OS_SECURITY_KEY` is configured, requests without a valid `Authorization: Bearer <key>` header return `401 Unauthorized`.
+</Note>
 
 ## Role-Based Access Control (RBAC)
 
-AgentOS supports built-in Role-Based Access Control (RBAC) to manage permissions for your agents, teams, and workflows. When enabled, RBAC validates JWT scopes against required permissions for each endpoint.
+AgentOS provides built-in Role-Based Access Control (RBAC) to secure your entire agentic system. 
+RBAC validates the identity of the user making the request using [JWT tokens](https://www.jwt.io/introduction).
+Whether this user is coming from the AgentOS Control Plane or your own application, the JWT token is validated and the scopes are checked against the required permissions for each endpoint.
 
 Learn more about how identity and authorization flow in AgentOS RBAC in the [RBAC](/agent-os/security/rbac) documentation.
 
@@ -34,7 +61,6 @@ agent_os = AgentOS(
     authorization=True,  # Enable authorization with RBAC
 )
 ```
-
 
 ### Configuring the Verification Key
 
@@ -86,57 +112,6 @@ See the [RBAC Documentation](/agent-os/security/rbac) for more details.
 
 For a complete list of all features, available scopes and default endpoint mappings, see [RBAC Documentation](/agent-os/security/rbac).
 
-## Developer Resources
-
-<CardGroup cols={2}>
-  <Card
-    title="RBAC Documentation"
-    icon="lock"
-    href="/agent-os/security/rbac"
-  >
-    Complete RBAC scopes, permissions, and access control configuration.
-  </Card>
-  <Card
-    title="JWT Middleware"
-    icon="key"
-    href="/agent-os/middleware/jwt"
-  >
-    JWT authentication with parameter injection and claims extraction.
-  </Card>
-</CardGroup>
-
----
-
-## Security Key Authentication
-
-Security Key authentication provides simple bearer-token authentication for securing your AgentOS instance.
-
-### Configuration
-
-Set the `OS_SECURITY_KEY` environment variable:
-
-```bash
-export OS_SECURITY_KEY="OSK_...your_key..."
-```
-
-And run your AgentOS application:
-
-```python agent_os.py
-from agno.os import AgentOS
-
-agent_os = AgentOS(
-    id="my-agent-os",
-    agents=[my_agent],
-)
-
-if __name__ == "__main__":
-    agent_os.serve(app="agent_os:app", reload=True)
-```
-
-<Note>
-When `OS_SECURITY_KEY` is configured, requests without a valid `Authorization: Bearer <key>` header return `401 Unauthorized`.
-</Note>
-
 ### Switching to RBAC
 
 If you are currently using Security Key authentication and want to switch to RBAC:
@@ -160,3 +135,22 @@ If `OS_SECURITY_KEY` remains set while RBAC is enabled, the security key checks 
 <Note>
 If you're experiencing authorization failures , check the [troubleshooting guide](/faq/rbac-auth-failed) for step-by-step resolution.
 </Note>
+
+## Developer Resources
+
+<CardGroup cols={2}>
+  <Card
+    title="RBAC Documentation"
+    icon="lock"
+    href="/agent-os/security/rbac"
+  >
+    Complete RBAC scopes, permissions, and access control configuration.
+  </Card>
+  <Card
+    title="JWT Middleware"
+    icon="key"
+    href="/agent-os/middleware/jwt"
+  >
+    JWT authentication with parameter injection and claims extraction.
+  </Card>
+</CardGroup>
