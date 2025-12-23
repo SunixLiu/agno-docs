@@ -3114,9 +3114,7 @@
               },
               {
                 "group": "Memory",
-                "pages": [
-                  "integrations/memory/memori"
-                ]
+                "pages": ["integrations/memory/memori"]
               },
               {
                 "group": "Observability",
@@ -3516,8 +3514,7 @@
                   "examples/use-cases/workflows/investment-report-generator",
                   "examples/use-cases/workflows/employee-recruiter",
                   "examples/use-cases/workflows/notion-knowledge-manager",
-                  "examples/use-cases/workflows/company-description",
-                  "examples/use-cases/workflows/speech-to-text-workflow"
+                  "examples/use-cases/workflows/company-description"
                 ]
               }
             ]
