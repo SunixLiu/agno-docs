@@ -1,0 +1,92 @@
+---
+title: 什么是Agno?
+description: "**Agno 是一个极其快速的多智能体框架、运行时和控制平面.**"
+keywords: [introduction]
+mode: "wide"
+---
+
+企业希望构建AI产品，将其作为安全的容器化服务运行在自己的云环境中，并通过美观的用户界面来监控、测试和管理其智能体系统。要实现这一点，远不止是在循环中调用大语言模型（LLM）API那么简单，而是需要一个经过精心设计的智能体平台。
+
+Agno 提供了一套统一的技术栈，用于构建、运行和管理多智能体系统:
+
+- **框架**: 构建具备记忆、知识、状态、安全护栏、人工干预（HITL - Human In The Loop）、上下文压缩、MCP、智能体间通信（A2A）以及100多种工具包的智能体、多智能体团队和工作流。
+- **AgentOS 运行时**: 在生产环境中运行您的多智能体系统，依托安全的无状态运行时和开箱即用的集成端点。
+- **AgentOS 控制平面**: 在不同环境中测试、监控和管理 AgentOS 部署，获得全面的运行可见性。您可以构建自己的 Web 界面，或使用 [AgentOS UI](https://os.agno.com).
+
+## 举例说明
+
+以下是一个智能体的示例：它连接到一个 MCP 服务器，在数据库中管理对话状态，并通过 FastAPI 应用提供服务，您可以使用[AgentOS UI](https://os.agno.com) 来与其进行聊天.
+
+```python agno_agent.py lines
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.anthropic import Claude
+from agno.os import AgentOS
+from agno.tools.mcp import MCPTools
+
+# ************* 创建 Agent *************
+agno_agent = Agent(
+    name="Agno Agent",
+    model=Claude(id="claude-sonnet-4-5"),
+    db=SqliteDb(db_file="agno.db"),
+    tools=[MCPTools(transport="streamable-http", url="https://docs.agno.com/mcp")],
+    add_history_to_context=True,
+    markdown=True,
+)
+
+# ************* 创建 AgentOS *************
+agent_os = AgentOS(agents=[agno_agent])
+app = agent_os.get_app()
+
+# ************* 运行 AgentOS *************
+if __name__ == "__main__":
+    agent_os.serve(app="agno_agent:app", reload=True)
+```
+
+## AgentOS - 用于多智能体系统的生产环境运行时
+
+构建智能体很容易，但将其作为安全、可扩展的服务运行却很难。AgentOS 通过提供一个高性能的运行时环境，解决了在生产环境中部署多智能体系统的难题。其核心特性包括：
+
+1. **预构建的 FastAPI 应用**: AgentOS 提供了一个开箱即用的 FastAPI 应用，用于运行您的智能体、团队和工作流，让您在构建 AI 产品时获得显著的先发优势。
+
+2. **集成的控制平面**: [AgentOS UI](https://os.agno.com) 直接连接到您的运行时环境，让您能够实时测试、监控和管理您的系统，并具备完整的运行可见性。
+
+3. **隐私优先设计**: AgentOS 完全运行在您的云环境中，确保数据的完全私密性。没有任何数据会离开您的环境，非常适合对安全性有高要求的企业。
+
+当您运行上面分享的 `agno_agent.py` 脚本时，会启动一个 FastAPI 应用，您可以将其连接到 [AgentOS UI](https://os.agno.com)。以下是它实际运行时的效果：
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agno-agent-chat.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 完整的智能体解决方案
+
+Agno 为企业构建智能体系统提供了完整的解决方案：
+
+- 构建智能体、多智能体团队和智能体工作流的最快框架。
+- 一个开箱即用的 FastAPI 应用，让您从第一天起就能构建 AI 产品。
+- 一个用于测试、监控和管理您系统的控制平面。
+
+我们采用了一种其他框架所不具备的全新架构：您的 AgentOS 安全地运行在您自己的云环境中，而控制平面则直接从您的浏览器与其连接。您无需将数据发送到任何外部服务，也无需支付数据留存费用，从而获得完全的隐私保护和掌控权。
+
+## 开始使用
+
+如果您是 Agno 的新手，请按照[快速入门指南](/get-started/quickstart)构建您的第一个智能体，并使用 AgentOS 运行它。
+
+之后，请查看[示例库](/examples/use-cases/agents/overview)，并使用 Agno 构建真实世界的应用程序。
+
+<Tip>
+
+如果您需要查阅 Agno 1.0 的文档，请访问 [docs-v1.agno.com](https://docs-v1.agno.com)。
+
+我们还为从 Agno 1.0 迁移的用户准备了[迁移指南](/how-to/v2-migration)。
+
+</Tip>
