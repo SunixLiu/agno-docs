@@ -1,0 +1,169 @@
+---
+title: 快速开始
+description: 使用Agno构建并运行你的第一个代理.
+keywords: [agno, agent, quickstart, tutorial]
+mode: "wide"
+---
+
+## 构建你的第一个代理
+
+**智能体（Agents）是人工智能程序，其中由语言模型控制执行流程。**
+
+与其做一个简单的演示，不如我们构建一个智能体（Agent），你可以通过连接任意的 MCP 服务器来对其进行扩展。我们将该智能体连接到 Agno MCP 服务器，并为其配备一个数据库，用于存储对话历史和状态。
+
+将以下代码保存为`agno_agent.py`
+
+```python agno_agent.py lines
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.anthropic import Claude
+from agno.os import AgentOS
+from agno.tools.mcp import MCPTools
+
+# Create the Agent
+agno_agent = Agent(
+    name="Agno Agent",
+    model=Claude(id="claude-sonnet-4-5"),
+    # Add a database to the Agent
+    db=SqliteDb(db_file="agno.db"),
+    # Add the Agno MCP server to the Agent
+    tools=[MCPTools(transport="streamable-http", url="https://docs.agno.com/mcp")],
+    # Add the previous session history to the context
+    add_history_to_context=True,
+    markdown=True,
+)
+
+
+# Create the AgentOS
+agent_os = AgentOS(agents=[agno_agent])
+# Get the FastAPI app for the AgentOS
+app = agent_os.get_app()
+```
+
+<Check>
+
+这25行代码中蕴含着惊人的超额收益（alpha）。
+
+你得到了一个具有记忆和状态的完整功能的智能体，它可以访问任何 MCP 服务器。它通过一个带有预构建端点的 FastAPI 应用程序提供，你可以使用这些端点来构建你的产品。
+
+</Check>
+
+## 运行你的 AgentOS
+
+AgentOS 为我们提供了一个内置可用 API 端点的 FastAPI 应用程序。让我们运行它。
+
+<Steps>
+  <Step title="设置你的虚拟环境">
+
+    <CodeGroup>
+    ```bash Mac
+    uv venv --python 3.12
+    source .venv/bin/activate
+    ```
+
+    ```bash Windows
+    uv venv --python 3.12
+    .venv/Scripts/activate
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="安装依赖包">
+
+    <CodeGroup>
+    ```bash Mac
+    uv pip install -U agno anthropic mcp 'fastapi[standard]' sqlalchemy
+    ```
+
+    ```bash Windows
+    uv pip install -U agno anthropic mcp 'fastapi[standard]' sqlalchemy
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="设置 Anthropic API key">
+
+    <CodeGroup>
+    ```bash Mac
+    export ANTHROPIC_API_KEY=sk-***
+    ```
+
+    ```bash Windows
+    setx ANTHROPIC_API_KEY sk-***
+    ```
+    </CodeGroup>
+
+  </Step>
+  <Step title="运行你的AgentOS">
+
+    ```shell
+    fastapi dev agno_agent.py
+    ```
+
+    AgentOS将运行在 `http://localhost:8000`
+
+  </Step>
+</Steps>
+
+## 连接你的AgentOS
+
+Agno 提供了一个精美的网页界面，可直接连接到你的 AgentOS，用于监控、管理和测试你的智能体系统。请打开 [os.agno.com](https://os.agno.com) 并登录你的账户。
+
+- 点击顶部导航栏中的 **“Add new OS”**。
+- 选择 **"Local"** 以连接到运行在你机器上的本地 AgentOS。
+- 输入你的 AgentOS 的端点 URL。缺省地址为 `http://localhost:8000`.
+- 为你的 AgentOS 起一个描述性的名称，比如 "Development OS" 或 "Local 8000"。
+- 点击 **"Connect"**.
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agent-os-connect-1.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+连接后，你将看到你的新OS，并带有实时状态指示器。
+
+## 与你的智能体（Agent）进行聊天
+
+接下来，让我们与我们的智能体（Agent）聊天，请转到侧边栏中的 `Chat` 部分并选择你的智能体。
+
+- 询问 "What is Agno?"，智能体将使用 Agno MCP 服务器来回答。
+- 智能体（Agents）会保留自己的历史记录、工具和指令；切换用户不会混淆上下文。
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/agno-agent-chat.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+<Tip>
+
+点击“Sessions”查看你的智能体的对话。这些数据存储在你的智能体的数据库中，因此无需外部跟踪服务。
+
+</Tip>
+
+## 预构建的 API 端点
+
+你的 AgentOS 生成的 FastAPI 应用程序附带了预构建的 SSE 兼容 API 端点，你可以在其基础上构建你的产品。你可以添加自己的路由、中间件或任何其他 FastAPI 功能。
+
+请在你的 AgentOS URL 的 `/docs` 路径下查看 API 端点，例如 http://localhost:8000/docs
+
+## 下一步
+
+- 了解如何 [构建智能体](/basics/agents/building-agents_cn) 以获得更多功能
+- 浏览 [示例](/examples/use-cases/agents/overview_cn) 以获取灵感
+- 阅读 [完整文档](/basics/agents/overview_cn) 以深入了解
+
+祝你构建愉快！
