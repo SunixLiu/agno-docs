@@ -443,6 +443,7 @@
                       "basics/tools/mcp/overview",
                       "basics/tools/mcp/mcp-toolbox",
                       "basics/tools/mcp/multiple-servers",
+                      "basics/tools/mcp/dynamic-headers",
                       {
                         "group": "Transports",
                         "pages": [
@@ -1601,6 +1602,15 @@
                       }
                     ]
                   }
+                ]
+              },
+              {
+                "group": "Skills",
+                "tag": "beta",
+                "pages": [
+                  "basics/skills/overview",
+                  "basics/skills/creating-skills",
+                  "basics/skills/loading-skills"
                 ]
               },
               "basics/custom-logging",
@@ -3877,9 +3887,9 @@
                 "group": "Tracing",
                 "tag": "beta",
                 "pages": [
-                  "reference-api/schema/tracing/list-traces",
-                  "reference-api/schema/tracing/get-trace-detail",
-                  "reference-api/schema/tracing/get-trace-session-stats"
+                  "reference-api/schema/traces/list-traces",
+                  "reference-api/schema/traces/get-trace-detail",
+                  "reference-api/schema/traces/get-trace-session-stats"
                 ]
               },
               {
