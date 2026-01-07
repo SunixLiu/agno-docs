@@ -19,7 +19,7 @@ from agno.team import RemoteTeam
 async def main():
     # Connect to a remote team
     team = RemoteTeam(
-        base_url="http://remote-server:7778",  # Use localhost for local testing
+        base_url="http://localhost:7778",  # Running on localhost for this example
         team_id="research-team",
     )
     
@@ -39,7 +39,7 @@ from agno.team import RemoteTeam
 from agno.run.team import RunContentEvent
 
 team = RemoteTeam(
-    base_url="http://remote-server:7778",  # Use localhost for local testing
+    base_url="http://localhost:7778",  # Running on localhost for this example
     team_id="research-team",
 )
 
@@ -60,7 +60,7 @@ Access the remote team's configuration:
 from agno.team import RemoteTeam
 
 team = RemoteTeam(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     team_id="research-team",
 )
 
@@ -104,7 +104,7 @@ For authenticated AgentOS instances:
 from agno.team import RemoteTeam
 
 team = RemoteTeam(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     team_id="research-team",
 )
 
@@ -121,7 +121,7 @@ from agno.team import RemoteTeam
 from agno.exceptions import RemoteServerUnavailableError
 
 team = RemoteTeam(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     team_id="research-team",
 )
 
@@ -142,7 +142,7 @@ except RemoteServerUnavailableError as e:
 from agno.team import RemoteTeam
 
 team = RemoteTeam(
-    base_url="http://localhost:7003/a2a/teams/my-team",
+    base_url="http://localhost:7778/a2a/teams/my-team",  # Running on localhost for this example
     team_id="my-team",
     protocol="a2a",
 )

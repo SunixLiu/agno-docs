@@ -19,7 +19,7 @@ from agno.agent import RemoteAgent
 async def main():
     # Connect to a remote agent
     agent = RemoteAgent(
-        base_url="http://remote-server:7778",  # Use localhost for local testing
+        base_url="http://localhost:7778",  # Running on localhost for this example
         agent_id="assistant-agent",
     )
     
@@ -38,7 +38,7 @@ Stream responses in real-time for a better user experience:
 from agno.agent import RemoteAgent
 
 agent = RemoteAgent(
-    base_url="http://remote-server:7778",  # Use localhost for local testing
+    base_url="http://localhost:7778",  # Running on localhost for this example
     agent_id="assistant-agent",
 )
 
@@ -58,7 +58,7 @@ Access the remote agent's configuration:
 from agno.agent import RemoteAgent
 
 agent = RemoteAgent(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     agent_id="assistant-agent",
 )
 
@@ -83,7 +83,7 @@ For authenticated AgentOS instances:
 from agno.agent import RemoteAgent
 
 agent = RemoteAgent(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     agent_id="assistant-agent",
 )
 
@@ -100,7 +100,7 @@ from agno.agent import RemoteAgent
 from agno.exceptions import RemoteServerUnavailableError
 
 agent = RemoteAgent(
-    base_url="http://localhost:7777",
+    base_url="http://localhost:7778",  # Running on localhost for this example
     agent_id="assistant-agent",
 )
 
@@ -121,7 +121,7 @@ except RemoteServerUnavailableError as e:
 from agno.agent import RemoteAgent
 
 agent = RemoteAgent(
-    base_url="http://localhost:7003/a2a/agents/my-agent",
+    base_url="http://localhost:7778/a2a/agents/my-agent",  # Running on localhost for this example
     agent_id="my-agent",
     protocol="a2a",
     a2a_protocol="rest",  # Agno A2A servers use REST protocol by default
@@ -138,7 +138,7 @@ from agno.agent import RemoteAgent
 
 # Connect to a Google ADK A2A server
 agent = RemoteAgent(
-    base_url="http://localhost:8001",
+    base_url="http://localhost:8001",  # Running on localhost for this example
     agent_id="facts_agent",
     protocol="a2a",
     a2a_protocol="json-rpc",  # Google ADK uses JSON-RPC
