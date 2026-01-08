@@ -1,0 +1,116 @@
+---
+title: 专为 Agent 工程设计
+sidebarTitle: Agent 工程
+mode: wide
+---
+
+Agno 是一个专为企业级打造的框架，专为多智能体系统而设计。Agno 专为生产环境部署而构建，提供了全面的工具，用于大规模构建、编排和管理复杂的智能体应用。
+
+## 核心原语
+
+<CardGroup cols={3}>
+  <Card
+    title="Agents"
+    icon="user-astronaut"
+    iconType="duotone"
+    href="/basics/agents/overview"
+  >
+    构建并运行具备自主决策能力的智能体。
+  </Card>
+  <Card
+    title="Teams"
+    icon="users"
+    iconType="duotone"
+    href="/basics/teams/overview"
+  >
+    编排[多智能体系统](/basics/teams/overview_cn), 让智能体之间既能协作又能各司其职.
+  </Card>
+  <Card
+    title="Workflows"
+    icon="diagram-project"
+    iconType="duotone"
+    href="/basics/workflows/overview_cn"
+  >
+    设计具有结构化执行模式的确定性的[智能体工作流](/basics/workflows/overview_cn) 
+
+  </Card>
+</CardGroup>
+
+## 上下文工程
+
+<CardGroup cols={3}>
+  <Card
+    title="Manage Context"
+    icon="brain"
+    iconType="duotone"
+    href="/basics/sessions/overview_cn"
+  >
+    代理，团队和工作流的高级 [上下文管理](/basics/sessions/overview_cn)。
+  </Card>
+  <Card
+    title="Chat History"
+    icon="users"
+    iconType="duotone"
+    href="/basics/chat-history/overview_cn"
+  >
+    跨智能体系统的全面 [聊天记录](/basics/chat-history/overview_cn)管理。
+  </Card>
+  <Card
+    title="State Management"
+    icon="database"
+    iconType="duotone"
+    href="/basics/state/overview"
+  >
+    面向持久化智能体应用的企业级 [状态管理](/basics/state/overview_cn)。
+  </Card>
+</CardGroup>
+
+### 核心能力
+
+- [**模型无关架构**](/basics/models/overview)：无缝集成任意 [大语言模型提供商](/basics/models/overview)，为您的智能体系统提供跨模型生态的灵活性。
+
+- [**类型安全的输入/输出**](/basics/input-output/overview)：通过[类型安全的接口](/basics/input-output/overview)强制执行结构化的输入和输出模式，以实现可预测、可组合的智能体行为。
+
+- [**动态上下文工程**](/basics/context/overview)：强大的[上下文注入](/basics/context/overview)功能，可将变量、状态和检索到的数据动态注入智能体上下文中，针对依赖驱动的多智能体架构进行了优化。
+
+### 记忆、知识与持久化
+
+- [**持久化存储**](/basics/database/overview)：企业级[数据库集成](/basics/database/overview)，支持智能体、团队和工作流持久保存会话历史、状态和消息，并提供完整的事务支持。
+
+- [**用户记忆**](/basics/memory/overview)：先进的[记忆系统](/basics/memory/overview)，使智能体能够在不同会话间保持和调用特定于用户的上下文，从而增强智能体交互的个性化体验。
+
+- [**智能体RAG**](/basics/knowledge/content-db)：生产就绪的[智能体检索增强生成](/basics/knowledge/content-db)，支持 20 多种向量数据库（在 Agno 中称为 **知识**），具备混合搜索和智能重排序功能。
+
+- [**文化（集体记忆）**](/basics/culture/overview)：跨[多智能体系统](/basics/culture/overview)累积的共享知识架构，实现集体智能和组织学习。
+
+### 执行与控制
+
+- [**人工介入**](/basics/hitl/overview)：原生支持[人工介入](/basics/hitl/overview)，用于确认、人工干预和外部工具执行，确保在关键智能体工作流中有人工监督。
+
+- [**护栏**](/basics/guardrails/overview)：全面的[安全防护系统](/basics/guardrails/overview)，用于智能体应用的验证、安全防护和提示词保护。
+
+- [**智能体生命周期钩子**](/basics/hooks/overview)：可扩展的[钩子系统](/basics/hooks/overview)，包含执行前和执行后钩子，用于验证、转换和监控智能体的输入和输出。
+
+- [**MCP 集成**](/basics/tools/mcp/overview)：一流支持[模型上下文协议 (MCP)](/basics/tools/mcp/overview)，实现智能体系统与外部服务的无缝集成。
+
+- [**工具包**](/integrations/toolkits/overview)：包含 120 多个[预构建工具包](/integrations/toolkits/overview)的庞大库，涵盖数千种工具，适用于数据处理、代码生成、网页自动化和企业级 API 集成等领域，随时可部署。
+
+### 运行时与评估
+
+- [**AgentOS 运行时**](/agent-os/overview)：生产就绪的 [基于 FastAPI 的运行时](/agent-os/overview)，具备兼容服务器发送事件 (SSE) 的端点，从第一天起即为面向企业部署而设计。
+
+- [**AgentOS 控制平面**](/agent-os/control-plane)：集成的 [控制平面界面](/agent-os/control-plane)，用于跨智能体、团队和工作流实时可视化、监控和调试智能体系统活动。
+
+- [**原生多模态**](/basics/multimodal/overview)：内置的 [多模态功能](/basics/multimodal/overview)，使智能体能够在统一的智能体工作流中处理和生成文本、图像、音频、视频和文件。
+
+- [**评估框架**](/basics/evals/overview)：全面的 [评估系统](/basics/evals/overview)，用于衡量各类智能体应用的准确性、性能和可靠性。
+
+### 安全与隐私
+
+- **隐私优先设计**：企业级隐私架构，所有智能体系统完全在您的基础设施内运行。控制平面直接从您的浏览器连接到您的 AgentOS——数据绝不会传输到外部服务。
+
+- **数据治理**：完全的数据主权，将数据安全存储在您的智能体数据库中，消除外部数据共享和供应商锁定，同时保持对敏感智能体工作流的完全控制。
+
+{/* - **访问控制**: 企业级[基于角色的访问控制 (RBAC)](/agent-os/security) 和精细的单智能体权限，以保护敏感上下文、工具和多智能体系统配置。 */}
+
+Agno 专为企业级智能体 AI 部署而设计，将世界级的开发者体验与生产级的性能、可靠性及安全性融为一体。
