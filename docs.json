@@ -443,6 +443,7 @@
                       "basics/tools/mcp/overview",
                       "basics/tools/mcp/mcp-toolbox",
                       "basics/tools/mcp/multiple-servers",
+                      "basics/tools/mcp/dynamic-headers",
                       {
                         "group": "Transports",
                         "pages": [
@@ -1515,7 +1516,8 @@
                     "group": "Usage",
                     "pages": [
                       "basics/tracing/usage/basic-agent-tracing",
-                      "basics/tracing/usage/basic-team-tracing"
+                      "basics/tracing/usage/basic-team-tracing",
+                      "basics/tracing/usage/basic-workflow-tracing"
                     ]
                   }
                 ]
@@ -1600,6 +1602,15 @@
                       }
                     ]
                   }
+                ]
+              },
+              {
+                "group": "Skills",
+                "tag": "beta",
+                "pages": [
+                  "basics/skills/overview",
+                  "basics/skills/creating-skills",
+                  "basics/skills/loading-skills"
                 ]
               },
               "basics/custom-logging",
@@ -3247,10 +3258,12 @@
               "agent-os/background-tasks/overview",
               "agent-os/lifespan",
               {
-                "group": "Client",
+                "group": "Clients",
                 "tag": "beta",
                 "pages": [
-                  "agent-os/client/overview"
+                  "agent-os/client/overview",
+                  "agent-os/client/agentos-client",
+                  "agent-os/client/a2a-client"
                 ]
               },
               {
@@ -3599,9 +3612,15 @@
                 "pages": [
                   "reference/agent-os/agent-os",
                   "reference/agent-os/configuration",
-                  "reference/agent-os/client",
                   "reference/agent-os/authorization-config",
                   "reference/agent-os/jwt-middleware"
+                ]
+              },
+              {
+                "group": "Clients",
+                "pages": [
+                  "reference/clients/agentos-client",
+                  "reference/clients/a2a-client"
                 ]
               },
               {
@@ -3868,9 +3887,9 @@
                 "group": "Tracing",
                 "tag": "beta",
                 "pages": [
-                  "reference-api/schema/tracing/list-traces",
-                  "reference-api/schema/tracing/get-trace-detail",
-                  "reference-api/schema/tracing/get-trace-session-stats"
+                  "reference-api/schema/traces/list-traces",
+                  "reference-api/schema/traces/get-trace-detail",
+                  "reference-api/schema/traces/get-trace-session-stats"
                 ]
               },
               {
