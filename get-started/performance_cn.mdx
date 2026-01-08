@@ -1,0 +1,96 @@
+---
+title: 性能
+description: 使用 Agno 开箱即获得极致性能。
+mode: wide
+---
+
+如果你正在使用 Agno 进行构建，你将默认获得同类最佳的性能。我们对性能的执着是必要的，因为即使是简单的 AI 工作流程也可能产生数百个智能体，而且许多任务都是长时间运行的——无状态、水平扩展性是成功的关键。
+
+在 Agno，我们在三个维度上优化性能：
+
+1. **智能体性能：** 我们优化静态操作（实例化、内存占用）和运行时操作（工具调用、内存更新、历史管理）。
+2. **系统性能：** AgentOS API 默认采用异步模式，具有最小的内存占用。系统是无状态且可水平扩展的，重点关注防止内存泄漏。它在知识摄取期间处理并行和批量嵌入生成、后台任务中的指标收集，以及其他系统级优化。
+3. **智能体的可靠性和准确性：** 通过评估（evals）进行监控，我们稍后将探讨这一点。
+
+## 智能体性能
+
+让我们测量实例化一个智能体所需的时间以及该智能体的内存占用。以下是数字（最后测量于2025年10月，在一台Apple M4 MacBook Pro上）：
+
+- **代理实例化:** 平均约为3微秒（3μs）
+- **内存占用:** 平均约为 6.6 KiB
+
+我们将展示 Agno 智能体实例化速度比 Langgraph 快 **529 倍**，比 PydanticAI 快 **57 倍**，比 CrewAI 快 **70 倍**。Agno 智能体还比 Langgraph 使用 **24 倍更低的内存**，比 PydanticAI 低 **4 倍**，比 CrewAI 低 **10 倍**。
+
+<Note>
+
+运行时性能受限于推理速度，难以准确基准测试，因此我们专注于最小化开销、减少内存使用以及并行化工具调用。
+
+</Note>
+
+### 实例化时间
+
+让我们测量具有 1 个工具的智能体的实例化时间。我们将运行 1000 次评估以获得基线测量值。我们将把 Agno 与 LangGraph、CrewAI 和 Pydantic AI 进行比较。
+
+<Note>
+
+此基准测试的代码可在 [此处](https://github.com/agno-agi/agno/tree/main/cookbook/evals/performance) 获取。你应在自己的机器上运行评估，请不要直接接受这些结果。
+
+</Note>
+
+```shell
+# 设置虚拟环境
+./scripts/perf_setup.sh
+source .venvs/perfenv/bin/activate
+
+# Agno
+python cookbook/evals/performance/instantiate_agent_with_tool.py
+
+# LangGraph
+python cookbook/evals/performance/comparison/langgraph_instantiation.py
+# CrewAI
+python cookbook/evals/performance/comparison/crewai_instantiation.py
+# Pydantic AI
+python cookbook/evals/performance/comparison/pydantic_ai_instantiation.py
+```
+
+LangGraph 在右侧，**让我们先启动它并给它一个先发优势**。然后是 CrewAI 和 Pydantic AI，最后是 Agno。Agno 显然会最先完成，但让我们看看差距有多大。
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/performance_benchmark.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+### 内存占用
+
+为了测量内存使用情况，我们使用 `tracemalloc`  库。我们首先通过运行一个空函数来计算基准内存使用量，然后运行该 Agent 1000 次并计算差值。这样可以得到 Agent 内存使用量的一个（相对）独立的测量结果。
+
+我们建议您在自己的机器上亲自运行评估，并深入研究代码以了解其工作原理。如果我们犯了错误，请务必告知我们。
+
+### 结果
+
+以 Agno 为基准，我们可以看到：
+
+| 指标             | Agno | Langgraph   | PydanticAI | CrewAI     |
+| ------------------ | ---- | ----------- | ---------- | ---------- |
+| **时间 (秒)** | 1×   | 529× slower | 57× slower | 70× slower |
+| **内存 (MiB)**   | 1×   | 24× higher  | 4× higher  | 10× higher |
+
+Exact numbers from the benchmark:
+
+| 指标             | Agno     | Langgraph | PydanticAI | CrewAI   |
+| ------------------ | -------- | --------- | ---------- | -------- |
+| **时间 (秒)** | 0.000003 | 0.001587  | 0.000170   | 0.000210 |
+| **内存 (MiB)**   | 0.006642 | 0.161435  | 0.028712   | 0.065652 |
+
+<Note>
+
+Agno 代理旨在追求性能，虽然我们分享了与其他框架的基准对比，但我们应该牢记，准确性和可靠性比速度更重要。
+
+</Note>
