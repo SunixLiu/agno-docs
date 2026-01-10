@@ -1,0 +1,78 @@
+---
+title: 构建智能体
+sidebarTitle: 构建智能体
+description: 学习如何使用 Agno 构建智能体。
+keywords: [agent, agents, ai agents, introduction]
+mode: wide
+---
+
+构建高效的智能体，应从简入手——仅需一个模型、一些工具和指令。待其运行顺畅后，再根据需要逐步增加更多功能。
+
+关键在于从定义明确的任务入手，例如报告生成、数据提取、分类、摘要、知识搜索和文档处理。这些早期的成功有助于您识别有效的方法，验证用户需求，并为构建更高级的系统奠定基础。
+
+例如，这是一个最简单的报告生成智能体（使用了 Hackernews 工具包）。:
+
+```python hackernews_agent.py lines
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="Write a report on the topic. Output only the report.",
+    markdown=True,
+)
+agent.print_response("Trending startups and products.", stream=True)
+```
+
+## 运行你的智能体
+
+在开发智能体时，请使用 `Agent.print_response()` 方法来运行它。这将以友好的格式在你的终端中打印出智能体的响应。
+
+这仅用于开发目的，不建议在生产环境中使用。在生产环境中，请使用 `Agent.run()` 或 `Agent.arun()` 方法。例如：
+
+```python
+from typing import Iterator
+from agno.agent import Agent, RunOutput, RunOutputEvent, RunEvent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+from agno.utils.pprint import pprint_run_response
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="Write a report on the topic. Output only the report.",
+    markdown=True,
+)
+
+# Run the agent and print the response
+agent.print_response("Trending startups and products.")
+
+################ STREAM RESPONSE #################
+stream: Iterator[RunOutputEvent] = agent.run("Trending products", stream=True)
+for chunk in stream:
+    if chunk.event == RunEvent.run_content:
+        print(chunk.content)
+
+################ STREAM AND PRETTY PRINT #################
+stream: Iterator[RunOutputEvent] = agent.run("Trending products", stream=True)
+pprint_run_response(stream, markdown=True)
+```
+
+## 下一步
+
+熟悉了基础知识后，请根据需要继续为你的智能体添加功能以完善构建。
+
+可参考的常见问题：
+
+- **如何运行我的智能体？** -> 请参阅 [运行智能体](/basics/agents/running-agents) 文档。
+- **如何调试我的智能体？** -> 请参阅 [调试智能体](/basics/agents/debugging-agents) 文档。
+- **如何管理会话？** -> 请参阅 [智能体会话](/basics/sessions/overview) 文档。
+- **如何管理输入和捕获输出？** -> 请参阅 [输入与输出](/basics/input-output/overview) 文档。
+- **如何添加工具？** -> 请参阅 [工具](/basics/tools/overview) 文档。
+- **如何为智能体提供上下文？** -> 请参阅 [上下文工程](/basics/context/overview) 文档。
+- **如何添加知识？** -> 请参阅 [知识](/basics/knowledge/overview) 文档。
+- **如何处理图像、音频、视频和文件？** -> 请参阅 [多模态](/basics/multimodal/overview) 文档。
+- **如何添加护栏（Guardrails）？** -> 请参阅 [护栏](/basics/guardrails/overview) 文档。
+- **如何在开发期间缓存模型响应？** -> 请参阅 [响应缓存](/basics/models/cache-response) 文档。

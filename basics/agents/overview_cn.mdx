@@ -1,0 +1,70 @@
+---
+title: 智能体（Agents）
+sidebarTitle: 总揽
+description: 了解 Agno Agents 以及它们是如何工作的。
+mode: wide
+---
+
+**智能体是由语言模型控制执行流程的 AI 程序。**
+
+智能体的核心是一个模型，该模型在循环中使用工具，并由指令引导。
+
+- **模型：** 控制执行流程。它决定是进行推理、使用工具还是做出响应。
+- **指令：** 引导模型如何使用工具和做出响应。
+- **工具：** 使模型能够采取行动并与外部系统交互。
+
+使用 Agno，你还可以赋予智能体记忆、知识、存储以及推理的能力：
+
+- **记忆：** 赋予智能体存储和回忆先前交互信息的能力，使其能够学习并改进响应。
+- **存储：** 使智能体能够在数据库中保存会话历史和状态。模型 API 本身是无状态的，而存储使智能体具备了状态性，从而支持多轮对话。
+- **知识：** 智能体在运行时可以搜索的信息，以便提供更好的响应。知识存储在向量数据库中，这种在运行时进行搜索的模式被称为 **Agentic RAG** 或 **Agentic Search**（智能体搜索）。
+- **推理：** 使智能体能够在响应之前对行动结果进行“思考”和“分析”，从而提高响应的可靠性和质量。
+
+<Tip>
+如果这是你第一次使用 Agno，在深入研究高级概念之前，可以先[从这里开始](/get-started/quickstart)。
+</Tip>
+
+## 指南
+
+请参考以下指南，学习如何构建、运行和调试你的智能体。
+
+<CardGroup cols={3}>
+  <Card
+    title="Building Agents"
+    icon="wrench"
+    iconType="duotone"
+    href="/basics/agents/building-agents"
+  >
+    学习如何运行你的智能体.
+  </Card>
+  <Card
+    title="Running Agents"
+    icon="user-robot"
+    iconType="duotone"
+    href="/basics/agents/running-agents"
+  >
+    学习如何运行你的智能体.
+  </Card>
+  <Card
+    title="Debugging Agents"
+    icon="bug"
+    iconType="duotone"
+    href="/basics/agents/debugging-agents"
+  >
+    学习如何调试和排查智能体的故障。
+  </Card>
+</CardGroup>
+
+## 从智能体到多智能体系统
+
+Agno 提供了两种更高层次的抽象概念，用于构建超越单一智能体的系统：
+
+- [**团队 (Team)**](/basics/teams/overview)：一组共同工作的智能体（或子团队）的集合。每个团队成员都可以拥有不同的专长、工具和指令，从而实现专业化的解决问题方式。
+
+- [**工作流 (Workflow)**](/basics/workflows/overview)：通过一系列定义好的步骤来编排智能体、团队和函数。工作流提供了具有可预测行为的结构化自动化，非常适合需要可靠、可重复流程的任务。
+
+
+## 开发者资源
+
+- 查看 [Agent Schema](/reference/agents/agent)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/README.md)
