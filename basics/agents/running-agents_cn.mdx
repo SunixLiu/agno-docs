@@ -167,9 +167,9 @@ for chunk in stream:
 
 根据智能体的配置，`Agent.run()` 和 `Agent.arun()` 函数可能会产生以下事件：
 
-### Core Events
+### 核心事件
 
-| Event Type               | Description                                                                                                    |
+| 事件类型                  | 描述                                                                                                    |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------- |
 | `RunStarted`             | 标识运行开始                                                                                   |
 | `RunContent`             | 包含模型的响应文本，以独立的块（individual chunks）形式呈现。                                                        |
@@ -181,73 +181,72 @@ for chunk in stream:
 
 ### 控制流事件
 
-| 事件类型        | 表述                                  |
+| 事件类型        | 描述                                  |
 | -------------- | -------------------------------------------- |
-| `RunPaused`    | Indicates the run has been paused            |
-| `RunContinued` | Signals that a paused run has been continued |
+| `RunPaused`    | 指示运行暂停            |
+| `RunContinued` | 一个暂停的运行已经继续的信号 |
 
-### Tool Events
+### 工具事件
 
-| Event Type          | Description                                                    |
+| 事件类型          | 描述                                                     |
 | ------------------- | -------------------------------------------------------------- |
-| `ToolCallStarted`   | Indicates the start of a tool call                             |
-| `ToolCallCompleted` | Signals completion of a tool call, including tool call results |
+| `ToolCallStarted`   | 指示一个工具调用的开始Indicates the start of a tool call                             |
+| `ToolCallCompleted` | 工具调用结束的信号，包括工具调用的结果 |
 
-### Reasoning Events
+### 推理事件
 
-| Event Type           | Description                                          |
+| 事件类型          | 描述                                           |
 | -------------------- | ---------------------------------------------------- |
-| `ReasoningStarted`   | Indicates the start of the agent's reasoning process |
-| `ReasoningStep`      | Contains a single step in the reasoning process      |
-| `ReasoningCompleted` | Signals completion of the reasoning process          |
+| `ReasoningStarted`   | 表示智能体推理过程的开始 |
+| `ReasoningStep`      | 包含推理过程中的一个单步骤      |
+| `ReasoningCompleted` | 推理过程结束的信号          |
 
-### Memory Events
+### 记忆事件
 
-| Event Type              | Description                                     |
+| 事件类型              | 描述                                     |
 | ----------------------- | ----------------------------------------------- |
-| `MemoryUpdateStarted`   | Indicates that the agent is updating its memory |
-| `MemoryUpdateCompleted` | Signals completion of a memory update           |
+| `MemoryUpdateStarted`   | 指示智能体正在更新其记忆 |
+| `MemoryUpdateCompleted` | 记忆更新完成的信号           |
 
-### Session Summary Events
+### 会话简介事件
 
-| Event Type                 | Description                                         |
+| 事件类型                 | 描述                                         |
 | -------------------------- | --------------------------------------------------- |
-| `SessionSummaryStarted`    | Indicates the start of session summary generation   |
-| `SessionSummaryCompleted`  | Signals completion of session summary generation    |
+| `SessionSummaryStarted`    | 指示会话简介生成的开始   |
+| `SessionSummaryCompleted`  | 会话简介生成结束的信号    |
 
-### Pre-Hook Events
+### 前置钩子事件
 
-| Event Type         | Description                                    |
+| 事件类型         | 描述                                    |
 | ------------------ | ---------------------------------------------- |
-| `PreHookStarted`   | Indicates the start of a pre-run hook          |
-| `PreHookCompleted` | Signals completion of a pre-run hook execution |
+| `PreHookStarted`   | 指示预运行钩子的开始          |
+| `PreHookCompleted` | 指示预运行钩子执行完成 |
 
-### Post-Hook Events
+### 后置钩子事件
 
-| Event Type         | Description                                    |
+| 事件类型         | 描述                                    |
 | ------------------ | ---------------------------------------------- |
-| `PostHookStarted`   | Indicates the start of a post-run hook          |
-| `PostHookCompleted` | Signals completion of a post-run hook execution |
+| `PostHookStarted`   | 指示后运行钩子的开始          |
+| `PostHookCompleted` | 指示后运行钩子执行完成 |
 
-### Parser Model events
+### 解析器模型事件
 
-| Event Type                     | Description                                      |
+| 事件类型                      | 描述                                      |
 | ------------------------------ | ------------------------------------------------ |
-| `ParserModelResponseStarted`   | Indicates the start of the parser model response |
-| `ParserModelResponseCompleted` | Signals completion of the parser model response  |
+| `ParserModelResponseStarted`   | 指示解析器模型响应的开始 |
+| `ParserModelResponseCompleted` | 指示解析器模型响应的完成  |
 
-### Output Model events
+### 输出模型事件
 
-| Event Type                     | Description                                      |
+|  事件类型                     | 描述                                      |
 | ------------------------------ | ------------------------------------------------ |
-| `OutputModelResponseStarted`   | Indicates the start of the output model response |
-| `OutputModelResponseCompleted` | Signals completion of the output model response  |
+| `OutputModelResponseStarted`   | 指示输出模型响应的开始 |
+| `OutputModelResponseCompleted` | 指示输出模型响应的结束  |
 
-### Custom Events
+### 自定义事件
 
-If you are using your own custom tools, you can yield custom events along with the rest of the Agno events.
-
-You can create your custom event class by extending the `CustomEvent` class:
+如果您正在使用自己的自定义工具，可以与其他 Agno 事件一同生成（yield）自定义事件。
+您可以通过继承 CustomEvent 类来创建您自己的自定义事件类：
 
 ```python
 from dataclasses import dataclass
@@ -263,7 +262,7 @@ class CustomerProfileEvent(CustomEvent):
     customer_phone: Optional[str] = None
 ```
 
-You can then yield your custom event from your tool. The event will be handled internally as an Agno event, and you will be able to access it in the same way you would access any other Agno event:
+随后，您可以在工具中生成（yield）该自定义事件。该事件将在内部被作为 Agno 事件进行处理，且您能够以访问其他任何 Agno 事件的相同方式来访问它：
 
 ```python
 from agno.tools import tool
@@ -279,31 +278,31 @@ async def get_customer_profile():
     )
 ```
 
-See the [full example](/examples/basics/agent/events/custom_events) for more details.
+更多详细内容，查看[完整样例](/examples/basics/agent/events/custom_events) .
 
-## Specify Run User and Session
+## 指定运行用户和会话
 
-You can specify which user and session to use when running the agent by passing the `user_id` and `session_id` parameters. This ensures the current run is associated with the correct user and session. For example:
+在运行智能体时，您可以通过传入 `user_id` 和 `session_id` 参数，来指定所要使用的用户和会话。这能确保当前的运行记录与正确的用户及会话相关联。例如：
 
 ```python
 agent.run("Tell me a 5 second short story about a robot", user_id="john@example.com", session_id="session_123")
 ```
 
-For more information see the [Agent Sessions](/basics/sessions/overview) documentation.
+更多详细信息，请参阅 [智能体会话](/basics/sessions/overview).
 
-## Passing Images / Audio / Video / Files
+## 传入图片/音频/视频/文件
 
-You can pass images, audio, video, or files to the agent by passing the `images`, `audio`, `video`, or `files` parameters. For example:
+您可以通过传入 `images`、`audio`、`video` 或 `files` 参数，向智能体传递图片、音频、视频或文件。例如：
 
 ```python
 agent.run("Tell me a 5 second short story about this image", images=[Image(url="https://example.com/image.jpg")])
 ```
 
-For more information see the [Multimodal Agents](/basics/multimodal/overview) documentation.
+更多详细信息，请参阅[多模态智能体](/basics/multimodal/overview).
 
-## Passing Output Schema
+## 传递输出模式
 
-You can pass an output schema for a specific run by passing the `output_schema` parameter. For example:
+您可以通过传入 `output_schema` 参数，为特定的运行指定输出模式。例如：
 
 ```python
 from pydantic import BaseModel
@@ -318,22 +317,22 @@ agent = Agent(model=OpenAIChat(id="gpt-4o-mini"))
 agent.run("Create a TV show", output_schema=TVShow)
 ```
 
-For more information see the [Input & Output](/basics/input-output/overview) documentation.
+更多详细信息，请参阅 [输入与输出](/basics/input-output/overview) .
 
-## Pausing and Continuing a Run
+## 暂停和继续一次运行
 
-An agent run can be paused when a human-in-the-loop flow is initiated. You can then continue the execution of the agent by calling the `Agent.continue_run()` method.
+当启动“人在回路”（human-in-the-loop）流程时，智能体的运行可以被暂停。随后，你可以通过调用 `Agent.continue_run()` 方法来继续执行该智能体。
 
-See more details in the [Human-in-the-Loop](/basics/hitl/overview) documentation.
+更多详细信息，请参阅 [人在回路 (HITL)](/basics/hitl/overview) 文档。
 
-## Cancelling a Run
+### 取消运行
 
-A run can be cancelled by calling the `Agent.cancel_run()` method.
+可以通过调用 `Agent.cancel_run()` 方法来取消一次运行。
 
-See more details in the [Cancelling a Run](/execution-control/run-cancellation/overview) documentation.
+更多详细信息，请参阅 [取消运行](/execution-control/run-cancellation/overview) 文档。
 
-## Developer Resources
+## 开发者资源
 
-- View the [Agent reference](/reference/agents/agent)
-- View the [RunOutput schema](/reference/agents/run-response)
-- View [Agent Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/README.md)
+- 查看 [智能体参考文档](/reference/agents/agent)
+- 查看 [RunOutput 模式](/reference/agents/run-response)
+- 查看 [智能体 Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/README.md)
