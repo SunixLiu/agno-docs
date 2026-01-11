@@ -1,0 +1,80 @@
+---
+title: 调试智能体
+sidebarTitle: 调试智能体
+description: 了解如何调试 Agno 代理。
+mode: wide
+---
+
+Agno 配备了极其完善的调试模式，可帮助您理解执行流程及中间步骤。例如：
+- 检查发送给模型的消息以及模型生成的响应。
+- 追踪中间步骤，并监控令牌使用量、执行时间等指标。
+- 检查工具调用、错误及其结果。这有助于您识别工具存在的问题。
+
+### 调试模式
+
+要启用调试模式：
+
+1. 在智能体上设置 `debug_mode` 参数，以针对所有运行启用。
+2. 在 `run` 方法上设置 `debug_mode` 参数，以针对当前运行启用。
+3. 将 `AGNO_DEBUG` 环境变量设置为 `True`，以针对所有智能体启用调试模式。
+
+```python
+from agno.agent import Agent
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    instructions="Write a report on the topic. Output only the report.",
+    markdown=True,
+    debug_mode=True,
+    # debug_level=2, # Uncomment to get more detailed logs
+)
+
+# Run agent and print response to the terminal
+agent.print_response("Trending startups and products.")
+```
+
+<Tip>
+你可以通过设置`debug_level=2` 从而在日志中获取更新信息.
+</Tip>
+
+看上去是这样的:
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
+  >
+    <source src="/videos/debug_mode.mp4" type="video/mp4" />
+  </video>
+</Frame>
+
+## 交互式命令行界面 (CLI)
+
+Agno 还附带了一个预构建的交互式命令行界面（CLI），可将您的智能体作为命令行应用程序运行。
+
+您可以使用它来测试与智能体的来回对话：
+
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.anthropic import Claude
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=Claude(id="claude-sonnet-4-5"),
+    tools=[HackerNewsTools()],
+    db=SqliteDb(db_file="tmp/data.db"),
+    add_history_to_context=True,
+    num_history_runs=3,
+    markdown=True,
+)
+
+# Run agent as an interactive CLI app
+agent.cli_app(stream=True)
+```

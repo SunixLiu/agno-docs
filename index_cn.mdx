@@ -225,16 +225,16 @@ export const codeTabs = [
       </div>
       <div className="flex items-center gap-3">
         <a
-          href="/introduction"
+          href="/introduction_cn"
           className="rounded-full border border-[#d1d5db] dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-semibold text-zinc-800 dark:text-zinc-100 transition hover:bg-zinc-50 dark:hover:bg-zinc-700"
         >
-          Read the docs
+          阅读文档
         </a>
         <a
           href="https://os.agno.com"
           className="rounded-full border border-[#ff4017] bg-[#ff4017] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(255,64,23,0.25)] transition hover:bg-[#ff2e00]"
         >
-          Try AgentOS
+          试试 AgentOS
         </a>
       </div>
     </header>
@@ -244,7 +244,7 @@ export const codeTabs = [
         ============================================ */}
     <section className="mt-20 flex flex-col items-center gap-6 text-center">
       <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] text-zinc-900 dark:text-zinc-100 sm:text-5xl md:text-[64px]">
-        Build. Run. Manage.<br />Multi-Agent Systems
+        构建，运行，管理. <br />多模态智能体系统
         {/* Blinking Cursor Animation */}
         {(() => {
           const [visible, setVisible] = React.useState(true);
@@ -307,7 +307,7 @@ export const codeTabs = [
 
         {/* Reference Card */}
         <a
-          href="/reference/agents/agent"
+          href="/reference/agents/agent_cn"
           className="group relative flex flex-col gap-2 rounded-xl border border-[#e5e7eb] dark:border-zinc-700 bg-[#f6f7f9] dark:bg-zinc-900 p-5 transition hover:border-[#e5e7eb] dark:hover:border-zinc-600"
         >
           <span className="pointer-events-none absolute -left-2 -top-2 h-4 w-4 border-l-2 border-t-2 border-[#ff4017] opacity-0 transition-opacity group-hover:opacity-100" />
@@ -328,7 +328,7 @@ export const codeTabs = [
         ============================================ */}
     <section className="mt-20 flex flex-col gap-6">
       <div className="flex flex-col gap-2 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-zinc-500 dark:text-zinc-400">Build with agno</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-zinc-500 dark:text-zinc-400">使用 agno 构建</p>
       </div>
       <div className=" lg:p-10">
         <CodeTabs tabs={codeTabs} defaultTab="agents" />
@@ -342,30 +342,30 @@ export const codeTabs = [
       {/* Footer Links Grid */}
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-8 px-5 sm:px-8 lg:grid-cols-5 lg:px-10">
         <div>
-          <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Get Started</h3>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">开始使用</h3>
           <ul className="space-y-3">
-            <li><a href="/get-started/quickstart" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Quickstart</a></li>
-            <li><a href="/get-started/getting-help" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Getting Help</a></li>
+            <li><a href="/get-started/quickstart_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">快速开始</a></li>
+            <li><a href="/get-started/getting-help_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">获取帮助</a></li>
           </ul>
         </div>
 
         <div>
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">Concepts</h3>
           <ul className="space-y-3">
-            <li><a href="/basics/agents/overview" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Agents</a></li>
-            <li><a href="/basics/teams/overview" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Teams</a></li>
-            <li><a href="/basics/workflows/overview" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Workflows</a></li>
-            <li><a href="/basics/tools/overview" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Tools</a></li>
+            <li><a href="/basics/agents/overview_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">智能体</a></li>
+            <li><a href="/basics/teams/overview_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">团队</a></li>
+            <li><a href="/basics/workflows/overview_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">工作流</a></li>
+            <li><a href="/basics/tools/overview_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">工具</a></li>
           </ul>
         </div>
 
         <div>
           <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">AgentOS</h3>
           <ul className="space-y-3">
-            <li><a href="/agent-os/introduction" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Overview</a></li>
-            <li><a href="/agent-os/creating-your-first-os" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Getting Started</a></li>
-            <li><a href="/agent-os/config" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Configuration</a></li>
-            <li><a href="/deploy/overview" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">Deploy</a></li>
+            <li><a href="/agent-os/introduction_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">总览</a></li>
+            <li><a href="/agent-os/creating-your-first-os_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">开始使用</a></li>
+            <li><a href="/agent-os/config_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">配置</a></li>
+            <li><a href="/deploy/overview_cn" className="text-sm text-zinc-500 dark:text-zinc-400 transition hover:text-[#ff4017]">部署</a></li>
           </ul>
         </div>
 
