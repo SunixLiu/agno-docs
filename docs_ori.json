@@ -65,68 +65,68 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "主页",
+        "tab": "Home",
         "groups": [
           {
             "group": "Overview",
-            "pages": ["index_cn"]
+            "pages": ["index"]
           }
         ]
       },
       {
-        "tab": "文档",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "开始使用",
+            "group": "Get Started",
             "pages": [
-              "introduction_cn",
-              "get-started/quickstart_cn",
-              "get-started/performance_cn",
-              "get-started/getting-help_cn"
+              "introduction",
+              "get-started/quickstart",
+              "get-started/performance",
+              "get-started/getting-help"
             ]
           },
           {
-            "group": "基础",
+            "group": "Basics",
             "pages": [
               {
-                "group": "智能体",
+                "group": "Agents",
                 "pages": [
-                  "basics/agents/overview_cn",
-                  "basics/agents/building-agents_cn",
-                  "basics/agents/running-agents_cn",
-                  "basics/agents/debugging-agents_cn",
+                  "basics/agents/overview",
+                  "basics/agents/building-agents",
+                  "basics/agents/running-agents",
+                  "basics/agents/debugging-agents",
                   {
-                    "group": "使用",
+                    "group": "Usage",
                     "pages": [
                       {
-                        "group": "基本流程",
+                        "group": "Basic Flows",
                         "pages": [
-                          "basics/agents/usage/basic_cn",
-                          "basics/agents/usage/basic-async_cn",
-                          "basics/agents/usage/streaming_cn",
-                          "basics/agents/usage/instructions_cn",
-                          "basics/agents/usage/tools_cn",
-                          "basics/agents/usage/debug_cn"
+                          "basics/agents/usage/basic",
+                          "basics/agents/usage/basic-async",
+                          "basics/agents/usage/streaming",
+                          "basics/agents/usage/instructions",
+                          "basics/agents/usage/tools",
+                          "basics/agents/usage/debug"
                         ]
                       },
                       {
-                        "group": "核心功能 ",
+                        "group": "Core Features",
                         "pages": [
-                          "basics/agents/usage/agent-with-storage_cn",
-                          "basics/agents/usage/agent-with-memory_cn",
-                          "basics/agents/usage/agent-with-knowledge_cn"
+                          "basics/agents/usage/agent-with-storage",
+                          "basics/agents/usage/agent-with-memory",
+                          "basics/agents/usage/agent-with-knowledge"
                         ]
                       },
                       {
-                        "group": "其他功能",
+                        "group": "Other",
                         "pages": [
-                          "basics/agents/usage/run-response-events_cn",
-                          "basics/agents/usage/intermediate-steps_cn",
-                          "basics/agents/usage/agent-run-metadata_cn",
-                          "basics/agents/usage/cancel-a-run_cn",
-                          "basics/agents/usage/debug-level_cn",
-                          "basics/agents/usage/scenario-testing_cn",
-                          "basics/agents/usage/tool-call-limit_cn"
+                          "basics/agents/usage/run-response-events",
+                          "basics/agents/usage/intermediate-steps",
+                          "basics/agents/usage/agent-run-metadata",
+                          "basics/agents/usage/cancel-a-run",
+                          "basics/agents/usage/debug-level",
+                          "basics/agents/usage/scenario-testing",
+                          "basics/agents/usage/tool-call-limit"
                         ]
                       }
                     ]
@@ -134,43 +134,43 @@
                 ]
               },
               {
-                "group": "团队",
+                "group": "Teams",
                 "pages": [
-                  "basics/teams/overview_cn",
-                  "basics/teams/building-teams_cn",
-                  "basics/teams/running-teams_cn",
-                  "basics/teams/delegation_cn",
-                  "basics/teams/debugging-teams_cn",
+                  "basics/teams/overview",
+                  "basics/teams/building-teams",
+                  "basics/teams/running-teams",
+                  "basics/teams/delegation",
+                  "basics/teams/debugging-teams",
                   {
-                    "group": "使用",
+                    "group": "Usage",
                     "pages": [
                       {
-                        "group": "基本流程",
+                        "group": "Basic Flows",
                         "pages": [
-                          "basics/teams/usage/basic-flows/basic-team_cn",
-                          "basics/teams/usage/basic-flows/basic-streaming_cn",
-                          "basics/teams/usage/basic-flows/stream-events_cn",
-                          "basics/teams/usage/basic-flows/response-as-variable_cn",
-                          "basics/teams/usage/basic-flows/respond-directly_cn",
-                          "basics/teams/usage/basic-flows/delegate-to-all-members_cn"
+                          "basics/teams/usage/basic-flows/basic-team",
+                          "basics/teams/usage/basic-flows/basic-streaming",
+                          "basics/teams/usage/basic-flows/stream-events",
+                          "basics/teams/usage/basic-flows/response-as-variable",
+                          "basics/teams/usage/basic-flows/respond-directly",
+                          "basics/teams/usage/basic-flows/delegate-to-all-members"
                         ]
                       },
                       {
-                        "group": "异步流程",
+                        "group": "Async Flows",
                         "pages": [
-                          "basics/teams/usage/async-flows/basic-team_cn",
-                          "basics/teams/usage/async-flows/basic-streaming_cn",
-                          "basics/teams/usage/async-flows/stream-events_cn",  
-                          "basics/teams/usage/async-flows/respond-directly_cn",
-                          "basics/teams/usage/async-flows/delegate-to-all-members_cn"
+                          "basics/teams/usage/async-flows/basic-team",
+                          "basics/teams/usage/async-flows/basic-streaming",
+                          "basics/teams/usage/async-flows/stream-events",
+                          "basics/teams/usage/async-flows/respond-directly",
+                          "basics/teams/usage/async-flows/delegate-to-all-members"
                         ]
                       },
                       {
-                        "group": "其他功能",
+                        "group": "Other",
                         "pages": [
-                          "basics/teams/usage/other/run-as-cli_cn",
-                          "basics/teams/usage/other/team-exponential-backoff_cn",
-                          "basics/teams/usage/other/model-inheritance_cn"
+                          "basics/teams/usage/other/run-as-cli",
+                          "basics/teams/usage/other/team-exponential-backoff",
+                          "basics/teams/usage/other/model-inheritance"
                         ]
                       }
                     ]
@@ -178,97 +178,97 @@
                 ]
               },
               {
-                "group": "工作流",
+                "group": "Workflows",
                 "pages": [
-                  "basics/workflows/overview_cn",
-                  "basics/workflows/building-workflows_cn",
-                  "basics/workflows/running-workflows_cn",
+                  "basics/workflows/overview",
+                  "basics/workflows/building-workflows",
+                  "basics/workflows/running-workflows",
                   {
-                    "group": "工作流模式",
+                    "group": "Workflow Patterns",
                     "pages": [
-                      "basics/workflows/workflow-patterns/overview_cn",
-                      "basics/workflows/workflow-patterns/sequential_cn",
-                      "basics/workflows/workflow-patterns/fully-python-workflow_cn",
-                      "basics/workflows/workflow-patterns/step-based-workflow_cn",
-                      "basics/workflows/workflow-patterns/custom-function-step-workflow_cn",
-                      "basics/workflows/workflow-patterns/conditional-workflow_cn",
-                      "basics/workflows/workflow-patterns/parallel-workflow_cn",
-                      "basics/workflows/workflow-patterns/iterative-workflow_cn",
+                      "basics/workflows/workflow-patterns/overview",
+                      "basics/workflows/workflow-patterns/sequential",
+                      "basics/workflows/workflow-patterns/fully-python-workflow",
+                      "basics/workflows/workflow-patterns/step-based-workflow",
+                      "basics/workflows/workflow-patterns/custom-function-step-workflow",
+                      "basics/workflows/workflow-patterns/conditional-workflow",
+                      "basics/workflows/workflow-patterns/parallel-workflow",
+                      "basics/workflows/workflow-patterns/iterative-workflow",
                       "basics/workflows/workflow-patterns/branching-workflow",
                       "basics/workflows/workflow-patterns/grouped-steps-workflow",
                       "basics/workflows/workflow-patterns/advanced-workflow-patterns"
                     ]
                   },
-                  "basics/workflows/additional-data_cn",
-                  "basics/workflows/conversational-workflows_cn",
-                  "basics/workflows/access-previous-steps_cn",
-                  "basics/workflows/early-stop_cn",
-                  "basics/workflows/workflow-tools_cn",
-                  "basics/workflows/background-execution_cn",
+                  "basics/workflows/additional-data",
+                  "basics/workflows/conversational-workflows",
+                  "basics/workflows/access-previous-steps",
+                  "basics/workflows/early-stop",
+                  "basics/workflows/workflow-tools",
+                  "basics/workflows/background-execution",
                   {
-                    "group": "使用",
+                    "group": "Usage",
                     "pages": [
                       {
                         "group": "Basic Workflows",
                         "pages": [
-                          "basics/workflows/usage/function-instead-of-steps_cn",
-                          "basics/workflows/usage/sequence-of-functions-and-agents_cn",
-                          "basics/workflows/usage/sequence-of-steps_cn",
-                          "basics/workflows/usage/step-with-function_cn",
-                          "basics/workflows/usage/step-with-function-streaming-agentos_cn",
-                          "basics/workflows/usage/class-based-executor_cn",
-                          "basics/workflows/usage/async-events-streaming_cn",
-                          "basics/workflows/usage/workflow-using-steps_cn",
-                          "basics/workflows/usage/workflow-using-steps-nested_cn"
+                          "basics/workflows/usage/function-instead-of-steps",
+                          "basics/workflows/usage/sequence-of-functions-and-agents",
+                          "basics/workflows/usage/sequence-of-steps",
+                          "basics/workflows/usage/step-with-function",
+                          "basics/workflows/usage/step-with-function-streaming-agentos",
+                          "basics/workflows/usage/class-based-executor",
+                          "basics/workflows/usage/async-events-streaming",
+                          "basics/workflows/usage/workflow-using-steps",
+                          "basics/workflows/usage/workflow-using-steps-nested"
                         ]
                       },
                       {
-                        "group": "条件执行",
+                        "group": "Conditional Execution",
                         "pages": [
-                          "basics/workflows/usage/condition-steps-workflow-stream_cn",
-                          "basics/workflows/usage/condition-with-list-of-steps_cn",
-                          "basics/workflows/usage/condition-and-parallel-steps-stream_cn"
+                          "basics/workflows/usage/condition-steps-workflow-stream",
+                          "basics/workflows/usage/condition-with-list-of-steps",
+                          "basics/workflows/usage/condition-and-parallel-steps-stream"
                         ]
                       },
                       {
-                        "group": "并行执行",
+                        "group": "Parallel Execution",
                         "pages": [
-                          "basics/workflows/usage/parallel-steps-workflow_cn",
-                          "basics/workflows/usage/parallel-and-custom-function-step-streaming-agentos_cn"
+                          "basics/workflows/usage/parallel-steps-workflow",
+                          "basics/workflows/usage/parallel-and-custom-function-step-streaming-agentos"
                         ]
                       },
                       {
-                        "group": "循环执行",
+                        "group": "Loop Execution",
                         "pages": [
-                          "basics/workflows/usage/loop-steps-workflow_cn",
-                          "basics/workflows/usage/loop-with-parallel-steps-stream_cn"
+                          "basics/workflows/usage/loop-steps-workflow",
+                          "basics/workflows/usage/loop-with-parallel-steps-stream"
                         ]
                       },
                       {
-                        "group": "条件分支 (Router)",
+                        "group": "Conditional Branching (Router)",
                         "pages": [
-                          "basics/workflows/usage/router-steps-workflow_cn",
-                          "basics/workflows/usage/router-with-loop-steps_cn",
-                          "basics/workflows/usage/selector-for-image-video-generation-pipelines_cn"
+                          "basics/workflows/usage/router-steps-workflow",
+                          "basics/workflows/usage/router-with-loop-steps",
+                          "basics/workflows/usage/selector-for-image-video-generation-pipelines"
                         ]
                       },
                       {
-                        "group": "对话工作流",
+                        "group": "Conversational Workflows",
                         "pages": [
-                          "basics/workflows/usage/basic-workflow-agent_cn",
-                          "basics/workflows/usage/conversational-workflow-with-conditional-step_cn"
+                          "basics/workflows/usage/basic-workflow-agent",
+                          "basics/workflows/usage/conversational-workflow-with-conditional-step"
                         ]
                       },
                       {
-                        "group": "高级概念",
+                        "group": "Advanced Concepts",
                         "pages": [
-                          "basics/workflows/usage/early-stop-workflow_cn",
-                          "basics/workflows/usage/step-with-function-additional-data_cn",
-                          "basics/workflows/usage/access-multiple-previous-steps-output_cn",
-                          "basics/workflows/usage/store-events-and-events-to-skip-in-a-workflow_cn",
-                          "basics/workflows/usage/structured-io-at-each-step-level_cn",
-                          "basics/workflows/usage/workflow-with-input-schema_cn",
-                          "basics/workflows/usage/workflow-cancellation_cn"
+                          "basics/workflows/usage/early-stop-workflow",
+                          "basics/workflows/usage/step-with-function-additional-data",
+                          "basics/workflows/usage/access-multiple-previous-steps-output",
+                          "basics/workflows/usage/store-events-and-events-to-skip-in-a-workflow",
+                          "basics/workflows/usage/structured-io-at-each-step-level",
+                          "basics/workflows/usage/workflow-with-input-schema",
+                          "basics/workflows/usage/workflow-cancellation"
                         ]
                       }
                     ]
@@ -276,60 +276,60 @@
                 ]
               },
               {
-                "group": "输入与输出",
+                "group": "Input & Output",
                 "pages": [
-                  "basics/input-output/overview_cn",
+                  "basics/input-output/overview",
                   {
-                    "group": "使用智能体",
+                    "group": "With Agents",
                     "pages": [
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": [
-                          "basics/input-output/agent/usage/input-as-dict_cn",
-                          "basics/input-output/agent/usage/input-as-list_cn",
-                          "basics/input-output/agent/usage/input-as-message_cn",
-                          "basics/input-output/agent/usage/input-as-messages-list_cn",
-                          "basics/input-output/agent/usage/input-schema-on-agent_cn",
-                          "basics/input-output/agent/usage/input-schema-on-agent-as-typed-dict_cn",
-                          "basics/input-output/agent/usage/output-model_cn",
-                          "basics/input-output/agent/usage/parser-model_cn",
-                          "basics/input-output/agent/usage/parser-model-ollama_cn",
-                          "basics/input-output/agent/usage/parser-model-stream_cn",
-                          "basics/input-output/agent/usage/response-as-variable_cn",
-                          "basics/input-output/agent/usage/structured-input_cn",
-                          "basics/input-output/agent/usage/output-schema-on-run_cn",
-                          "basics/input-output/agent/usage/json-schema-output_cn"
+                          "basics/input-output/agent/usage/input-as-dict",
+                          "basics/input-output/agent/usage/input-as-list",
+                          "basics/input-output/agent/usage/input-as-message",
+                          "basics/input-output/agent/usage/input-as-messages-list",
+                          "basics/input-output/agent/usage/input-schema-on-agent",
+                          "basics/input-output/agent/usage/input-schema-on-agent-as-typed-dict",
+                          "basics/input-output/agent/usage/output-model",
+                          "basics/input-output/agent/usage/parser-model",
+                          "basics/input-output/agent/usage/parser-model-ollama",
+                          "basics/input-output/agent/usage/parser-model-stream",
+                          "basics/input-output/agent/usage/response-as-variable",
+                          "basics/input-output/agent/usage/structured-input",
+                          "basics/input-output/agent/usage/output-schema-on-run",
+                          "basics/input-output/agent/usage/json-schema-output"
                         ]
                       }
                     ]
                   },
                   {
-                    "group": "使用团队",
+                    "group": "With Teams",
                     "pages": [
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": [
-                          "basics/input-output/team/usage/input-as-dict_cn",
-                          "basics/input-output/team/usage/input-as-list_cn",
-                          "basics/input-output/team/usage/input-as-messages-list_cn",
-                          "basics/input-output/team/usage/few-shot-learning_cn",
-                          "basics/input-output/team/usage/pydantic-model-output_cn",
-                          "basics/input-output/team/usage/pydantic-model-as-input_cn",
-                          "basics/input-output/team/usage/team-with-output-model_cn",
-                          "basics/input-output/team/usage/structured-output-streaming_cn",
-                          "basics/input-output/team/usage/async-structured-output-streaming_cn",
-                          "basics/input-output/team/usage/input-schema-on-team_cn",
-                          "basics/input-output/team/usage/output-schema-on-run_cn",
-                          "basics/input-output/team/usage/json-schema-output_cn"
+                          "basics/input-output/team/usage/input-as-dict",
+                          "basics/input-output/team/usage/input-as-list",
+                          "basics/input-output/team/usage/input-as-messages-list",
+                          "basics/input-output/team/usage/few-shot-learning",
+                          "basics/input-output/team/usage/pydantic-model-output",
+                          "basics/input-output/team/usage/pydantic-model-as-input",
+                          "basics/input-output/team/usage/team-with-output-model",
+                          "basics/input-output/team/usage/structured-output-streaming",
+                          "basics/input-output/team/usage/async-structured-output-streaming",
+                          "basics/input-output/team/usage/input-schema-on-team",
+                          "basics/input-output/team/usage/output-schema-on-run",
+                          "basics/input-output/team/usage/json-schema-output"
                         ]
                       }
                     ]
                   },
                   {
-                    "group": "使用工作流",
+                    "group": "With Workflows",
                     "pages": [
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": []
                       }
                     ]
@@ -337,136 +337,136 @@
                 ]
               },
               {
-                "group": "会话",
+                "group": "Sessions",
                 "pages": [
-                  "basics/sessions/overview_cn",
+                  "basics/sessions/overview",
                   {
-                    "group": "持久化会话",
+                    "group": "Persisting Sessions",
                     "pages": [
-                      "basics/sessions/persisting-sessions/overview_cn",
-                      "basics/sessions/persisting-sessions/storage-control_cn"
+                      "basics/sessions/persisting-sessions/overview",
+                      "basics/sessions/persisting-sessions/storage-control"
                     ]
                   },
-                  "basics/sessions/session-management_cn",
-                  "basics/sessions/history-management_cn",
-                  "basics/sessions/session-summaries_cn",
-                  "basics/sessions/workflow-sessions_cn",
+                  "basics/sessions/session-management",
+                  "basics/sessions/history-management",
+                  "basics/sessions/session-summaries",
+                  "basics/sessions/workflow-sessions",
                   {
-                    "group": "指标",
+                    "group": "Metrics",
                     "pages": [
-                      "basics/sessions/metrics/overview_cn",
+                      "basics/sessions/metrics/overview",
                       {
-                        "group": "智能体指标",
+                        "group": "Agent Metrics",
                         "pages": [
-                          "basics/sessions/metrics/agent_cn",
+                          "basics/sessions/metrics/agent",
                           {
-                            "group": "使用指标",
+                            "group": "Usage",
                             "pages": [
-                              "basics/sessions/metrics/usage/agent-extra-metrics_cn",
-                              "basics/sessions/metrics/usage/agent-metrics_cn"
+                              "basics/sessions/metrics/usage/agent-extra-metrics",
+                              "basics/sessions/metrics/usage/agent-metrics"
                             ]
                           }
                         ]
                       },
                       {
-                        "group": "团队指标",
+                        "group": "Team Metrics",
                         "pages": [
-                          "basics/sessions/metrics/team_cn",
+                          "basics/sessions/metrics/team",
                           {
-                            "group": "使用指标",
+                            "group": "Usage",
                             "pages": [
-                              "basics/sessions/metrics/usage/team-metrics_cn"
+                              "basics/sessions/metrics/usage/team-metrics"
                             ]
                           }
                         ]
                       },
-                      "basics/sessions/metrics/workflow_cn"
+                      "basics/sessions/metrics/workflow"
                     ]
                   }
                 ]
               },
               {
-                "group": "数据库",
+                "group": "Database",
                 "pages": [
-                  "basics/database/overview_cn",
-                  "basics/database/migrations_cn"
+                  "basics/database/overview",
+                  "basics/database/migrations"
                 ]
               },
               {
-                "group": "模型",
+                "group": "Models",
                 "pages": [
-                  "basics/models/overview_cn",
-                  "basics/models/model-as-string_cn",
-                  "basics/models/compatibility_cn",
-                  "basics/models/cache-response_cn"
+                  "basics/models/overview",
+                  "basics/models/model-as-string",
+                  "basics/models/compatibility",
+                  "basics/models/cache-response"
                 ]
               },
               {
-                "group": "工具",
+                "group": "Tools",
                 "pages": [
-                  "basics/tools/overview_cn",
+                  "basics/tools/overview",
                   {
-                    "group": "配备智能体的工具",
+                    "group": "Tools with Agents",
                     "pages": [
-                      "basics/tools/agent_cn",
+                      "basics/tools/agent",
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": []
                       }
                     ]
                   },
                   {
-                    "group": "配备团队的工具",
+                    "group": "Tools with Teams",
                     "pages": [
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": [
-                          "basics/tools/usage/team-with-custom-tools_cn",
-                          "basics/tools/usage/team-with-tool-hooks_cn",
-                          "basics/tools/usage/async-team-with-tools_cn"
+                          "basics/tools/usage/team-with-custom-tools",
+                          "basics/tools/usage/team-with-tool-hooks",
+                          "basics/tools/usage/async-team-with-tools"
                         ]
                       }
                     ]
                   },
                   {
-                    "group": "创建你自己的工具",
+                    "group": "Create Your Own Tools",
                     "pages": [
-                      "basics/tools/creating-tools/overview_cn",
-                      "basics/tools/creating-tools/python-functions_cn",
-                      "basics/tools/creating-tools/toolkits_cn"
+                      "basics/tools/creating-tools/overview",
+                      "basics/tools/creating-tools/python-functions",
+                      "basics/tools/creating-tools/toolkits"
                     ]
                   },
-                  "basics/tools/hooks_cn",
+                  "basics/tools/hooks",
                   {
                     "group": "MCP",
                     "pages": [
-                      "basics/tools/mcp/overview_cn",
-                      "basics/tools/mcp/mcp-toolbox_cn",
-                      "basics/tools/mcp/multiple-servers_cn",
-                      "basics/tools/mcp/dynamic-headers_cn",
+                      "basics/tools/mcp/overview",
+                      "basics/tools/mcp/mcp-toolbox",
+                      "basics/tools/mcp/multiple-servers",
+                      "basics/tools/mcp/dynamic-headers",
                       {
-                        "group": "传输",
+                        "group": "Transports",
                         "pages": [
-                          "basics/tools/mcp/transports/stdio_cn",
-                          "basics/tools/mcp/transports/streamable_http_cn",
-                          "basics/tools/mcp/transports/sse_cn"
+                          "basics/tools/mcp/transports/stdio",
+                          "basics/tools/mcp/transports/streamable_http",
+                          "basics/tools/mcp/transports/sse"
                         ]
                       },
-                      "basics/tools/mcp/server-params_cn",
+                      "basics/tools/mcp/server-params",
                       {
-                        "group": "使用",
+                        "group": "Usage",
                         "pages": [
-                          "basics/tools/mcp/usage/airbnb_cn",
-                          "basics/tools/mcp/usage/github_cn",
-                          "basics/tools/mcp/usage/notion_cn",
-                          "basics/tools/mcp/usage/parallel_cn",
-                          "basics/tools/mcp/usage/pipedream-auth_cn",
+                          "basics/tools/mcp/usage/airbnb",
+                          "basics/tools/mcp/usage/github",
+                          "basics/tools/mcp/usage/notion",
+                          "basics/tools/mcp/usage/parallel",
+                          "basics/tools/mcp/usage/pipedream-auth",
                           "basics/tools/mcp/usage/pipedream-slack",
-                          "basics/tools/mcp/usage/pipedream-google-calendar_cn",
-                          "basics/tools/mcp/usage/pipedream-linkedin_cn",
-                          "basics/tools/mcp/usage/stagehand_cn",
-                          "basics/tools/mcp/usage/stripe_cn",
-                          "basics/tools/mcp/usage/supabase_cn"
+                          "basics/tools/mcp/usage/pipedream-google-calendar",
+                          "basics/tools/mcp/usage/pipedream-linkedin",
+                          "basics/tools/mcp/usage/stagehand",
+                          "basics/tools/mcp/usage/stripe",
+                          "basics/tools/mcp/usage/supabase"
                         ]
                       }
                     ]
