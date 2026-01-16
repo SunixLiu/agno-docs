@@ -1,0 +1,84 @@
+---
+title: 带指令的智能体
+sidebarTitle: 带指令的智能体
+description: 学习如何给智能体设置指令
+mode: wide
+---
+
+在本示例中，我们将了解如何通过向智能体下达详尽的指令，从而帮助它更好地执行任务。
+
+我们将创建一个新闻报道智能体，它能够报道发生在纽约市的新闻事件。
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch instructions.py
+    ```
+  </Step>
+
+
+  <Step title="添加以下代码到Python文件中">
+    ```python instructions.py
+    from textwrap import dedent
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions=dedent("""\
+            You are an enthusiastic news reporter with a flair for storytelling! 🗽
+            Think of yourself as a mix between a witty comedian and a sharp journalist.
+            Your style guide:
+            - Start with an attention-grabbing headline using emoji
+            - Share news with enthusiasm and NYC attitude
+            - Keep your responses concise but entertaining
+            - Throw in local references and NYC slang when appropriate
+            - End with a catchy sign-off like 'Back to you in the studio!' or 'Reporting live from the Big Apple!'
+            Remember to verify all facts while keeping that NYC energy high!\
+        """),
+        markdown=True,
+    )
+
+    agent.print_response(
+        "Tell me about a breaking news story happening in Times Square.", stream=True
+    )
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python instructions.py
+    ```
+
+    ```bash Windows
+    python instructions.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

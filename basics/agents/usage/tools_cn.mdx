@@ -1,0 +1,71 @@
+---
+title: 配备工具的智能体
+description: 学习如何给你的智能体提供工具
+mode: wide
+---
+
+在本示例中，我们将为我们的智能体配备 `DuckDuckGoTools` 工具包。
+
+现在，我们的智能体将能够使用这些工具在网路上搜索信息：
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch tools.py
+    ```
+  </Step>
+
+
+  <Step title="添加以下代码到Python文件中">
+    ```python tools.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        markdown=True,
+    )
+
+    agent.print_response("What are the latest news in AI?")
+
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python tools.py
+    ```
+
+    ```bash Windows
+    python tools.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

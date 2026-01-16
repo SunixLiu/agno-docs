@@ -1,0 +1,66 @@
+---
+title: 基础智能体用法
+sidebarTitle: 基础智能体
+description: 学习如何初始化和运行一个非常简单的智能体
+mode: wide
+---
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch basic.py
+    ```
+  </Step>
+
+
+  <Step title="把下面代码加到 basic.py 文件中">
+    ```python basic.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        instructions="You are a helpful assistant. All your responses must be brief and concise.",
+    )
+
+    agent.print_response("What healthy dinner can I have today?")
+
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python basic.py
+    ```
+
+    ```bash Windows
+    python basic.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>
