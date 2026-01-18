@@ -1,0 +1,59 @@
+---
+title: 构建工作流
+sidebarTitle: 构建工作流
+description: 了解如何构建您的工作流。
+---
+
+工作流是编排您的智能体和团队的强大方式。它们是一系列步骤，按照您控制的流程执行。
+
+## 构建模块
+
+1. **`Workflow`** 类是管理整个执行过程的顶级编排器。
+2. **`Step`** 是工作流系统中的基本工作单元。每个步骤封装了恰好一个 `executor`（执行器）——即 `Agent`（智能体）、`Team`（团队）或自定义的 Python 函数。这种设计确保了清晰度和可维护性，同时保留了每个执行器的独立特性。
+3. **`Loop`** 是一种结构，允许您多次执行一个或多个步骤。当您需要重复执行一组步骤直到满足特定条件时，这非常有用。
+4. **`Parallel`** 是一种结构，允许您并行执行一个或多个步骤。当您需要同时执行一组步骤并将输出合并在一起时，这非常有用。
+5. **`Condition`** 根据您指定的标准使步骤变为条件性执行。
+6. **`Router`** 允许您指定接下来要执行的步骤，从而在您的工作流中有效地创建分支逻辑。
+
+<Note>
+  当使用自定义 Python 函数作为步骤的执行器时，`StepInput` 和
+  `StepOutput` 为步骤间的数据流提供了标准化的接口：
+</Note>
+<img 
+  className="block dark:hidden" 
+  src="/images/workflows-step-io-flow-light.png" 
+  alt="Workflows step IO flow diagram"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/workflows-step-io-flow.png" 
+  alt="Workflows step IO flow diagram"
+/>
+
+## 如何创建您的第一个工作流？
+
+您可以使用不同类型的模式来构建工作流。
+例如，您可以结合智能体、团队和函数来构建一个工作流。
+
+```python
+from agno.workflow import Step, Workflow, StepOutput
+
+def data_preprocessor(step_input):
+    # Custom preprocessing logic
+
+    # Or you can also run any agent/team over here itself
+    # response = some_agent.run(...)
+    return StepOutput(content=f"Processed: {step_input.input}") # <-- Now pass the agent/team response in content here
+
+workflow = Workflow(
+    name="Mixed Execution Pipeline",
+    steps=[
+        research_team,      # Team
+        data_preprocessor,  # Function
+        content_agent,      # Agent
+    ]
+)
+
+workflow.print_response("Analyze the competitive landscape for fintech startups", markdown=True)
+```

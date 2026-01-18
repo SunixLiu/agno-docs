@@ -1,0 +1,80 @@
+---
+title: 调试团队
+sidebarTitle: 调试团队
+description: 学习如何调试Agno团队.
+keywords: [teams, debugging teams]
+---
+
+Agno 内置了调试模式，能将您的团队开发体验提升到一个新的水平。它帮助您理解执行流程和中间步骤。例如：
+
+1. 检查发送给模型的消息及其生成的响应。
+2. 追踪中间步骤，并监控令牌使用量、执行时间等指标。
+3. 检查工具调用、错误及其结果。
+4. 监控团队成员之间的交互及委派模式。
+
+## 调试模式
+
+要在团队上启用调试模式，请使用以下方法之一：
+
+1. 在您的团队上设置 `debug_mode` 参数，以针对所有运行（包括成员运行）启用调试模式。
+2. 在 `run` 方法上设置 `debug_mode` 参数，以针对单次运行启用调试模式。
+3. 将 `AGNO_DEBUG` 环境变量设置为 `True`，以针对所有团队启用调试模式。
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+news_agent = Agent(name="News Agent", role="Get the latest news")
+weather_agent = Agent(name="Weather Agent", role="Get the weather for the next 7 days")
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    debug_mode=True,
+    # debug_level=2, # Uncomment to get more detailed logs
+)
+
+# Run team and print response to the terminal
+team.print_response("What is the weather in Tokyo?", show_member_responses=True)
+```
+
+<Tip>
+您可以设置 `debug_level=2` 以获取更详细的日志。
+</Tip>
+
+## 交互式命令行界面 (CLI)
+
+Agno 还附带了一个预构建的交互式命令行界面 (CLI)，可将您的团队作为命令行应用程序运行。您可以使用它来测试与团队的来回对话。
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+
+news_agent = Agent(name="News Agent", role="Get the latest news")
+weather_agent = Agent(name="Weather Agent", role="Get the weather for the next 7 days")
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/data.db"),
+    add_history_to_context=True,
+    num_history_runs=3,
+)
+
+# Run team as an interactive CLI app
+team.cli_app(stream=True)
+```
+
+<Note>
+使用 `await team.acli_app()` 在交互式命令行界面应用中异步运行团队。
+</Note>
+
+## 开发者资源
+
+- 查看 [团队参考文档](/zh/reference/teams/team)
+- 查看 [团队Cookbook (Team Cookbook)](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/README.md)

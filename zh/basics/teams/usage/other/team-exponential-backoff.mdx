@@ -1,0 +1,90 @@
+---
+title: 带指数退避的团队
+sidebarTitle: 指数退避
+description: 该示例演示了如何配置带有指数退避重试逻辑的团队。
+---
+
+当智能体遇到错误或速率限制时，团队会自动重试，且尝试之间的延迟时间会逐渐增加。
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch team_exponential_backoff.py
+    ```
+  </Step>
+
+  <Step title="添加以下代码到你的Python文件">
+
+    ```python team_exponential_backoff.py
+    from agno.agent import Agent
+    from agno.team import Team
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    # Create a research team
+    team = Team(
+        members=[
+            Agent(
+                name="Sarah",
+                role="Data Researcher",
+                tools=[DuckDuckGoTools()],
+                instructions="Focus on gathering and analyzing data",
+            ),
+            Agent(
+                name="Mike",
+                role="Technical Writer",
+                instructions="Create clear, concise summaries",
+            ),
+        ],
+        retries=3,
+        exponential_backoff=True,
+    )
+
+    team.print_response(
+        "Search for latest news about the latest AI models",
+        stream=True,
+    )
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行团队">
+    <CodeGroup>
+    ```bash Mac
+    python team_exponential_backoff.py
+    ```
+    
+    ```bash Windows
+    python team_exponential_backoff.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbooks">
+  探索 Agno 仓库中所有可用的Cookbooks。点击下方链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/other" target="_blank">
+    Agno Cookbooks on GitHub
+  </Link>
+</Step>
+</Steps>

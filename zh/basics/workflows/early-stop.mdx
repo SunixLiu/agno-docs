@@ -1,0 +1,58 @@
+---
+title: 提前终止
+sidebarTitle: 提前终止
+description: 如何提前终止工作流
+mode: wide
+---
+
+当满足特定条件时，工作流支持提前终止，从而避免不必要的处理并实现安全防护。任何步骤都可以通过返回 `StepOutput(stop=True)` 来触发提前终止，立即停止整个工作流的执行。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/workflows-early-stop-light.png" 
+  alt="Workflows early stop diagram"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/workflows-early-stop.png" 
+  alt="Workflows early stop diagram"
+/>
+
+## 示例
+
+```python
+from agno.workflow import Step, Workflow, StepInput, StepOutput
+
+def security_gate(step_input: StepInput) -> StepOutput:
+    """Security gate that stops deployment if vulnerabilities found"""
+    security_result = step_input.previous_step_content or ""
+    
+    if "VULNERABLE" in security_result.upper():
+        return StepOutput(
+            content="🚨 SECURITY ALERT: Critical vulnerabilities detected. Deployment blocked.",
+            stop=True  # Stop the entire workflow
+        )
+    else:
+        return StepOutput(
+            content="✅ Security check passed. Proceeding with deployment...",
+            stop=False
+        )
+
+# Secure deployment pipeline
+workflow = Workflow(
+    name="Secure Deployment Pipeline",
+    steps=[
+        Step(name="Security Scan", agent=security_scanner),
+        Step(name="Security Gate", executor=security_gate),  # May stop here
+        Step(name="Deploy Code", agent=code_deployer),       # Only if secure
+        Step(name="Setup Monitoring", agent=monitoring_agent), # Only if deployed
+    ]
+)
+
+# Test with vulnerable code - workflow stops at security gate
+workflow.print_response("Scan this code: exec(input('Enter command: '))")
+```
+
+## 开发者资源
+
+- [提前终止](/zh/basics/workflows/usage/early-stop-workflow)

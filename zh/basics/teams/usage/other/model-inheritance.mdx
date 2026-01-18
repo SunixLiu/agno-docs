@@ -1,0 +1,137 @@
+---
+title: 模型继承
+sidebarTitle: 成员继承模型
+description: 该示例演示了智能体如何自动从其父级团队继承模型。
+---
+
+**当团队拥有模型时：**
+- 没有指定模型的智能体将使用团队的 `model`
+- 拥有自己模型的智能体将保留使用其自身的模型
+- 在嵌套团队中，智能体使用其直接父级团队的 `model`
+- `reasoning_model`、`parser_model` 和 `output_model` 必须在每个团队成员或团队上显式设置
+
+**当团队没有模型时：**
+- 团队及所有智能体默认使用 OpenAI 的 `gpt-4o
+
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch model_inheritance.py
+    ```
+  </Step>
+
+  <Step title="添加以下代码到你的Python文件">
+
+    ```python model_inheritance.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+
+    # These agents don't have models set
+    researcher = Agent(
+        name="Researcher",
+        role="Research and gather information",
+        instructions=["Be thorough and detailed"],
+    )
+
+    writer = Agent(
+        name="Writer",
+        role="Write content based on research",
+        instructions=["Write clearly and concisely"],
+    )
+
+    # This agent has a model set
+    editor = Agent(
+        name="Editor",
+        role="Edit and refine content",
+        model=OpenAIChat(id="gpt-4o-mini"),
+        instructions=["Ensure clarity and correctness"],
+    )
+
+    # Nested team setup
+    analyst = Agent(
+        name="Analyst",
+        role="Analyze data and provide insights",
+    )
+
+    sub_team = Team(
+        name="Analysis Team",
+        model=OpenAIChat(id="gpt-5-mini"),
+        members=[analyst],
+    )
+
+    team = Team(
+        name="Content Production Team",
+        model=OpenAIChat(id="gpt-4o"),
+        members=[researcher, writer, editor, sub_team],
+        instructions=[
+            "Research the topic thoroughly",
+            "Write clear and engaging content",
+            "Edit for quality and clarity",
+            "Coordinate the entire process",
+        ],
+        show_members_responses=True,
+    )
+
+    team.initialize_team()
+
+    # researcher and writer inherit gpt-4o from team
+    print(f"Researcher model: {researcher.model.id}")
+    print(f"Writer model: {writer.model.id}")
+
+    # editor keeps its explicit model
+    print(f"Editor model: {editor.model.id}")
+
+    # analyst inherits gpt-5-mini from its sub-team
+    print(f"Analyst model: {analyst.model.id}")
+
+    team.print_response(
+        "Write a brief article about AI", stream=True
+    )
+    ```
+
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="运行团队">
+    <CodeGroup>
+    ```bash Mac
+    python model_inheritance.py
+    ```
+    
+    ```bash Windows
+    python model_inheritance.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbooks">
+  探索 Agno 仓库中所有可用的Cookbooks。点击下方链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows" target="_blank">
+    Agno Cookbooks on GitHub
+  </Link>
+</Step>
+</Steps>

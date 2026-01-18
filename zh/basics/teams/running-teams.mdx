@@ -1,0 +1,393 @@
+---
+title: 运行团队
+sidebarTitle: 运行团队
+description: 学习如何运行Agno团队.
+keywords: [teams, running teams, running teams with agno, running teams with agno agents]
+---
+
+通过调用 `Team.run()` 或 `Team.arun()` 来运行你的团队。以下是解释团队运行流程的流程图：
+
+<Accordion title="执行流程图">
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-details-light.png" 
+  alt="Team execution flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-details-dark.png" 
+  alt="Team execution flow"
+/>
+</Accordion>
+
+1.  **执行前置钩子**（如果已配置），在运行开始前执行验证或设置。
+2.  **运行推理代理**（如果已启用），用于规划和分解任务。
+3.  **构建上下文**，包括系统消息、用户消息、聊天历史、用户记忆、会话状态及其他输入。
+4.  **调用模型**，传入准备好的上下文。
+5.  **模型决策**，决定是直接回复、调用提供的工具，还是将请求委派给团队成员。
+6.  **如果发生委派**，成员代理将并发（在 `async` 模式下）执行其任务，并将结果返回给团队负责人。团队负责人的模型处理这些结果，并可能进行进一步委派或回复。
+7.  **处理响应**，如果提供了 [`output_schema`](/zh/basics/input-output/overview#structured-output)，则将其解析为指定格式。
+8.  **执行后置钩子**（如果已配置），对最终输出执行最终的验证或转换。
+9.  **存储会话和指标** 到数据库中（如果已配置）。
+10. **返回 TeamRunOutput** 给调用者，包含最终响应。
+
+<Note>
+对于流式响应，团队负责人会将来自模型和成员的响应流式传输给调用者。详见 [流式传输](/zh/basics/teams/running-teams#streaming) 章节以获取更多细节。
+</Note>
+
+## 基础执行
+
+`Team.run()` 函数用于运行团队并返回输出结果——返回类型要么是 `TeamRunOutput` 对象，要么是 `TeamRunOutputEvent` 和 `RunOutputEvent`（针对成员代理）对象的流（当 `stream=True` 时）。例如：
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.utils.pprint import pprint_run_response
+
+news_agent = Agent(
+    name="News Agent",
+    model=OpenAIChat(id="gpt-4o"),
+    role="Get the latest news",
+    tools=[DuckDuckGoTools()]
+)
+weather_agent = Agent(
+    name="Weather Agent",
+    model=OpenAIChat(id="gpt-4o"),
+    role="Get the weather for the next 7 days",
+    tools=[DuckDuckGoTools()]
+)
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o")
+)
+
+# Run team and return the response as a variable
+response = team.run(input="What is the weather in Tokyo?")
+# Print the response in markdown format
+pprint_run_response(response, markdown=True)
+```
+
+<Tip>
+
+你也可以使用 `Team.arun()` 异步运行团队。这意味着如果团队负责人在一次请求中委派给多个成员，这些成员将并发运行。
+
+</Tip>
+
+<Tip>
+
+更多详细信息请参阅 [输入与输出](/zh/basics/input-output/overview) 文档，了解如何在团队中使用结构化输入和输出。
+
+</Tip>
+
+## 运行输出
+
+当不启用流式传输时，`Team.run()` 函数会返回一个 `TeamRunOutput` 对象。该对象包含输出内容、发送给模型的消息列表、运行指标、使用的模型以及可选的成员响应列表。
+
+详细架构请参阅 [TeamRunOutput](/reference/teams/team-response) 文档。
+
+## 流式传输
+
+要启用流式传输，在调用 `run()` 时请设置 `stream=True`。这将返回一个 `TeamRunOutputEvent` 对象的迭代器，而不是单个的 `TeamRunOutput` 对象。
+
+```python
+from typing import Iterator
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+news_agent = Agent(name="News Agent", role="Get the latest news")
+weather_agent = Agent(name="Weather Agent", role="Get the weather for the next 7 days")
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o")
+)
+
+# Run team and return the response as a stream
+stream: Iterator[TeamRunOutputEvent] = team.run("What is the weather in Tokyo?", stream=True)
+for chunk in stream:
+    print(chunk.content, end="", flush=True)
+```
+
+
+### 流式传输团队事件
+
+当你流式传输响应时，默认情况下只会流式传输 `TeamRunContent` 事件。
+
+你也可以通过设置 `stream_events=True` 来流式传输所有运行事件。
+
+这将提供关于团队内部流程（例如工具调用或推理）的实时更新：
+
+```python
+# Stream all events
+response_stream = team.run(
+    "What is the weather in Tokyo?",
+    stream=True,
+    stream_events=True
+)
+```
+
+### 流式传输成员事件
+
+当使用 `stream_events=True` 流式传输事件时，团队负责人也会将来自团队成员的事件流式传输给调用者。
+
+当你的团队异步运行（使用 `arun`）时，如果团队负责人在一次请求中委派给多个成员，这些成员将并发运行。
+
+这意味着你将并发接收到成员事件，且事件的顺序无法保证。
+
+你可以通过设置 `stream_member_events=False` 来禁用此功能。
+
+```python
+...
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    stream_member_events=False
+)
+
+response_stream = team.run(
+    "What is the weather in Tokyo?",
+    stream=True,
+    stream_events=True)
+```
+
+### 事件处理
+
+您可以通过遍历响应流，在事件到达时对其进行处理：
+
+```python
+from agno.team import Team
+from agno.run.team import TeamRunEvent
+from agno.run.agent import RunEvent
+from agno.models.openai import OpenAIChat
+from agno.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+weather_agent = Agent(name="Weather Agent", role="Get the weather for the next 7 days", tools=[DuckDuckGoTools()])
+team = Team(
+    name="Test Team",
+    members=[weather_agent],
+    model=OpenAIChat(id="gpt-4o-mini")
+)
+
+response_stream = team.run("What is the weather in Tokyo?", stream=True, stream_events=True)
+
+for event in response_stream:
+    if event.event == TeamRunEvent.run_content:
+        print(event.content, end="", flush=True)
+    elif event.event == TeamRunEvent.tool_call_started:
+        print(f"Team tool call started")
+    elif event.event == TeamRunEvent.tool_call_completed:
+        print(f"Team tool call completed")
+    elif event.event == RunEvent.tool_call_started:
+        print(f"Member tool call started")
+    elif event.event == RunEvent.tool_call_completed:
+        print(f"Member tool call completed")
+    elif event.event == TeamRunEvent.run_started:
+        print(f"Run started")
+    elif event.event == TeamRunEvent.run_completed:
+        print(f"Run completed")
+```
+
+### 存储事件
+
+你可以将运行期间发生的所有事件存储在 `TeamRunOutput` 对象中。
+
+```python
+...
+
+team = Team(
+    name="Story Team",
+    members=[],
+    model=OpenAIChat(id="gpt-4o"),
+    store_events=True
+)
+```
+
+默认情况下，`TeamRunContentEvent` 和 `RunContentEvent` 事件不会被存储。你可以通过设置 `events_to_skip` 参数来修改被跳过的事件。
+
+例如：
+```python
+team = Team(
+    name="Story Team",
+    members=[],
+    model=OpenAIChat(id="gpt-4o"),
+    store_events=True,
+    events_to_skip=[]  # Include all events
+)
+```
+
+更多详细信息请参阅完整的 [`TeamRunOutput` 架构](/zh/reference/teams/team-response)。
+
+### 事件类型
+
+根据团队的配置，当 `stream_events=True` 时，`Team.run()` 和 `Team.arun()` 函数会流式传输以下事件：
+
+#### 核心事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamRunStarted` | 指示运行开始 |
+| `TeamRunContent` | 包含模型响应文本的各个数据块 |
+| `TeamRunContentCompleted` | 标志内容流式传输完成 |
+| `TeamRunIntermediateContent` | 包含模型的中间响应文本的各个数据块。当设置 `output_model` 时使用此事件。 |
+| `TeamRunCompleted` | 标志运行成功完成 |
+| `TeamRunError` | 指示运行期间发生错误 |
+| `TeamRunCancelled` | 标志运行已取消 |
+
+#### 工具事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamToolCallStarted` | 指示工具调用开始 |
+| `TeamToolCallCompleted` | 标志工具调用完成，包括工具调用结果 |
+
+#### 推理事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamReasoningStarted` | 指示团队推理过程开始 |
+| `TeamReasoningStep` | 包含推理过程中的单个步骤 |
+| `TeamReasoningCompleted` | 标志推理过程完成 |
+
+#### 内存事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamMemoryUpdateStarted` | 指示团队正在更新其内存 |
+| `TeamMemoryUpdateCompleted` | 标志内存更新完成 |
+
+#### 会话摘要事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamSessionSummaryStarted` | 指示会话摘要生成开始 |
+| `TeamSessionSummaryCompleted` | 标志会话摘要生成完成 |
+
+#### 前置钩子事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamPreHookStarted` | 指示运行前钩子开始 |
+| `TeamPreHookCompleted` | 标志运行前钩子执行完成 |
+
+#### 后置钩子事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamPostHookStarted` | 指示运行后钩子开始 |
+| `TeamPostHookCompleted` | 标志运行后钩子执行完成 |
+
+#### 解析模型事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamParserModelResponseStarted` | 指示解析模型响应开始 |
+| `TeamParserModelResponseCompleted` | 标志解析模型响应完成 |
+
+#### 输出模型事件
+
+| Event Type | Description |
+| :--- | :--- |
+| `TeamOutputModelResponseStarted` | 指示输出模型响应开始 |
+| `TeamOutputModelResponseCompleted` | 标志输出模型响应完成 |
+
+See detailed documentation in the [TeamRunOutput](/reference/teams/team-response) documentation.
+
+### 自定义事件
+
+如果你正在使用自己的自定义工具，能够生成自定义事件通常会非常有用。你的自定义事件将与其余预期的 Agno 事件一起生成。
+
+我们建议创建继承自内置 `CustomEvent` 类的自定义事件类：
+
+```python
+from dataclasses import dataclass
+from agno.run.team import CustomEvent
+
+@dataclass
+class CustomerProfileEvent(CustomEvent):
+    """CustomEvent for customer profile."""
+
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    customer_phone: Optional[str] = None
+```
+
+然后，你可以在工具中生成该自定义事件。该事件将在内部作为 Agno 事件进行处理，你可以像访问任何其他 Agno 事件一样访问它。
+
+```python
+from agno.tools import tool
+
+@tool()
+async def get_customer_profile():
+    """Example custom tool that simply yields a custom event."""
+
+    yield CustomerProfileEvent(
+        customer_name="John Doe",
+        customer_email="john.doe@example.com",
+        customer_phone="1234567890",
+    )
+```
+
+更多详细信息请参阅[完整示例](/zh/examples/basics/teams/events/custom_events)。
+
+## 指定运行用户和会话
+
+通过传入 `user_id` 和 `session_id` 参数，你可以指定运行团队时要使用的用户和会话。
+这可以确保当前运行与正确的用户和会话相关联。例如：
+
+```python
+team.run("Get me my monthly report", user_id="john@example.com", session_id="session_123")
+```
+
+更多信息请参阅[会话](/zh/basics/sessions/overview)文档。
+
+## 传递图片/音频/视频/文件
+
+通过传入 `images`、`audio`、`video` 或 `files` 参数，你可以向团队传递图片、音频、视频或文件。例如：
+
+```python
+team.run("Tell me a 5 second short story about this image", images=[Image(url="https://example.com/image.jpg")])
+```
+
+更多信息请参阅[多模态](/zh/basics/multimodal)文档。
+
+## 传递输出模式
+
+通过传入 `output_schema` 参数，你可以为特定运行传递一个输出模式。例如：
+
+```python
+from pydantic import BaseModel
+from agno.agent import Agent
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+
+class DetailedReport(BaseModel):
+    overview: str
+    findings: list[str]
+
+agent = Agent(name="Analyst", model=OpenAIChat(id="gpt-4o-mini"))
+team = Team(members=[agent], model=OpenAIChat(id="gpt-4o-mini"))
+team.run("Analyze the market", output_schema=DetailedReport)
+```
+
+更多信息请参阅[输入与输出](/zh/basics/input-output/overview)文档。
+
+## 取消运行
+
+可以通过调用 `Team.cancel_run()` 方法来取消一个运行。
+
+更多详情请参阅[取消运行](/zh/execution-control/run-cancellation/overview)文档。
+
+## 开发者资源
+
+- 查看[团队参考文档](/zh/reference/teams/team)
+- 查看[TeamRunOutput 模式](/zh/reference/teams/team-response)
+- 查看[团队 Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/README.md)

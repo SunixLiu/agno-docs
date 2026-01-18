@@ -1,0 +1,57 @@
+---
+title: 分支工作流
+description: 需要根据内容分析进行动态路径选择的复杂决策树
+---
+
+**示例用例**：专家路由、内容类型检测、多路径处理
+
+动态路由工作流提供了智能的路径选择，同时在每个选定的分支内保持可预测的执行。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/workflows-router-steps-light.png" 
+  alt="Workflows router steps diagram"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/workflows-router-steps.png" 
+  alt="Workflows router steps diagram"
+/>
+
+## 示例
+
+```python branching_workflow.py
+from agno.workflow import Router, Step, Workflow
+
+def route_by_topic(step_input) -> List[Step]:
+    topic = step_input.input.lower()
+
+    if "tech" in topic:
+        return [Step(name="Tech Research", agent=tech_expert)]
+    elif "business" in topic:
+        return [Step(name="Business Research", agent=biz_expert)]
+    else:
+        return [Step(name="General Research", agent=generalist)]
+
+workflow = Workflow(
+    name="Expert Routing",
+    steps=[
+        Router(
+            name="Topic Router",
+            selector=route_by_topic,
+            choices=[tech_step, business_step, general_step]
+        ),
+        Step(name="Synthesis", agent=synthesizer),
+    ]
+)
+
+workflow.print_response("Latest developments in artificial intelligence and machine learning", markdown=True)
+```
+
+## 开发者资源
+
+- [路由步骤工作流](/zh/basics/workflows/usage/router-steps-workflow)
+
+## 参考文档
+
+有关完整的 API 文档，请参阅[路由步骤参考](/zh/reference/workflows/router-steps)。

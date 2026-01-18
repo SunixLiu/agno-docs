@@ -6,3 +6,5 @@ tmp
 .DS_Store
 .mintlify-last
 .cursor
+docs.json.bak
+update_json.py

@@ -1,0 +1,91 @@
+---
+title: 工作流模式
+sidebarTitle: 开发指南
+description: 掌握确定性的工作流模式，包括顺序、并行、条件和循环执行，以实现可靠的多智能体自动化。
+---
+
+构建确定性的、可用于生产的工流，以可预测的执行模式编排智能体、团队和函数。本综合指南涵盖了所有工作流类型，从简单的顺序流程到具有并行执行和动态路由的复杂分支逻辑。
+与自由形式的智能体交互不同，这些模式通过结构化自动化提供了一致且可重复的结果，非常适合生产系统。
+
+## 构建模块
+
+Agno 工作流的核心构建模块是：
+
+| Component     | 目的 |
+| ------------- | --- |
+| **Step**      | 基础执行单元 |
+| **Agent**     | 具有特定角色的 AI 助手 |
+| **Team**      | 协同工作的智能体组 |
+| **Function**  | 自定义 Python 逻辑 |
+| **Parallel**  | 并发执行 |
+| **Condition** | 条件执行 |
+| **Loop**      | 迭代执行 |
+| **Router**    | 动态路由 |
+
+
+Agno 工作流支持多种执行模式，可以组合这些模式来构建复杂的自动化系统。
+每种模式都服务于特定的用例，并且可以组合在一起以实现复杂的工作流。
+
+<CardGroup cols={3}>
+  <Card
+    title="顺序流"
+    icon="arrow-right"
+    href="/zh/basics/workflows/workflow-patterns/sequential"
+  >
+    线性执行，按步骤逐步处理
+  </Card>
+  <Card
+    title="并行流"
+    icon="arrows-split-up-and-left"
+    href="/zh/basics/workflows/workflow-patterns/parallel-workflow"
+  >
+    用于独立任务的并发执行
+  </Card>
+  <Card
+    title="条件流"
+    icon="code-branch"
+    href="/zh/basics/workflows/workflow-patterns/conditional-workflow"
+  >
+    基于条件的分支逻辑
+  </Card>
+  <Card
+    title="迭代流"
+    icon="rotate"
+    href="/zh/basics/workflows/workflow-patterns/iterative-workflow"
+  >
+    带有质量控制的循环执行
+  </Card>
+  <Card
+    title="分支流"
+    icon="sitemap"
+    href="/zh/basics/workflows/workflow-patterns/branching-workflow"
+  >
+    动态路由与路径选择
+  </Card>
+  <Card
+    title="分组步骤"
+    icon="layer-group"
+    href="/zh/basics/workflows/workflow-patterns/grouped-steps-workflow"
+  >
+    可复用的步骤序列与模块化设计
+  </Card>
+</CardGroup>
+
+## 高级模式
+
+<CardGroup cols={3}>
+  <Card
+    title="基于功能的工作流"
+    icon="function"
+    href="/zh/basics/workflows/workflow-patterns/custom-function-step-workflow"
+  >
+    拥有完全控制权的纯 Python 工作流
+  </Card>
+  <Card
+    title="多种模式组合"
+    icon="puzzle-piece"
+    href="/zh/basics/workflows/workflow-patterns/advanced-workflow-patterns"
+  >
+    结合多种模式的复杂工作流
+  </Card>
+</CardGroup>

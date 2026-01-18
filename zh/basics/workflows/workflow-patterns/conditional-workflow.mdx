@@ -1,0 +1,52 @@
+---
+title: 条件工作流
+description: 根据输入分析或业务规则进行确定性的分支处理
+---
+
+**示例用例**：内容类型路由、特定主题处理、基于质量的决策
+
+条件工作流在保持确定性执行路径的同时，提供了可预测的分支逻辑。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/workflows-condition-steps-light.png" 
+  alt="Workflows condition steps diagram"
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/workflows-condition-steps.png" 
+  alt="Workflows condition steps diagram"
+/>
+
+## 示例
+
+```python conditional_workflow.py
+from agno.workflow import Condition, Step, Workflow
+
+def is_tech_topic(step_input) -> bool:
+    topic = step_input.input.lower()
+    return any(keyword in topic for keyword in ["ai", "tech", "software"])
+
+workflow = Workflow(
+    name="Conditional Research",
+    steps=[
+        Condition(
+            name="Tech Topic Check",
+            evaluator=is_tech_topic,
+            steps=[Step(name="Tech Research", agent=tech_researcher)]
+        ),
+        Step(name="General Analysis", agent=general_analyst),
+    ]
+)
+
+workflow.print_response("Comprehensive analysis of AI and machine learning trends", markdown=True)
+```
+
+## 开发者资源
+
+- [条件步骤工作流](/basics/workflows/usage/condition-steps-workflow-stream)
+- [步骤列表条件](/basics/workflows/usage/condition-with-list-of-steps)
+
+## 参考文档
+
+查看完整API 文档 [条件步骤参考](/reference/workflows/conditional-steps).

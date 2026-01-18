@@ -1,0 +1,384 @@
+---
+title: 团队委派是如何工作的
+sidebarTitle: 委派给团队成员
+description: 任务是如何委派给团队成员的.
+keywords: [teams, delegation, responding directly, sending input directly to members, delegating to all members]
+---
+
+一个 `Team` 内部包含一个团队领导“智能体”，负责向团队成员委派任务和请求。当你在团队上调用 `run` 或 `arun` 时，团队领导会利用模型来决定将任务委派给哪位成员。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-delegate-light.png" 
+  alt="Team delegation flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-delegate-dark.png" 
+  alt="Team delegation flow"
+/>
+
+基本流程如下：
+1. 团队接收用户输入
+2. 团队领导分析输入并决定如何将其分解为子任务
+3. 团队领导将特定任务委派给合适的团队成员
+4. 团队成员完成分配的任务并返回结果
+5. 团队领导随后要么继续委派给更多团队成员，要么将所有输出合成为一个最终的、连贯的响应返回给用户
+
+<Note>
+委派给成员的操作是由团队领导决定使用一个**工具**来完成的，即 `delegate_task_to_member` 工具。
+
+当异步运行团队（使用 `arun`）时，如果团队领导决定同时委派给多个成员，这些成员将**并发**运行。在底层，这仅仅是 `delegate_task_to_member` 工具的并发执行。
+</Note>
+
+有多种方式可以控制团队如何向成员委派任务：
+- **如何直接返回成员的响应？** → 详见[成员直接响应](#成员直接响应)
+- **如何在没有团队领导综合处理的情况下，直接将用户输入发送给成员？** → 详见[直接向成员发送输入](#直接向成员发送输入)
+- **如何确保团队领导同时向所有成员委派任务？** → 详见[向所有成员委派任务](#向所有成员委派任务)
+
+## 成员直接响应
+
+默认情况下，团队领导会处理来自成员的响应，并将其合成为一个单一的、连贯的响应。
+
+设置 `respond_directly=True` 可直接返回成员的响应，而无需经过团队领导的综合处理。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-direct-response-light.png" 
+  alt="Team direct response flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-direct-response-dark.png" 
+  alt="Team direct response flow"
+/>
+
+
+
+<Tip>
+将此功能与 `determine_input_for_members=False` 一起使用，可以创建一个**直通模式**的团队——团队领导实际上被绕过，所有沟通都直接与团队成员进行。
+</Tip>
+
+**示例：** 创建一个将问题导向特定语言智能体的语言路由工具：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+
+english_agent = Agent(
+    name="English Agent",
+    role="You can only answer in English",
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=[
+        "You must only respond in English",
+    ],
+)
+
+japanese_agent = Agent(
+    name="Japanese Agent",
+    role="You can only answer in Japanese",
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=[
+        "You must only respond in Japanese",
+    ],
+)
+multi_language_team = Team(
+    name="Multi Language Team",
+    model=OpenAIChat("gpt-4.5-preview"),
+    respond_directly=True,
+    members=[
+        english_agent,
+        japanese_agent,
+    ],
+    markdown=True,
+    instructions=[
+        "You are a language router that directs questions to the appropriate language agent.",
+        "If the user asks in a language whose agent is not a team member, respond in English with:",
+        "'I can only answer in the following languages: English and Japanese. Please ask your question in one of these languages.'",
+        "Always check the language of the user's input before routing to an agent.",
+        "For unsupported languages like Italian, respond in English with the above message.",
+    ],
+    show_members_responses=True,
+)
+
+
+# Ask "How are you?" in all supported languages
+multi_language_team.print_response(
+    "How are you?", stream=True  # English
+)
+
+multi_language_team.print_response(
+    "お元気ですか?", stream=True  # Japanese
+)
+```
+
+<Note>
+`respond_directly` 与 `delegate_to_all_members` 不兼容。
+</Note>
+
+<Note>
+当使用 `respond_directly` 且团队领导决定同时向多个成员委派任务时，最终内容将是所有成员响应结果的拼接。
+</Note>
+
+## 直接向成员发送输入
+
+默认情况下，团队领导会根据用户输入来确定分配给每个成员的“任务”。
+
+设置 `determine_input_for_members=False` 可将原始用户输入**直接**发送给成员智能体。此时，团队领导依然会选择委派给哪些成员，但不会对输入内容进行转换。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-raw-input-light.png" 
+  alt="Send input directly to members flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-raw-input-dark.png" 
+  alt="Send input directly to members flow"
+/>
+
+
+
+<Tip>
+这对于需要成员接收且保持不变的结构化输入（例如 Pydantic 模型），或者当你拥有专业智能体并希望查询被自动路由且无需修改时非常有用。
+</Tip>
+
+**示例：** 将结构化的 Pydantic 输入直接发送给专业的研究智能体：
+
+```python
+from typing import List
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+from agno.tools.hackernews import HackerNewsTools
+from pydantic import BaseModel, Field
+
+
+class ResearchTopic(BaseModel):
+    """Structured research topic with specific requirements."""
+
+    topic: str = Field(description="The main research topic")
+    focus_areas: List[str] = Field(description="Specific areas to focus on")
+    target_audience: str = Field(description="Who this research is for")
+    sources_required: int = Field(description="Number of sources needed", default=5)
+
+
+# Create specialized Hacker News research agent
+hackernews_agent = Agent(
+    name="Hackernews Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[HackerNewsTools()],
+    role="Extract key insights and content from Hackernews posts",
+    instructions=[
+        "Search Hacker News for relevant articles and discussions",
+        "Extract key insights and summarize findings",
+        "Focus on high-quality, well-discussed posts",
+    ],
+)
+
+# Create collaborative research team
+team = Team(
+    name="Hackernews Research Team",
+    model=OpenAIChat(id="gpt-5-mini"),
+    members=[hackernews_agent],
+    determine_input_for_members=False,  # The member gets the input directly, without the team leader synthesizing it
+    instructions=[
+        "Conduct thorough research based on the structured input",
+        "Address all focus areas mentioned in the research topic",
+        "Tailor the research to the specified target audience",
+        "Provide the requested number of sources",
+    ],
+    show_members_responses=True,
+)
+
+# Use Pydantic model as structured input
+research_request = ResearchTopic(
+    topic="AI Agent Frameworks",
+    focus_areas=["AI Agents", "Framework Design", "Developer Tools", "Open Source"],
+    target_audience="Software Developers and AI Engineers",
+    sources_required=7,
+)
+# Execute research with structured input
+team.print_response(input=research_request)
+```
+
+## 直通团队
+
+一种常见的模式是，团队首先决定将请求委派给哪个成员，然后在不进行任何修改的情况下将请求直接传递给该成员，并且在将成员的响应返回给用户之前也不进行任何处理。也就是说，这种团队被称为“直通”团队（或“路由”团队）。
+
+这意味着需要同时设置 `respond_directly=True` 和 `determine_input_for_members=False`。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-passthrough-light.png" 
+  alt="Passthrough team flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-passthrough-dark.png" 
+  alt="Passthrough team flow"
+/>
+
+
+例如:
+
+```python
+from agno.team.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+team = Team(
+    name="Question Router Team",
+    model=OpenAIChat(id="gpt-5-mini"),
+    members=[
+        Agent(name="Big Question Agent", role="You handle BIG questions"),
+        Agent(name="Small Question Agent", role="You handle SMALL questions"),
+    ],
+    respond_directly=True,  # The team leader doesn't process the response from the members and instead returns them directly
+    determine_input_for_members=False,  # The member gets the input directly, without the team leader synthesizing it
+)
+
+team.print_response(input="What is the capital of France?", stream=True)
+team.print_response(input="What is the meaning of life?", stream=True)
+```
+
+## 向所有成员委派任务
+
+设置 `delegate_to_all_members=True` 可将任务**同时**委派给所有成员，而不是进行选择性委派。
+
+当异步运行（使用 `arun`）时，所有成员将**并发**执行，以实现最大程度的并行处理。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-delegate-to-all-members-light.png" 
+  alt="Delegate tasks to all members simultaneously flow"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-delegate-to-all-members-dark.png" 
+  alt="Delegate tasks to all members simultaneously flow"
+/>
+
+
+**示例：** 同时从多个来源收集观点的研究团队：
+
+```python
+import asyncio
+from textwrap import dedent
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+from agno.tools.arxiv import ArxivTools
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+
+reddit_researcher = Agent(
+    name="Reddit Researcher",
+    role="Research a topic on Reddit",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    add_name_to_context=True,
+    instructions=dedent("""
+    You are a Reddit researcher.
+    You will be given a topic to research on Reddit.
+    You will need to find the most relevant posts on Reddit.
+    """),
+)
+
+hackernews_researcher = Agent(
+    name="HackerNews Researcher",
+    model=OpenAIChat("gpt-5-mini"),
+    role="Research a topic on HackerNews.",
+    tools=[HackerNewsTools()],
+    add_name_to_context=True,
+    instructions=dedent("""
+    You are a HackerNews researcher.
+    You will be given a topic to research on HackerNews.
+    You will need to find the most relevant posts on HackerNews.
+    """),
+)
+
+academic_paper_researcher = Agent(
+    name="Academic Paper Researcher",
+    model=OpenAIChat("gpt-5-mini"),
+    role="Research academic papers and scholarly content",
+    tools=[DuckDuckGoTools(), ArxivTools()],
+    add_name_to_context=True,
+    instructions=dedent("""
+    You are a academic paper researcher.
+    You will be given a topic to research in academic literature.
+    You will need to find relevant scholarly articles, papers, and academic discussions.
+    Focus on peer-reviewed content and citations from reputable sources.
+    Provide brief summaries of key findings and methodologies.
+    """),
+)
+
+twitter_researcher = Agent(
+    name="Twitter Researcher",
+    model=OpenAIChat("gpt-5-mini"),
+    role="Research trending discussions and real-time updates",
+    tools=[DuckDuckGoTools()],
+    add_name_to_context=True,
+    instructions=dedent("""
+    You are a Twitter/X researcher.
+    You will be given a topic to research on Twitter/X.
+    You will need to find trending discussions, influential voices, and real-time updates.
+    Focus on verified accounts and credible sources when possible.
+    Track relevant hashtags and ongoing conversations.
+    """),
+)
+
+
+agent_team = Team(
+    name="Discussion Team",
+    model=OpenAIChat("gpt-5-mini"),
+    members=[
+        reddit_researcher,
+        hackernews_researcher,
+        academic_paper_researcher,
+        twitter_researcher,
+    ],
+    instructions=[
+        "You are a discussion master.",
+        "You have to stop the discussion when you think the team has reached a consensus.",
+    ],
+    delegate_to_all_members=True,
+    markdown=True,
+    show_members_responses=True,
+)
+
+if __name__ == "__main__":
+    asyncio.run(
+        agent_team.aprint_response(
+            input="Start the discussion on the topic: 'What is the best way to learn to code?'",
+            stream=True,
+        )
+    )
+```
+
+## 更多示例
+
+<CardGroup cols={3}>
+  <Card title="基础协作" icon="link" href="/zh/basics/teams/usage/basic-flows/basic-team">
+    基础的团队协作模式
+  </Card>
+  <Card title="成员直接响应" icon="link" href="/zh/basics/teams/usage/basic-flows/respond-directly">
+    带有直接响应的路由模式
+  </Card>
+  <Card title="委派给所有成员" icon="link" href="/zh/basics/teams/usage/basic-flows/delegate-to-all-members">
+    将任务委派给所有成员以进行协作
+  </Card>
+</CardGroup>
+
+## 开发者资源
+
+- 查看 [团队参考文档](/zh/reference/teams/team)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/basic_flows/README.md)

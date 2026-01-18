@@ -1,0 +1,54 @@
+---
+title: 并行工作流
+description: 相互独立且可同时执行的并发任务，旨在提高效率
+---
+
+**示例用例**：多源研究、并行分析、并发数据处理
+
+并行工作流在保持结果确定性的同时，显著缩短了独立操作的执行时间。
+
+<img
+  className="block dark:hidden"
+  src="/images/workflows-parallel-steps-light.png"
+  alt="Workflows parallel steps diagram"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/workflows-parallel-steps.png"
+  alt="Workflows parallel steps diagram"
+/>
+
+## 示例
+
+```python parallel_workflow.py
+from agno.workflow import Parallel, Step, Workflow
+
+workflow = Workflow(
+    name="Parallel Research Pipeline",
+    steps=[
+        Parallel(
+            Step(name="HackerNews Research", agent=hn_researcher),
+            Step(name="Web Research", agent=web_researcher),
+            Step(name="Academic Research", agent=academic_researcher),
+            name="Research Step"
+        ),
+        Step(name="Synthesis", agent=synthesizer),  # Combines the results and produces a report
+    ]
+)
+
+workflow.print_response("Write about the latest AI developments", markdown=True)
+```
+
+## 在并行步骤中处理会话状态数据
+
+当在步骤中使用自定义 Python 函数时，您可以通过 `run_context` 参数访问和更新工作流会话状态。
+
+如果您在并行步骤中执行会话状态更新，请注意对共享状态的并发访问需要进行协调，以避免出现竞争条件。
+
+## 开发者资源
+
+- [并行步骤工作流](/zh/basics/workflows/usage/parallel-steps-workflow)
+
+## 参考文档
+
+有关完整的 API 文档，请参阅[并行步骤参考](/zh/reference/workflows/parallel-steps)。

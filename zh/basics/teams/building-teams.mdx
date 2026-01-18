@@ -1,0 +1,137 @@
+---
+title: 构建团队
+sidebarTitle: 构建团队
+description: 学习如何使用Agno构建团队.
+keywords: [teams, building teams, building teams with agno, building teams with agno agents]
+---
+
+为了构建高效的团队，应从最简单的配置开始——仅包含模型、团队成员和指令。待基础功能运行正常后，再根据需要逐步添加更多功能。
+
+以下是一个包含专用智能体的最简团队示例：
+
+```python news_weather_team.py
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# Create specialized agents
+news_agent = Agent(
+    id="news-agent",
+    name="News Agent",
+    role="Get the latest news and provide summaries",
+    tools=[DuckDuckGoTools()]
+)
+
+weather_agent = Agent(
+    id="weather-agent",
+    name="Weather Agent",
+    role="Get weather information and forecasts",
+    tools=[DuckDuckGoTools()]
+)
+
+# Create the team
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o"),
+    instructions="Coordinate with team members to provide comprehensive information. Delegate tasks based on the user's request."
+)
+
+team.print_response("What's the latest news and weather in Tokyo?", stream=True)
+```
+
+<Tip>
+  建议指定每个团队成员的 `id`、`name` 和 `role` 字段，以便团队负责人在委派请求时能更好地识别成员。
+  `id` 用于在团队内部以及团队负责人的上下文中标识该成员。
+</Tip>
+
+<Note>
+如果未指定，团队成员将从其父级 `Team` 继承 `model` 参数。对于已明确分配了 `model` 的成员，则保留其自身的模型设置。在嵌套的团队结构中，继承始终来自直接父级。
+未定义模型的团队默认使用 OpenAI 的 `gpt-4o`。
+
+`reasoning_model`（推理模型）、`parser_model`（解析模型）和 `output_model`（输出模型）必须为每个团队或团队成员显式定义。
+
+参见 [模型继承示例](/zh/basics/teams/usage/other/model-inheritance)。
+</Note>
+
+## 运行你的团队
+
+运行团队时，请使用 `Team.print_response()` 方法在终端中打印响应结果。
+
+你可以传入参数 `show_members_responses=True`，以同时打印团队成员的响应内容。
+
+例如：
+```python
+team.print_response("What's the latest news and weather in Tokyo?")
+```
+
+此方法仅用于开发目的，不建议在生产环境中使用。在生产环境中，请使用 Team.run() 或 Team.arun() 方法。
+例如：
+
+```python
+from typing import Iterator
+from agno.team import Team
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.utils.pprint import pprint_run_response
+
+news_agent = Agent(name="News Agent", role="Get the latest news", tools=[DuckDuckGoTools()])
+weather_agent = Agent(name="Weather Agent", role="Get the weather for the next 7 days", tools=[DuckDuckGoTools()])
+
+team = Team(
+    name="News and Weather Team",
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o")
+)
+
+# Run team and return the response as a variable
+response = team.run("What is the weather in Tokyo?")
+# Print the response
+print(response.content)
+
+################ STREAM RESPONSE #################
+stream = team.run("What is the weather in Tokyo?", stream=True)
+for chunk in stream:
+    print(chunk.content, end="", flush=True)
+
+# ################ STREAM AND PRETTY PRINT #################
+stream = team.run("What is the weather in Tokyo?", stream=True)
+pprint_run_response(stream, markdown=True)
+```
+
+### 修改终端显示内容
+
+使用 `print_response` 时，默认仅打印团队工具调用（通常指所有委派给成员的操作）。若要同时打印成员的响应内容，可以使用 `show_members_responses` 参数。
+```python
+...
+
+team = Team(
+    name="News and Weather Team", 
+    members=[news_agent, weather_agent],
+    model=OpenAIChat(id="gpt-4o")
+    show_members_responses=True,
+)
+
+team.print_response("What is the weather in Tokyo?")
+```
+
+## 透传团队模式
+
+一种常见的模式是，由团队决定将请求委派给哪位成员，随后直接将请求原封不动地传递给该成员，并且在将成员的响应返回给用户之前不做任何处理。也就是说，该团队充当了一个“透传”（Passthrough）团队（或称“路由”团队）。
+
+在这种情况下，团队负责人实际上被绕过了，所有沟通都是直接与某位团队成员进行的。详见 [透传团队](/zh/basics/teams/delegation#passthrough-teams) 章节以获取更多细节。
+
+## 下一步
+
+接下来，根据需要继续为你的团队添加功能。常见问题：
+
+- **如何运行我的团队？** -> 请参阅 [运行团队](/zh/basics/teams/running-teams) 文档。
+- **如何为我的团队添加历史记录？** -> 请参阅 [聊天历史](/zh/basics/chat-history/team/overview) 文档。
+- **如何管理会话？** -> 请参阅 [会话](/zh/basics/sessions/overview) 文档。
+- **如何管理输入并捕获输出？** -> 请参阅 [输入与输出](/zh/basics/input-output/overview) 文档。
+- **如何管理团队上下文？** -> 请参阅 [上下文工程](/zh/basics/context/team) 文档。
+- **如何添加知识库？** -> 请参阅 [知识](/zh/basics/knowledge/overview) 文档。
+- **如何添加护栏（Guardrails）？** -> 请参阅 [护栏](/zh/basics/guardrails/overview) 文档。
+- **如何在开发期间缓存响应？** -> 请参阅 [响应缓存](/zh/basics/models/cache-response) 文档。

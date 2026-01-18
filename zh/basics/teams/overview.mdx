@@ -1,0 +1,109 @@
+---
+title: 团队
+sidebarTitle: 总览
+description: 使用 Agno Teams 构建自主的多智能体系统。
+keywords: [teams, members, team of agents]
+---
+
+一个团队（Team）是由多个智能体（Agent）或其他子团队（sub-teams）组成的集合，它们共同协作以完成任务。
+
+`Team` 对象包含一个 `members` 列表，列表中的成员可以是 `Agent` 或 `Team` 的实例。
+
+团队可以被可视化为一种树状结构，其中团队负责人（team leader）将任务委派给子团队或直接委派给智能体。`Team` 的顶层被称为“团队负责人”（team leader）。
+
+以下是包含两个智能体和一个子团队的语言路由团队的最简示例。
+
+<img 
+  className="block dark:hidden" 
+  src="/images/teams/team-structure-light.png" 
+  alt="Team structure"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/teams/team-structure-dark.png" 
+  alt="Team structure"
+/>
+
+```python
+from agno.team import Team
+from agno.agent import Agent
+
+team = Team(members=[
+    Agent(name="English Agent", role="You answer questions in English"),
+    Agent(name="Chinese Agent", role="You answer questions in Chinese"),
+    Team(
+      name="Germanic Team", 
+      role="You coordinate the team members to answer questions in German and Dutch",
+      members=[
+        Agent(name="German Agent", role="You answer questions in German"),
+        Agent(name="Dutch Agent", role="You answer questions in Dutch"),
+      ],
+    ),
+])
+```
+
+<Note>
+
+强烈建议在深入研究团队（Teams）之前，先详细了解 [智能体（Agents）](/basics/agents/overview)。
+</Note>
+
+团队负责人会根据成员的角色和任务的性质，将任务委派给成员。详情请参阅 [委派（Delegation）](/basics/teams/delegation) 指南。
+
+与智能体一样，团队支持以下功能：
+
+- **模型（Model）：** 设置“团队负责人”用于向团队成员委派任务所使用的模型。
+- **指令（Instructions）：** 指导团队负责人如何解决问题。团队成员的名称、描述和角色会自动提供给团队负责人。
+- **数据库（Database）：** 团队的会话历史和状态存储在数据库中。这使得您的团队能够从离开的地方继续对话，支持多轮、长时间运行的对话。
+- **推理（Reasoning）：** 使团队负责人在向成员委派任务或回复之前能够进行“思考”，并对成员回复的结果进行“分析”。
+- **知识（Knowledge）：** 如果团队需要搜索信息，您可以为团队添加知识库。团队负责人可以访问此知识库。
+- **记忆（Memory）：** 赋予团队存储和回忆先前交互信息的能力，使其能够了解用户偏好并个性化其回复。
+- **工具（Tools）：** 如果团队负责人需要直接使用工具，您可以向团队添加工具。
+
+<Note>
+如果您正从 Agno v1.x.x 版本迁移，`mode` 参数已被弃用。有关如何迁移团队的更多详细信息，请参阅 [迁移指南](/how-to/v2-migration#teams)。
+</Note>
+
+## 何时应该使用团队（Teams）？
+
+何时应该使用团队？
+
+通用的指导准则是：智能体的功能范围应当相对专一。当您面临一个复杂的任务，该任务需要使用多种工具或包含大量步骤时，使用一组单一目的的智能体组成的团队将是最佳选择。
+
+此外，如果由于任务过于复杂，导致单个智能体的上下文长度限制很容易被超出，那么使用团队可以解决这一问题。因为团队中的每个智能体只需处理任务的一部分，从而保持了单个智能体上下文的精简。
+
+## 指南
+
+<CardGroup cols={3}>
+  <Card
+    title="构建团队"
+    icon="wrench"
+    iconType="duotone"
+    href="/zh/basics/teams/building-teams"
+  >
+    学习如何构建你的团队
+  </Card>
+  <Card
+    title="运行你的团队"
+    icon="user-robot"
+    iconType="duotone"
+    href="/zh/basics/teams/running-teams"
+  >
+    学习如何运行你的团队
+  </Card>
+  <Card
+    title="调试团队"
+    icon="bug"
+    iconType="duotone"
+    href="/zh/basics/teams/debugging-teams"
+  >
+    了解如何调试和排查团队（Teams）的故障。
+  </Card>
+</CardGroup>
+
+## 开发者资源
+
+- 查看 [`Team` 架构参考](/reference/teams/team)
+- 查看 [用例](/examples/use-cases/teams/)
+- 查看 [使用示例](/basics/teams/usage/)
+- 查看 [团队（Teams）cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/README.md)

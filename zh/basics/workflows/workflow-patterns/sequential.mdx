@@ -1,0 +1,49 @@
+---
+title: 顺序工作流
+description: 线性的、确定性流程，其中每个步骤都依赖于前一个步骤的输出。
+---
+
+顺序工作流确保了步骤之间可预测的执行顺序和清晰的数据流。
+
+**示例流程**：研究 → 数据处理 → 内容创作 → 最终审核
+
+顺序工作流确保了步骤之间可预测的执行顺序和清晰的数据流。
+
+```python sequential_workflow.py
+from agno.workflow import Step, Workflow, StepOutput
+
+def data_preprocessor(step_input):
+    # Custom preprocessing logic
+
+    # Or you can also run any agent/team over here itself
+    # response = some_agent.run(...)
+    return StepOutput(content=f"Processed: {step_input.input}") # <-- Now pass the agent/team response in content here
+
+workflow = Workflow(
+    name="Mixed Execution Pipeline",
+    steps=[
+        research_team,      # Team
+        data_preprocessor,  # Function
+        content_agent,      # Agent
+    ]
+)
+
+workflow.print_response("Analyze the competitive landscape for fintech startups", markdown=True)
+```
+
+<Note>
+  有关如何使用自定义函数的更多信息，请参阅
+  [带有自定义函数步骤的工作流](/zh/basics/workflows/workflow-patterns/custom-function-step-workflow) 页面。
+</Note>
+
+**参见示例**:
+
+- [函数与智能体的序列](/zh/basics/workflows/usage/function-instead-of-steps) - 包含函数和智能体的完整工作流
+
+<Note>
+`StepInput` 和 `StepOutput` 为步骤间的数据流提供了标准化接口：
+因此，如果您将自定义函数作为步骤的执行器，请确保输入和输出类型与 `StepInput` 和 `StepOutput` 接口兼容。
+这将确保您的自定义函数能够无缝集成到工作流系统中。
+
+请查看 [`StepInput`](/zh/reference/workflows/step_input) 和 [`StepOutput`](/zh/reference/workflows/step_output) 的架构定义。
+</Note>

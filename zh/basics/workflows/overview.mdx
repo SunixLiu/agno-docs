@@ -1,0 +1,131 @@
+---
+title: 什么是工作流？
+sidebarTitle: 概览
+description: 通过按步骤编排智能体、团队和函数，构建确定性工作流，以实现可靠的多智能体系统。
+keywords: [workflows, agno workflows, multi-agent systems, deterministic workflows, structured automation]
+---
+
+Agno 工作流使您能够通过按一系列定义的步骤编排智能体、团队和函数，来构建确定性、受控的智能体流程。与自由形式的智能体交互不同，工作流提供了具有可预测执行模式的结构化自动化，使其成为需要可靠、可重复流程的生产系统的理想选择。
+工作流中的每个步骤负责处理较大任务的特定部分，输出会自动从一个步骤流向下一个步骤，从而创建从开始到结束的顺畅管道。可以将其想象成一条装配线：每个步骤专门负责一件事，而它们共同协作完成单个智能体或团队难以处理的复杂任务。
+
+
+<img 
+  className="block dark:hidden" 
+  src="/images/workflows-flow-light.png" 
+  alt="Workflows flow diagram"
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/workflows-flow.png" 
+  alt="Workflows flow diagram"
+/>
+
+## 您的第一个工作流
+
+这是一个简单的流程，它接收一个主题，对其进行研究，然后撰写一篇文章。
+
+```python
+from agno.agent import Agent
+from agno.workflow import Workflow
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+# Define agents with specific roles
+researcher = Agent(
+    name="Researcher",
+    instructions="Find relevant information about the topic",
+    tools=[DuckDuckGoTools()]
+)
+
+writer = Agent(
+    name="Writer",
+    instructions="Write a clear, engaging article based on the research"
+)
+
+# Chain them together in a workflow
+content_workflow = Workflow(
+    name="Content Creation",
+    steps=[researcher, writer]
+)
+
+# Run the workflow
+content_workflow.print_response("Write an article about climate change solutions", stream=True)
+```
+
+就这样！该工作流会自动执行以下操作：
+1. 将您的输入传递给研究员
+2. 获取研究结果并将其提供给撰写者
+3. 返回最终文章
+
+## 为什么要使用工作流？
+
+工作流为您基于智能体的系统提供了确定性的控制，使您能够构建每次执行都可靠、一致的自动化流程。当您需要以下功能时，工作流至关重要：
+
+**确定性执行**
+
+- 具有明确定义输入和输出的、可预测的分步处理
+- 多次运行的一致结果
+- 用于生产系统的清晰审计追踪
+
+**复杂编排**
+
+- 具有受控交接的多智能体协调
+- 并行处理和条件分支
+- 用于迭代任务的循环结构
+
+工作流擅长于 **确定性的智能体自动化**，而 [团队](/zh/basics/teams/overview) 则是为 **动态的智能体协调** 而设计的。当您需要可预测、可重复的流程时，请使用工作流；当您需要灵活、协作式的问题解决时，请使用团队。
+
+## 什么可以作为步骤？
+
+您工作流中的每个步骤都可以是：
+
+- **智能体** —— 具有特定能力和指令的独立 AI 执行器
+- **团队** —— 协同工作的智能体群组，用于解决复杂问题
+- **函数** —— 用于特定处理逻辑的自定义 Python 函数
+
+<Note>
+您的智能体和团队保留了其独立的特性和能力，但现在在一个结构化的框架内运行，从而确保：
+
+- **可预测的执行**：步骤按预定义的顺序运行，并具有受控的输入/输出
+- **可重复的结果**：相同的输入在不同运行中产生一致的输出
+- **清晰的数据流**：每个步骤的输出明确成为下一个步骤的输入
+- **受控的状态**：步骤之间的会话管理和状态持久化
+- **可靠的错误处理**：内置的重试机制和错误恢复
+</Note>
+
+
+## 控制工作流
+
+熟悉基本工作流后，您可以添加以下功能：
+
+- **条件逻辑** —— 根据结果选择不同路径
+- **并行执行** —— 同时运行多个步骤
+- **循环** —— 重复步骤直到满足条件
+- **会话式工作流** —— 当用户直接与您的工作流交互（而非以编程方式调用）时，您可以通过添加 `WorkflowAgent` 使其变为 **会话式**。这支持类似自然聊天的交互，工作流能够智能地决定是从先前结果中回答，还是执行新的工作流运行。详见 [会话式工作流](/zh/basics/workflows/conversational-workflows) 指南。
+
+
+## 指南
+
+<CardGroup cols={3}>
+  <Card
+    title="查看完整示例"
+    icon="code"
+    href="/zh/basics/workflows/usage/function-instead-of-steps"
+  >
+    查看智能体、团队和函数协同工作的完整示例
+  </Card>
+  <Card
+    title="对话式工作流"
+    icon="comments"
+    href="/zh/basics/workflows/conversational-workflows"
+  >
+    为您的工作流启用类似聊天的交互，以实现与用户的直接互动
+  </Card>
+  <Card
+    title="在AgentOS里使用"
+    icon="play"
+    href="/zh/agent-os/features/chat-interface#run-a-workflow"
+  >
+    通过 AgentOS 聊天界面运行您的工作流
+  </Card>
+</CardGroup>

@@ -1,0 +1,135 @@
+---
+title: 异步团队流式传输
+sidebarTitle: 简单流式传输
+description: 该示例演示了如何使用配备金融工具的专业智能体，从团队中异步流式传输响应，以提供带有异步流式输出的实时股票信息。
+---
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch basic_streaming.py
+    ```
+  </Step>
+
+
+  <Step title="添加以下代码到你的Python文件">
+
+    ```python basic_streaming.py
+    """
+    This example demonstrates asynchronous streaming responses from a team.
+
+    The team uses specialized agents with financial tools to provide real-time
+    stock information with async streaming output.
+    """
+
+    import asyncio
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.team.team import Team
+    from agno.tools.exa import ExaTools
+    from agno.utils.pprint import apprint_run_response
+
+    # Stock price and analyst data agent
+    stock_searcher = Agent(
+        name="Stock Searcher",
+        model=OpenAIChat("gpt-5-mini"),
+        role="Searches the web for information on a stock.",
+        tools=[
+            ExaTools(
+                include_domains=["cnbc.com", "reuters.com", "bloomberg.com", "wsj.com"],
+                text=False,
+                show_results=True,
+                highlights=False,
+            )
+        ],
+    )
+
+    # Company information agent
+    company_info_agent = Agent(
+        name="Company Info Searcher",
+        model=OpenAIChat("gpt-5-mini"),
+        role="Searches the web for information on a company.",
+        tools=[
+            ExaTools(
+                include_domains=["cnbc.com", "reuters.com", "bloomberg.com", "wsj.com"],
+                text=False,
+                show_results=True,
+                highlights=False,
+            )
+        ],
+    )
+
+    # Create team with async streaming capabilities
+    team = Team(
+        name="Stock Research Team",
+        model=OpenAIChat("gpt-5-mini"),
+        members=[stock_searcher, company_info_agent],
+        markdown=True,
+        show_members_responses=True,
+    )
+
+
+    async def streaming_with_arun():
+        """Demonstrate async streaming using arun() method."""
+        await apprint_run_response(
+            team.arun(input="What is the current stock price of NVDA?", stream=True)
+        )
+
+
+    async def streaming_with_aprint_response():
+        """Demonstrate async streaming using aprint_response() method."""
+        await team.aprint_response("What is the current stock price of NVDA?", stream=True)
+
+
+    if __name__ == "__main__":
+        asyncio.run(streaming_with_arun())
+
+        # asyncio.run(streaming_with_aprint_response())
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno exa_py openai
+    ```
+  </Step>
+
+  <Step title="设置 API keys">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+export OPENAI_API_KEY="your_openai_api_key_here"
+export EXA_API_KEY="your_exa_api_key_here"
+    ```
+
+    ```bash Windows
+$Env:OPENAI_API_KEY="your_openai_api_key_here"
+$Env:EXA_API_KEY="your_exa_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+  <Step title="Run Team">
+    <CodeGroup>
+    ```bash Mac
+    python basic_streaming.py
+    ```
+    
+    ```bash Windows
+    python basic_streaming.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbooks">
+  探索 Agno 仓库中所有可用的Cookbooks。点击下方链接在 GitHub 上查看代码：
+
+  <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/streaming" target="_blank">
+    Agno Cookbooks on GitHub
+  </Link>
+</Step>
+</Steps>

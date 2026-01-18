@@ -1,0 +1,84 @@
+---
+title: 智能体运行元数据
+---
+
+本示例演示了如何将自定义元数据附加到智能体运行中。这对于跟踪业务上下文、请求类型以及用于监控和分析的运营信息非常有用。
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch agent_run_metadata.py
+    ```
+  </Step>
+
+
+  <Step title="添加以下代码到你的Python文件">
+    ```python agent_run_metadata.py
+    from datetime import datetime
+
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    agent = Agent(
+        model=OpenAIChat(id="gpt-5-mini"),
+        tools=[DuckDuckGoTools()],
+        instructions="You are a customer support agent. You help process customer inquiries efficiently.",
+        markdown=True,
+    )
+
+    response = agent.run(
+        "A customer is reporting that their premium subscription features are not working. They need urgent help as they have a presentation in 2 hours.",
+        metadata={
+            "ticket_id": "SUP-2024-001234",
+            "priority": "high",
+            "request_type": "customer_support",
+            "sla_deadline": datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "escalation_level": 2,
+            "customer_tier": "enterprise",
+            "department": "customer_success",
+            "agent_id": "support_agent_v1",
+            "business_impact": "revenue_critical",
+            "estimated_resolution_time_minutes": 30,
+        },
+        debug_mode=True,
+    )
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python agent_run_metadata.py
+    ```
+
+    ```bash Windows
+    python agent_run_metadata.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

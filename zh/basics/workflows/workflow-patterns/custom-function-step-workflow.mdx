@@ -1,0 +1,262 @@
+---
+title: 工作流中的自定义函数
+sidebarTitle: 工作流中的自定义函数
+description: 如何在工作流中使用自定义函数
+---
+
+自定义函数通过允许您为步骤执行定义特定逻辑，提供了最大的灵活性。利用它们来预处理输入、编排智能体和团队，以及通过完全的编程控制来后处理输出。
+
+**核心能力**
+- **自定义逻辑**：实现复杂的业务规则和数据转换
+- **智能体集成**：在您的自定义处理逻辑中调用智能体和团队
+- **数据流控制**：在步骤之间转换输出，以实现最佳的数据处理
+
+**实现模式**
+定义一个 `Step`，并将自定义函数作为 `executor`。该函数必须接受一个 `StepInput` 对象并返回一个 `StepOutput` 对象，以确保与工作流系统无缝集成。
+
+
+<img
+  className="block dark:hidden"
+  src="/images/custom-function-steps-light.png"
+  alt="Custom function step workflow diagram"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/custom-function-steps-dark.png"
+  alt="Custom function step workflow diagram"
+/>
+
+## 示例
+
+```python
+content_planning_step = Step(
+    name="Content Planning Step",
+    executor=custom_content_planning_function,
+)
+
+def custom_content_planning_function(step_input: StepInput) -> StepOutput:
+    """
+    Custom function that does intelligent content planning with context awareness
+    """
+    message = step_input.input
+    previous_step_content = step_input.previous_step_content
+
+    # Create intelligent planning prompt
+    planning_prompt = f"""
+        STRATEGIC CONTENT PLANNING REQUEST:
+
+        Core Topic: {message}
+
+        Research Results: {previous_step_content[:500] if previous_step_content else "No research results"}
+
+        Planning Requirements:
+        1. Create a comprehensive content strategy based on the research
+        2. Leverage the research findings effectively
+        3. Identify content formats and channels
+        4. Provide timeline and priority recommendations
+        5. Include engagement and distribution strategies
+
+        Please create a detailed, actionable content plan.
+    """
+
+    try:
+        response = content_planner.run(planning_prompt)
+
+        enhanced_content = f"""
+            ## Strategic Content Plan
+
+            **Planning Topic:** {message}
+
+            **Research Integration:** {"✓ Research-based" if previous_step_content else "✗ No research foundation"}
+
+            **Content Strategy:**
+            {response.content}
+
+            **Custom Planning Enhancements:**
+            - Research Integration: {"High" if previous_step_content else "Baseline"}
+            - Strategic Alignment: Optimized for multi-channel distribution
+            - Execution Ready: Detailed action items included
+        """.strip()
+
+        return StepOutput(content=enhanced_content)
+
+    except Exception as e:
+        return StepOutput(
+            content=f"Custom content planning failed: {str(e)}",
+            success=False,
+        )
+```
+
+**标准模式**
+所有自定义函数都遵循这种一致的结构：
+
+```python
+def custom_content_planning_function(step_input: StepInput) -> StepOutput:
+    # 1. Custom preprocessing
+    # 2. Call agents/teams as needed
+    # 3. Custom postprocessing
+    return StepOutput(content=enhanced_content)
+```
+
+## 基于类的执行器
+
+您也可以通过定义一个实现 `__call__` 方法的类，来使用基于类的执行器。
+
+
+```python
+class CustomExecutor:
+    def __call__(self, step_input: StepInput) -> StepOutput:
+        # 1. Custom preprocessing
+        # 2. Call agents/teams as needed
+        # 3. Custom postprocessing
+        return StepOutput(content=enhanced_content)
+
+content_planning_step = Step(
+    name="Content Planning Step",
+    executor=CustomExecutor(),
+)
+```
+
+**这在什么情况下有用？:**
+- **初始化时的配置**：在创建执行器时传入设置、API 密钥或行为标志
+- **有状态的执行**：在多次工作流运行中维护计数器、缓存或跟踪信息
+- **可复用的组件**：创建可在多个工作流之间共享的已配置执行器实例
+
+```python
+class CustomExecutor:
+    def __init__(self, max_retries: int = 3, use_cache: bool = True):
+        # Configuration passed during instantiation
+        self.max_retries = max_retries
+        self.use_cache = use_cache
+        self.call_count = 0  # Stateful tracking
+
+    def __call__(self, step_input: StepInput) -> StepOutput:
+        self.call_count += 1
+
+        # Access instance configuration and state
+        if self.use_cache and self.call_count > 1:
+            return StepOutput(content="Using cached result")
+
+        # Your custom logic with access to self.max_retries, etc.
+        return StepOutput(content=enhanced_content)
+
+# Instantiate with specific configuration
+content_planning_step = Step(
+    name="Content Planning Step",
+    executor=CustomExecutor(max_retries=5, use_cache=False),
+)
+```
+
+也支持异步执行，只需将 `__call__` 方法定义为异步函数即可。
+
+```python
+class CustomExecutor:
+    async def __call__(self, step_input: StepInput) -> StepOutput:
+        # 1. Custom preprocessing
+        # 2. Call agents/teams as needed
+        # 3. Custom postprocessing
+        return StepOutput(content=enhanced_content)
+
+content_planning_step = Step(
+    name="Content Planning Step",
+    executor=CustomExecutor(),
+)
+```
+
+详细示例请参阅[基于类的执行器](/zh/basics/workflows/usage/class-based-executor)。
+
+## 在 AgentOS 上使用自定义函数步骤进行流式执行：
+
+如果您在自定义函数步骤中运行智能体或团队，可以通过在调用 `run()` 或 `arun()` 时设置 `stream=True` 和 `stream_events=True` 并产出（yield）事件，来在 [AgentOS 聊天页面](/agent-os/introduction#chat-page) 上启用流式传输。
+
+<Note>
+在 AgentOS 上，运行将是异步的，并且响应会被流式传输。
+这意味着您必须通过使用 `.arun()` 代替 `.run()` 来运行您的智能体或团队，以保持自定义函数步骤的异步性。
+</Note>
+
+
+```python custom_function_step_async_stream.py
+content_planner = Agent(
+    name="Content Planner",
+    model=OpenAIChat(id="gpt-4o"),
+    instructions=[
+        "Plan a content schedule over 4 weeks for the provided topic and research content",
+        "Ensure that I have posts for 3 posts per week",
+    ],
+    db=InMemoryDb(),
+)
+
+async def custom_content_planning_function(
+    step_input: StepInput,
+) -> AsyncIterator[Union[WorkflowRunOutputEvent, StepOutput]]:
+    """
+    Custom function that does intelligent content planning with context awareness.
+
+    Note: This function calls content_planner.arun() internally, and all events
+    from that agent call will automatically get workflow context injected by
+    the workflow execution system - no manual intervention required!
+    """
+    message = step_input.input
+    previous_step_content = step_input.previous_step_content
+
+    # Create intelligent planning prompt
+    planning_prompt = f"""
+        STRATEGIC CONTENT PLANNING REQUEST:
+
+        Core Topic: {message}
+
+        Research Results: {previous_step_content[:500] if previous_step_content else "No research results"}
+
+        Planning Requirements:
+        1. Create a comprehensive content strategy based on the research
+        2. Leverage the research findings effectively
+        3. Identify content formats and channels
+        4. Provide timeline and priority recommendations
+        5. Include engagement and distribution strategies
+
+        Please create a detailed, actionable content plan.
+    """
+
+    try:
+        response_iterator = content_planner.arun(
+            planning_prompt, stream=True, stream_events=True
+        )
+        async for event in response_iterator:
+            yield event
+
+        response = content_planner.get_last_run_output()
+
+        enhanced_content = f"""
+            ## Strategic Content Plan
+
+            **Planning Topic:** {message}
+
+            **Research Integration:** {"✓ Research-based" if previous_step_content else "✗ No research foundation"}
+
+            **Content Strategy:**
+            {response.content}
+
+            **Custom Planning Enhancements:**
+            - Research Integration: {"High" if previous_step_content else "Baseline"}
+            - Strategic Alignment: Optimized for multi-channel distribution
+            - Execution Ready: Detailed action items included
+        """.strip()
+
+        yield StepOutput(content=enhanced_content)
+
+    except Exception as e:
+        yield StepOutput(
+            content=f"Custom content planning failed: {str(e)}",
+            success=False,
+        )
+```
+
+<Note>
+对于基于类的执行器，流式传输的工作方式也相同，只需定义 `__call__` 方法以产出（yield）事件即可。
+</Note>
+
+## 开发者资源
+
+- [带有自定义函数的步骤](/zh/basics/workflows/usage/step-with-function)
+- [在 AgentOS 上带有流式传输的自定义函数步骤](/zh/basics/workflows/usage/step-with-function-streaming-agentos)
+- [AgentOS 上的并行步骤与自定义函数步骤流式传输](/zh/basics/workflows/usage/parallel-steps-workflow)

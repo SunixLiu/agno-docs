@@ -1,0 +1,32 @@
+---
+title: 完全Python工作流
+description: 采用 v1 工作流风格，用纯 Python 保持简洁
+---
+
+**用纯 Python 保持简洁**：如果您更喜欢 Workflows 1.0 的方式或需要最大的灵活性，仍然可以使用单个 Python 函数来处理所有事情。
+这种方法让您能完全掌控执行流程，同时仍能受益于工作流的特性，如存储、流式传输和会话管理。
+
+用一个可执行函数替换工作流中的所有步骤，在其中您可以控制一切。
+
+```python fully_python_workflow.py
+from agno.workflow import Workflow, WorkflowExecutionInput
+
+def custom_workflow_function(workflow: Workflow, execution_input: WorkflowExecutionInput):
+    # Custom orchestration logic
+    research_result = research_team.run(execution_input.message)
+    analysis_result = analysis_agent.run(research_result.content)
+    return f"Final: {analysis_result.content}"
+
+workflow = Workflow(
+    name="Function-Based Workflow",
+    steps=custom_workflow_function  # Single function replaces all steps
+)
+
+workflow.print_response("Evaluate the market potential for quantum computing applications", markdown=True)
+```
+
+**参见示例**:
+
+- [基于函数的工作流](/basics/workflows/usage/function-instead-of-steps) - 完整的基于函数的工作流
+
+如需从 1.0 版本风格的工作流进行迁移，请参阅[迁移到 Workflows 2.0](/how-to/v2-migration)页面。

@@ -1,0 +1,37 @@
+---
+title: 基于步骤的工作流
+description: 命名步骤，用于在 AgentOS 聊天页面上实现更好的日志记录和支持
+---
+
+**您可以为步骤命名**，以便获得更好的日志记录以及 Agno 平台未来的支持。
+当在 `StepInput` 对象中访问该步骤的输出时，这也更改了步骤的名称。
+
+## 示例
+
+```python
+from agno.workflow import Step, Workflow
+
+# Named steps for better tracking
+workflow = Workflow(
+    name="Content Creation Pipeline",
+    steps=[
+        Step(name="Research Phase", team=researcher),
+        Step(name="Analysis Phase", executor=custom_function),
+        Step(name="Writing Phase", agent=writer),
+    ]
+)
+
+workflow.print_response(
+    "AI trends in 2024",
+    markdown=True,
+)
+```
+
+## 开发者资源
+
+- [步骤序列](/zh/basics/workflows/usage/sequence-of-steps)
+- [带有自定义函数的步骤](/zh/basics/workflows/usage/step-with-function)
+
+## 参考文档
+
+如需完整的 API 文档，请参阅[步骤参考](/zh/reference/workflows/step)。

@@ -1,0 +1,102 @@
+---
+title: 分组步骤工作流
+description: 将多个步骤组织成可重用的逻辑序列，以便在具有清晰关注点分离的复杂工作流中使用
+---
+
+**主要优势**：可重用的序列、更简洁的分支逻辑、模块化的工作流设计
+
+分组步骤通过可重用的组件和清晰的逻辑边界，实现了模块化的工作流架构。
+
+## 基础示例
+
+```python grouped_steps_workflow.py
+from agno.workflow import Steps, Step, Workflow
+
+# Create a reusable content creation sequence
+article_creation_sequence = Steps(
+    name="ArticleCreation",
+    description="Complete article creation workflow from research to final edit",
+    steps=[
+        Step(name="research", agent=researcher),
+        Step(name="writing", agent=writer),
+        Step(name="editing", agent=editor),
+    ],
+)
+
+# Use the sequence in a workflow
+workflow = Workflow(
+    name="Article Creation Workflow",
+    steps=[article_creation_sequence]  # Single sequence
+)
+
+workflow.print_response("Write an article about renewable energy", markdown=True)
+```
+
+## 带有路由的步骤
+
+这是 `Steps` 真正大放异彩的地方——为不同类型的内容或工作流创建不同的执行序列：
+
+```python
+from agno.workflow import Steps, Router, Step, Workflow
+
+# Define two completely different workflows as Steps
+image_sequence = Steps(
+    name="image_generation",
+    description="Complete image generation and analysis workflow",
+    steps=[
+        Step(name="generate_image", agent=image_generator),
+        Step(name="describe_image", agent=image_describer),
+    ],
+)
+
+video_sequence = Steps(
+    name="video_generation",
+    description="Complete video production and analysis workflow",
+    steps=[
+        Step(name="generate_video", agent=video_generator),
+        Step(name="describe_video", agent=video_describer),
+    ],
+)
+
+def media_sequence_selector(step_input) -> List[Step]:
+    """Route to appropriate media generation pipeline"""
+    if not step_input.input:
+        return [image_sequence]
+
+    message_lower = step_input.input.lower()
+
+    if "video" in message_lower:
+        return [video_sequence]
+    elif "image" in message_lower:
+        return [image_sequence]
+    else:
+        return [image_sequence]  # Default
+
+# Clean workflow with clear branching
+media_workflow = Workflow(
+    name="AI Media Generation Workflow",
+    description="Generate and analyze images or videos using AI agents",
+    steps=[
+        Router(
+            name="Media Type Router",
+            description="Routes to appropriate media generation pipeline",
+            selector=media_sequence_selector,
+            choices=[image_sequence, video_sequence],  # Clear choices
+        )
+    ],
+)
+
+# Usage examples
+media_workflow.print_response("Create an image of a magical forest", markdown=True)
+media_workflow.print_response("Create a cinematic video of city timelapse", markdown=True)
+```
+
+## 开发者资源
+
+- [`workflow_using_steps.py`](/zh/basics/workflows/usage/workflow-using-steps)
+- [`workflow_using_steps_nested.py`](/zh/basics/workflows/usage/workflow-using-steps-nested)
+- [`selector_for_image_video_generation_pipelines.py`](/zh/basics/workflows/usage/selector-for-image-video-generation-pipelines)
+
+## 参考文档
+
+有关完整的 API 文档，请参阅[步骤参考](/reference/workflows/steps-step)。

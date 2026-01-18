@@ -1,0 +1,617 @@
+---
+title: 运行工作流
+sidebarTitle: 运行工作流
+description: 了解如何运行工作流并获取响应。
+---
+
+`Workflow.run()` 函数用于运行工作流并生成响应，响应可以是 `WorkflowRunOutput` 对象，也可以是 `WorkflowRunOutput` 对象的流。
+
+我们的许多示例都使用了 `workflow.print_response()`，这是一个在终端中打印响应的辅助工具。它在底层使用了 `workflow.run()`。
+
+## 运行您的工作流
+
+以下是运行工作流的方法。响应会被捕获在 `response` 中。
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+from agno.workflow import Step, Workflow
+from agno.run.workflow import WorkflowRunOutput
+from agno.utils.pprint import pprint_run_response
+
+# Define agents
+hackernews_agent = Agent(
+    name="Hackernews Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[HackerNewsTools()],
+    role="Extract key insights and content from Hackernews posts",
+)
+web_agent = Agent(
+    name="Web Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    role="Search the web for the latest news and trends",
+)
+
+# Define research team for complex analysis
+research_team = Team(
+    name="Research Team",
+    members=[hackernews_agent, web_agent],
+    instructions="Research tech topics from Hackernews and the web",
+)
+
+content_planner = Agent(
+    name="Content Planner",
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=[
+        "Plan a content schedule over 4 weeks for the provided topic and research content",
+        "Ensure that I have posts for 3 posts per week",
+    ],
+)
+
+content_creation_workflow = Workflow(
+    name="Content Creation Workflow",
+    description="Automated content creation from blog posts to social media",
+    db=SqliteDb(db_file="tmp/workflow.db"),
+    steps=[research_team, content_planner],
+)
+
+# Create and use workflow
+if __name__ == "__main__":
+    response: WorkflowRunOutput = content_creation_workflow.run(
+        input="AI trends in 2024",
+        markdown=True,
+    )
+
+    pprint_run_response(response, markdown=True)
+```
+
+<Note>
+  当不使用流式传输时，`Workflow.run()` 函数返回一个 `WorkflowRunOutput` 对象。以下是关于
+  [WorkflowRunOutput](/zh/reference/workflows/run-output) 的详细文档。
+</Note>
+
+## 异步执行
+
+`Workflow.arun()` 函数是 `Workflow.run()` 的异步版本。
+
+以下是使用它的示例：
+
+```python
+from typing import AsyncIterator
+import asyncio
+
+from agno.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.workflow import Condition, Step, Workflow, StepInput
+from agno.run.workflow import WorkflowRunOutput, WorkflowRunOutputEvent, WorkflowRunEvent
+
+# === BASIC AGENTS ===
+researcher = Agent(
+    name="Researcher",
+    instructions="Research the given topic and provide detailed findings.",
+    tools=[DuckDuckGoTools()],
+)
+
+summarizer = Agent(
+    name="Summarizer",
+    instructions="Create a clear summary of the research findings.",
+)
+
+fact_checker = Agent(
+    name="Fact Checker",
+    instructions="Verify facts and check for accuracy in the research.",
+    tools=[DuckDuckGoTools()],
+)
+
+writer = Agent(
+    name="Writer",
+    instructions="Write a comprehensive article based on all available research and verification.",
+)
+
+# === CONDITION EVALUATOR ===
+def needs_fact_checking(step_input: StepInput) -> bool:
+    """Determine if the research contains claims that need fact-checking"""
+    summary = step_input.previous_step_content or ""
+
+    # Look for keywords that suggest factual claims
+    fact_indicators = [
+        "study shows",
+        "breakthroughs",
+        "research indicates",
+        "according to",
+        "statistics",
+        "data shows",
+        "survey",
+        "report",
+        "million",
+        "billion",
+        "percent",
+        "%",
+        "increase",
+        "decrease",
+    ]
+
+    return any(indicator in summary.lower() for indicator in fact_indicators)
+
+
+# === WORKFLOW STEPS ===
+research_step = Step(
+    name="research",
+    description="Research the topic",
+    agent=researcher,
+)
+
+summarize_step = Step(
+    name="summarize",
+    description="Summarize research findings",
+    agent=summarizer,
+)
+
+# Conditional fact-checking step
+fact_check_step = Step(
+    name="fact_check",
+    description="Verify facts and claims",
+    agent=fact_checker,
+)
+
+write_article = Step(
+    name="write_article",
+    description="Write final article",
+    agent=writer,
+)
+
+# === BASIC LINEAR WORKFLOW ===
+basic_workflow = Workflow(
+    name="Basic Linear Workflow",
+    description="Research -> Summarize -> Condition(Fact Check) -> Write Article",
+    steps=[
+        research_step,
+        summarize_step,
+        Condition(
+            name="fact_check_condition",
+            description="Check if fact-checking is needed",
+            evaluator=needs_fact_checking,
+            steps=[fact_check_step],
+        ),
+        write_article,
+    ],
+)
+
+async def main():
+    try:
+        response: WorkflowRunOutput = await basic_workflow.arun(
+            input="Recent breakthroughs in quantum computing",
+        )
+        pprint_run_response(response, markdown=True)
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## 流式响应
+
+要启用流式传输，在调用 `run()` 时请设置 `stream=True`。这将返回一个 `WorkflowRunOutputEvent` 对象的迭代器，而不是单个响应。
+
+```python
+# Define your agents/team
+...
+
+content_creation_workflow = Workflow(
+    name="Content Creation Workflow",
+    description="Automated content creation from blog posts to social media",
+    db=SqliteDb(db_file="tmp/workflow.db"),
+    steps=[research_team, content_planner],
+)
+
+# Create and use workflow
+if __name__ == "__main__":
+    response: Iterator[WorkflowRunOutputEvent] = content_creation_workflow.run(
+        input="AI trends in 2024",
+        markdown=True,
+        stream=True,
+    )
+
+    pprint_run_response(response, markdown=True)
+```
+
+### 流式传输所有事件
+
+默认情况下，当您流式传输响应时，只会流式传输 `WorkflowStartedEvent` 和 `WorkflowCompletedEvent` 事件（以及所有 Agent 和 Team 事件）。
+
+您也可以通过设置 `stream_events=True` 来流式传输所有事件。
+
+这将提供有关工作流内部进程的实时更新：
+
+```python
+from typing import Iterator
+
+from agno.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.workflow import Condition, Step, Workflow, StepInput
+from agno.run.workflow import WorkflowRunOutput, WorkflowRunOutputEvent, WorkflowRunEvent
+
+# === BASIC AGENTS ===
+researcher = Agent(
+    name="Researcher",
+    instructions="Research the given topic and provide detailed findings.",
+    tools=[DuckDuckGoTools()],
+)
+
+summarizer = Agent(
+    name="Summarizer",
+    instructions="Create a clear summary of the research findings.",
+)
+
+fact_checker = Agent(
+    name="Fact Checker",
+    instructions="Verify facts and check for accuracy in the research.",
+    tools=[DuckDuckGoTools()],
+)
+
+writer = Agent(
+    name="Writer",
+    instructions="Write a comprehensive article based on all available research and verification.",
+)
+
+# === CONDITION EVALUATOR ===
+def needs_fact_checking(step_input: StepInput) -> bool:
+    """Determine if the research contains claims that need fact-checking"""
+    summary = step_input.previous_step_content or ""
+
+    # Look for keywords that suggest factual claims
+    fact_indicators = [
+        "study shows",
+        "breakthroughs",
+        "research indicates",
+        "according to",
+        "statistics",
+        "data shows",
+        "survey",
+        "report",
+        "million",
+        "billion",
+        "percent",
+        "%",
+        "increase",
+        "decrease",
+    ]
+
+    return any(indicator in summary.lower() for indicator in fact_indicators)
+
+
+# === WORKFLOW STEPS ===
+research_step = Step(
+    name="research",
+    description="Research the topic",
+    agent=researcher,
+)
+
+summarize_step = Step(
+    name="summarize",
+    description="Summarize research findings",
+    agent=summarizer,
+)
+
+# Conditional fact-checking step
+fact_check_step = Step(
+    name="fact_check",
+    description="Verify facts and claims",
+    agent=fact_checker,
+)
+
+write_article = Step(
+    name="write_article",
+    description="Write final article",
+    agent=writer,
+)
+
+# === BASIC LINEAR WORKFLOW ===
+basic_workflow = Workflow(
+    name="Basic Linear Workflow",
+    description="Research -> Summarize -> Condition(Fact Check) -> Write Article",
+    steps=[
+        research_step,
+        summarize_step,
+        Condition(
+            name="fact_check_condition",
+            description="Check if fact-checking is needed",
+            evaluator=needs_fact_checking,
+            steps=[fact_check_step],
+        ),
+        write_article,
+    ],
+)
+
+if __name__ == "__main__":
+    try:
+        response: Iterator[WorkflowRunOutputEvent] = basic_workflow.run(
+            input="Recent breakthroughs in quantum computing",
+            stream=True,
+            stream_events=True,
+        )
+        for event in response:
+            if event.event == WorkflowRunEvent.condition_execution_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.condition_execution_completed.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.workflow_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.step_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.step_completed.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.workflow_completed.value:
+                print(event)
+                print()
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+
+        traceback.print_exc()
+```
+
+### 流式传输执行器事件
+
+在工作流流式传输期间，会自动输出（yield）工作流内部使用的智能体（Agents）和团队（Teams）的事件。您可以通过设置 `stream_executor_events=False` 来选择不流式传输这些执行器事件。
+
+以下工作流事件将在所有情况下被流式传输：
+- `WorkflowStarted`
+- `WorkflowCompleted`
+- `StepStarted`
+- `StepCompleted`
+
+请参见以下示例：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.workflow.step import Step
+from agno.workflow.workflow import Workflow
+
+agent = Agent(
+    name="ResearchAgent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions="You are a helpful research assistant. Be concise.",
+)
+
+workflow = Workflow(
+    name="Research Workflow",
+    steps=[Step(name="Research", agent=agent)],
+    stream=True,
+    stream_executor_events=False,  # <- Filter out internal executor events
+)
+
+print("\n" + "=" * 70)
+print("Workflow Streaming Example: stream_executor_events=False")
+print("=" * 70)
+print(
+    "\nThis will show only workflow and step events and will not yield RunContent and TeamRunContent events"
+)
+print("filtering out internal agent/team events for cleaner output.\n")
+
+# Run workflow and display events
+for event in workflow.run(
+    "What is Python?",
+    stream=True,
+    stream_events=True,
+):
+    event_name = event.event if hasattr(event, "event") else type(event).__name__
+    print(f"  → {event_name}")
+```
+
+### 异步流式传输
+
+`Workflow.arun(stream=True)` 返回一个 `WorkflowRunOutputEvent` 对象的异步迭代器，而不是单个响应。
+例如，如果您想要流式传输响应，可以执行以下操作：
+
+```Python
+
+# Define your workflow
+...
+
+async def main():
+    try:
+        response: AsyncIterator[WorkflowRunOutputEvent] = basic_workflow.arun(
+            message="Recent breakthroughs in quantum computing",
+            stream=True,
+            stream_events=True,
+        )
+        async for event in response:
+            if event.event == WorkflowRunEvent.condition_execution_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.condition_execution_completed.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.workflow_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.step_started.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.step_completed.value:
+                print(event)
+                print()
+            elif event.event == WorkflowRunEvent.workflow_completed.value:
+                print(event)
+                print()
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+        traceback.print_exc()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+更多详情请参阅 [异步流式传输](/zh/basics/workflows/usage/async-events-streaming) 示例。
+
+### 事件类型
+
+根据工作流的配置，`Workflow.run()` 和 `Workflow.arun()` 函数会生成以下事件：
+
+#### 核心事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `WorkflowStarted` | 表示工作流运行的开始 |
+| `WorkflowCompleted` | 表示工作流运行成功完成 |
+| `WorkflowError` | 表示工作流运行期间发生错误 |
+
+#### 步骤事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `StepStarted` | 表示步骤的开始 |
+| `StepCompleted` | 表示步骤成功完成 |
+| `StepError` | 表示步骤执行期间发生错误 |
+
+#### 步骤输出事件 (针对自定义函数)
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `StepOutput` | 表示步骤的输出 |
+
+#### 并行执行事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `ParallelExecutionStarted` | 表示并行步骤的开始 |
+| `ParallelExecutionCompleted` | 表示并行步骤成功完成 |
+
+#### 条件执行事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `ConditionExecutionStarted` | 表示条件判断的开始 |
+| `ConditionExecutionCompleted` | 表示条件判断成功完成 |
+
+#### 循环执行事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `LoopExecutionStarted` | 表示循环的开始 |
+| `LoopIterationStartedEvent` | 表示循环迭代的开始 |
+| `LoopIterationCompletedEvent` | 表示循环迭代成功完成 |
+| `LoopExecutionCompleted` | 表示循环成功完成 |
+
+#### 路由器执行事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `RouterExecutionStarted` | 表示路由器的开始 |
+| `RouterExecutionCompleted` | 表示路由器成功完成 |
+
+#### 步骤组执行事件
+
+| 事件类型 | 描述 |
+| --- | --- |
+| `StepsExecutionStarted` | 表示 `Steps` 步骤组开始执行 |
+| `StepsExecutionCompleted` | 表示 `Steps` 步骤组执行成功完成 |
+
+详情请参阅 [WorkflowRunOutputEvent](/zh/reference/workflows/run-output) 文档。
+
+### 存储事件
+
+工作流可以自动存储所有执行事件，以便进行分析、调试和审计。您可以过滤特定的事件类型，以减少噪音和存储开销，同时保留关键的执行记录。
+
+您可以通过 `workflow.run_response.events` 访问存储的事件，也可以在工作流会话数据库（SQLite、PostgreSQL 等）的 `runs` 列中找到它们。
+
+- `store_events=True`：自动将所有工作流事件存储在数据库中
+- `events_to_skip=[]`：过滤掉特定的事件类型，以减少存储量和噪音
+
+通过 `workflow.run_response.events` 访问所有存储的事件
+
+**可跳过的事件：**
+```python
+from agno.run.workflow import WorkflowRunEvent
+
+# Common events you might want to skip
+events_to_skip = [
+    WorkflowRunEvent.workflow_started,
+    WorkflowRunEvent.workflow_completed,
+    WorkflowRunEvent.workflow_cancelled,
+    WorkflowRunEvent.step_started,
+    WorkflowRunEvent.step_completed,
+    WorkflowRunEvent.parallel_execution_started,
+    WorkflowRunEvent.parallel_execution_completed,
+    WorkflowRunEvent.condition_execution_started,
+    WorkflowRunEvent.condition_execution_completed,
+    WorkflowRunEvent.loop_execution_started,
+    WorkflowRunEvent.loop_execution_completed,
+    WorkflowRunEvent.router_execution_started,
+    WorkflowRunEvent.router_execution_completed,
+]
+```
+
+**使用场景**
+- **调试**: 存储所有事件以分析工作流的执行流程
+- **审计追踪**: 保留所有工作流活动记录以满足合规要求
+- **性能分析**: 分析时间和执行模式
+- **错误排查**: 查看导致失败的事件序列
+- **降低噪音**: 跳过如 `step_started` 等冗长事件，专注于结果
+
+**配置示例**
+```python
+# store everything
+debug_workflow = Workflow(
+    name="Debug Workflow",
+    store_events=True,
+    steps=[...]
+)
+
+# store only important events
+production_workflow = Workflow(
+    name="Production Workflow",
+    store_events=True,
+    events_to_skip=[
+        WorkflowRunEvent.step_started,
+        WorkflowRunEvent.parallel_execution_started,
+        # keep step_completed and workflow_completed
+    ],
+    steps=[...]
+)
+
+# No event storage
+fast_workflow = Workflow(
+    name="Fast Workflow",
+    store_events=False,
+    steps=[...]
+)
+```
+
+<Tip>
+更多信息请参见此 [示例](/zh/basics/workflows/usage/store-events-and-events-to-skip-in-a-workflow)。
+</Tip>
+
+## Agno 遥测
+
+Agno 会记录工作流所使用的模型，以便我们优先更新最受欢迎的提供商。您可以通过在环境变量中设置 `AGNO_TELEMETRY=false`，或在工作流中设置 `telemetry=False` 来禁用此功能。
+
+```bash
+export AGNO_TELEMETRY=false
+```
+or:
+```python
+workflow = Workflow(..., telemetry=False)
+```
+
+更多详情请参阅 [Workflow 类参考文档](/zh/reference/workflows/workflow)。
+
+## 开发者资源
+
+- 查看 [Workflow 参考文档](/zh/reference/workflows/workflow)
+- 查看 [WorkflowRunOutput 模式](/zh/reference/workflows/run-output)
+- 查看 [Cookbook](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/README.md)

@@ -1,0 +1,143 @@
+---
+title: 带有函数的步骤
+description: 此示例演示了如何在带有自定义函数执行器的命名步骤中使用。
+---
+
+此示例演示了**工作流**如何在命名的 Step 对象中使用自定义函数执行器。这种模式结合了命名步骤的优势与自定义函数的灵活性，允许在结构化的工作流步骤内进行复杂的数据处理。
+
+**使用场景**：当您需要命名步骤的组织结构，但又希望拥有超越智能体/团队所提供的自定义逻辑时。适用于复杂的数据处理、多步骤操作，或当您需要在单个步骤内编排多个智能体时。
+
+```python step_with_function.py
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+from agno.workflow.step import Step, StepInput, StepOutput
+from agno.workflow.workflow import Workflow
+
+# Define agents
+hackernews_agent = Agent(
+    name="Hackernews Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[HackerNewsTools()],
+    instructions="Extract key insights and content from Hackernews posts",
+)
+
+web_agent = Agent(
+    name="Web Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+    instructions="Search the web for the latest news and trends",
+)
+
+# Define research team for complex analysis
+research_team = Team(
+    name="Research Team",
+    members=[hackernews_agent, web_agent],
+    instructions="Analyze content and create comprehensive social media strategy",
+)
+
+content_planner = Agent(
+    name="Content Planner",
+    model=OpenAIChat(id="gpt-5-mini"),
+    instructions=[
+        "Plan a content schedule over 4 weeks for the provided topic and research content",
+        "Ensure that I have posts for 3 posts per week",
+    ],
+)
+
+
+def custom_content_planning_function(step_input: StepInput) -> StepOutput:
+    """
+    Custom function that does intelligent content planning with context awareness
+    """
+    message = step_input.input
+    previous_step_content = step_input.previous_step_content
+
+    # Create intelligent planning prompt
+    planning_prompt = f"""
+        STRATEGIC CONTENT PLANNING REQUEST:
+
+        Core Topic: {message}
+
+        Research Results: {previous_step_content[:500] if previous_step_content else "No research results"}
+
+        Planning Requirements:
+        1. Create a comprehensive content strategy based on the research
+        2. Leverage the research findings effectively
+        3. Identify content formats and channels
+        4. Provide timeline and priority recommendations
+        5. Include engagement and distribution strategies
+
+        Please create a detailed, actionable content plan.
+    """
+
+    try:
+        response = content_planner.run(planning_prompt)
+
+        enhanced_content = f"""
+            ## Strategic Content Plan
+
+            **Planning Topic:** {message}
+
+            **Research Integration:** {"✓ Research-based" if previous_step_content else "✗ No research foundation"}
+
+            **Content Strategy:**
+            {response.content}
+
+            **Custom Planning Enhancements:**
+            - Research Integration: {"High" if previous_step_content else "Baseline"}
+            - Strategic Alignment: Optimized for multi-channel distribution
+            - Execution Ready: Detailed action items included
+        """.strip()
+
+        return StepOutput(content=enhanced_content)
+
+    except Exception as e:
+        return StepOutput(
+            content=f"Custom content planning failed: {str(e)}",
+            success=False,
+        )
+
+
+# Define steps using different executor types
+
+research_step = Step(
+    name="Research Step",
+    team=research_team,
+)
+
+content_planning_step = Step(
+    name="Content Planning Step",
+    executor=custom_content_planning_function,
+)
+
+
+# Define and use examples
+if __name__ == "__main__":
+    content_creation_workflow = Workflow(
+        name="Content Creation Workflow",
+        description="Automated content creation with custom execution options",
+        db=SqliteDb(
+            session_table="workflow_session",
+            db_file="tmp/workflow.db",
+        ),
+        # Define the sequence of steps
+        # First run the research_step, then the content_planning_step
+        # You can mix and match agents, teams, and even regular python functions directly as steps
+        steps=[research_step, content_planning_step],
+    )
+    content_creation_workflow.print_response(
+        input="AI trends in 2024",
+        markdown=True,
+    )
+
+    print("\n" + "=" * 60 + "\n")
+```
+
+这是该模式的一个同步非流式示例。要查看异步和流式版本，请参阅以下Cookbook：
+- [函数与智能体的序列 (同步流式)](https://github.com/agno-agi/agno/blob/main/cookbook/05_workflows/_01_basic_workflows/_01_sequence_of_steps/sync/sequence_of_functions_and_agents_stream.py)
+- [函数与智能体的序列 (异步非流式)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_01_basic_workflows/_01_sequence_of_steps/async/sequence_of_functions_and_agents.py)
+- [函数与智能体的序列 (异步流式)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_01_basic_workflows/_01_sequence_of_steps/async/sequence_of_functions_and_agents_stream.py)

@@ -1,0 +1,74 @@
+---
+title: 工具调用限制
+---
+
+本示例演示了如何使用工具调用限制来控制智能体可以进行的工具调用次数。这对于防止过度使用 API 或在特定场景下限制智能体行为非常有用。
+
+<Steps>
+
+  <Step title="创建一个Python文件">
+    ```bash
+    touch tool_call_limit.py
+    ```
+  </Step>
+
+
+  <Step title="添加以下代码到你的Python文件">
+    ```python tool_call_limit.py
+    """
+    This cookbook shows how to use tool call limit to control the number of tool calls an agent can make.
+    """
+
+    from agno.agent import Agent
+    from agno.models.anthropic import Claude
+    from agno.tools.duckduckgo import DuckDuckGoTools
+
+    agent = Agent(
+        model=Claude(id="claude-3-5-haiku-20241022"),
+        tools=[DuckDuckGoTools(company_news=True, cache_results=True)],
+        tool_call_limit=1,
+    )
+
+    # It should only call the first tool and fail to call the second tool.
+    agent.print_response(
+        "Find me the current price of TSLA, then after that find me the latest news about Tesla.",
+        stream=True,
+    )
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖">
+    ```bash
+    pip install -U agno anthropic ddgs
+    ```
+  </Step>
+
+  <Step title="设置 Anthropic API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:ANTHROPIC_API_KEY="your_anthropic_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python tool_call_limit.py
+    ```
+
+    ```bash Windows
+    python tool_call_limit.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

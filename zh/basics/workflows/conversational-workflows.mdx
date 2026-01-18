@@ -1,0 +1,158 @@
+---
+title: 对话式工作流
+description: 了解 Agno 中的对话式工作流。
+tag: beta
+---
+
+<Badge icon="code-branch" color="orange">
+    <Tooltip tip="Introduced in v2.2.6" cta="View release notes" href="https://github.com/agno-agi/agno/releases/tag/v2.2.6">v2.2.6</Tooltip>
+</Badge>
+
+如果您的用户需要直接与工作流进行交互，将其设计为**对话式工作流**通常会非常有用。用户随后便能像与智能体（Agent）或团队互动一样，与该工作流进行聊天。
+
+此功能允许您向工作流中添加一个 `WorkflowAgent`，它能智能地决定是执行以下哪种操作：
+1.  **直接回答**：基于当前输入和过往的工作流结果直接给出答复
+2.  **运行工作流**：当仅凭过往结果无法回答输入内容时，触发工作流运行
+
+<Note>
+什么是 **WorkflowAgent**？
+
+`WorkflowAgent` 是 `Agent` 类的一个受限版本，专为工作流编排而设计。
+</Note>
+
+## 快速开始
+
+您可以按照以下方式向工作流中添加 `WorkflowAgent`：
+```python
+from agno.workflow import WorkflowAgent
+from agno.workflow.workflow import Workflow
+from agno.models.openai import OpenAIChat
+
+workflow_agent = WorkflowAgent(
+    model=OpenAIChat(id="gpt-4o-mini"),  # Set the model that should be used
+    num_history_runs=4  # How many of the previous runs should it take into account
+)
+
+workflow = Workflow(
+    name="Story Generation Workflow",
+    description="A workflow that generates stories, formats them, and adds references",
+    agent=workflow_agent,
+)
+```
+
+## 架构
+
+<img 
+  className="block dark:hidden" 
+  src="/images/workflow-agent-flow-light.png" 
+  alt="Workflows conversational workflows diagram"
+  style={{ maxWidth: '500px', width: '100%', height: 'auto' }}
+/>
+<img 
+  className="hidden dark:block" 
+  src="/images/workflow-agent-flow-dark.png" 
+  alt="Workflows conversational workflows diagram"
+  style={{ maxWidth: '500px', width: '100%', height: 'auto' }}
+/>
+
+## 对话式工作流的历史记录：
+
+与[步骤的工作流历史记录](/zh/basics/chat-history/workflow/overview)类似，`WorkflowAgent` 可以访问当前会话的完整工作流运行历史。
+这使得它能够回答有关先前结果的问题，比较多次运行的输出，并保持对话的连贯性。
+
+<Tip>
+如何控制工作流智能体可见的先前运行次数？
+
+`num_history_runs` 参数控制了智能体在做决策时能看到多少次先前的工作流运行。这对于以下方面至关重要：
+
+- **上下文感知**：智能体需要查看过去的运行记录才能回答后续问题
+- **内存限制**：包含过多的记录可能会超出模型的上下文窗口限制
+- **性能**：记录越少，处理速度越快，输入的 Token 消耗也越低
+</Tip>
+
+## WorkflowAgent 的指令：
+
+您可以向 `WorkflowAgent` 提供自定义指令以控制其行为。尽管系统提供了默认指令（指示智能体直接从历史记录中回答，或在需要新处理时运行工作流），但您可以通过提供自己的指令来覆盖默认设置。
+
+<Warning>
+除非您有特定的用例，希望智能体以某种特定方式回答或在响应中包含某些特定信息，否则我们建议使用默认指令。
+默认指令已足以满足大多数使用场景。
+</Warning>
+
+```python
+workflow_agent = WorkflowAgent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    num_history_runs=4,
+    instructions="You are a helpful assistant that can answer questions and run workflows when new processing is needed.",
+)
+```
+
+## 使用示例
+
+```python
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+from agno.workflow import WorkflowAgent
+from agno.workflow.types import StepInput
+from agno.workflow.workflow import Workflow
+
+db_url = "postgresql+psycopg://ai:ai@localhost:5532/ai"
+
+
+story_writer = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    instructions="You are tasked with writing a 100 word story based on a given topic",
+)
+
+story_formatter = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    instructions="You are tasked with breaking down a short story in prelogues, body and epilogue",
+)
+
+
+def add_references(step_input: StepInput):
+    """Add references to the story"""
+
+    previous_output = step_input.previous_step_content
+
+    if isinstance(previous_output, str):
+        return previous_output + "\n\nReferences: https://www.agno.com"
+
+
+# Create a WorkflowAgent that will decide when to run the workflow
+workflow_agent = WorkflowAgent(model=OpenAIChat(id="gpt-4o-mini"), num_history_runs=4)
+
+# Create workflow with the WorkflowAgent
+workflow = Workflow(
+    name="Story Generation Workflow",
+    description="A workflow that generates stories, formats them, and adds references",
+    agent=workflow_agent,
+    steps=[story_writer, story_formatter, add_references],
+    db=PostgresDb(db_url),
+)
+
+# First call - will run the workflow (new topic)
+workflow.print_response(
+    "Tell me a story about a dog named Rocky", stream=True
+)
+
+# Second call - will answer directly from history
+workflow.print_response(
+    "What was Rocky's personality?", stream=True
+)
+
+# Third call - will run the workflow (new topic)
+workflow.print_response(
+    "Now tell me a story about a cat named Luna", stream=True
+)
+
+# Fourth call - will answer directly from history
+workflow.print_response(
+    "Compare Rocky and Luna", stream=True
+)
+```
+
+## 开发者资源
+
+欲了解更多详情，请在[对话式工作流示例](/zh/basics/workflows/usage/conversational-workflow-with-conditional-step)部分中探索不同的示例。
