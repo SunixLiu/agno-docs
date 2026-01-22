@@ -1,0 +1,130 @@
+---
+title: 条件步骤工作流
+description: 本示例演示了如何在工作流中使用条件步骤。
+---
+
+本示例演示了 **Workflows 2.0** 的条件执行模式。展示了如何根据内容分析来有条件地执行步骤，
+从而根据实际处理的数据提供智能化的步骤选择。
+
+**何时使用**：当您需要根据内容分析（而非简单的输入参数或其他业务逻辑）进行智能化的步骤选择时。
+此模式非常适合用于质量关卡、特定内容的处理，或响应中间结果的自适应工作流。
+
+```python condition_steps_workflow_stream.py
+from agno.agent.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.workflow.condition import Condition
+from agno.workflow.step import Step
+from agno.workflow.types import StepInput
+from agno.workflow.workflow import Workflow
+
+# === BASIC AGENTS ===
+researcher = Agent(
+    name="Researcher",
+    instructions="Research the given topic and provide detailed findings.",
+    tools=[DuckDuckGoTools()],
+)
+
+summarizer = Agent(
+    name="Summarizer",
+    instructions="Create a clear summary of the research findings.",
+)
+
+fact_checker = Agent(
+    name="Fact Checker",
+    instructions="Verify facts and check for accuracy in the research.",
+    tools=[DuckDuckGoTools()],
+)
+
+writer = Agent(
+    name="Writer",
+    instructions="Write a comprehensive article based on all available research and verification.",
+)
+
+# === CONDITION EVALUATOR ===
+
+
+def needs_fact_checking(step_input: StepInput) -> bool:
+    """Determine if the research contains claims that need fact-checking"""
+    summary = step_input.previous_step_content or ""
+
+    # Look for keywords that suggest factual claims
+    fact_indicators = [
+        "study shows",
+        "research indicates",
+        "according to",
+        "statistics",
+        "data shows",
+        "survey",
+        "report",
+        "million",
+        "billion",
+        "percent",
+        "%",
+        "increase",
+        "decrease",
+    ]
+
+    return any(indicator in summary.lower() for indicator in fact_indicators)
+
+
+# === WORKFLOW STEPS ===
+research_step = Step(
+    name="research",
+    description="Research the topic",
+    agent=researcher,
+)
+
+summarize_step = Step(
+    name="summarize",
+    description="Summarize research findings",
+    agent=summarizer,
+)
+
+# Conditional fact-checking step
+fact_check_step = Step(
+    name="fact_check",
+    description="Verify facts and claims",
+    agent=fact_checker,
+)
+
+write_article = Step(
+    name="write_article",
+    description="Write final article",
+    agent=writer,
+)
+
+# === BASIC LINEAR WORKFLOW ===
+basic_workflow = Workflow(
+    name="Basic Linear Workflow",
+    description="Research -> Summarize -> Condition(Fact Check) -> Write Article",
+    steps=[
+        research_step,
+        summarize_step,
+        Condition(
+            name="fact_check_condition",
+            description="Check if fact-checking is needed",
+            evaluator=needs_fact_checking,
+            steps=[fact_check_step],
+        ),
+        write_article,
+    ],
+)
+
+if __name__ == "__main__":
+    print("🚀 Running Basic Linear Workflow Example")
+    print("=" * 50)
+
+    try:
+        basic_workflow.print_response(
+            input="Recent breakthroughs in quantum computing",
+            stream=True,
+        )
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+
+        traceback.print_exc()
+```
+
+要查看异步示例，请参阅Cookbook-
+- [条件步骤工作流 (异步流式传输)](https://github.com/agno-agi/agno/blob/main/cookbook/05_workflows/_02_workflows_conditional_execution/sync/condition_steps_workflow_stream.py)

@@ -1,0 +1,102 @@
+---
+title: 循环步骤工作流
+description: 本示例演示了用于质量驱动的迭代过程的 **Workflows 2.0** 循环执行。
+---
+
+本示例演示了 **Workflows 2.0** 如何重复执行步骤，直到满足特定条件为止，从而确保在进入内容创建阶段前达到足够的研究深度。
+
+**何时使用**：当您需要进行迭代优化、质量保证，或者无法在单次执行中保证所需输出质量时。非常适合用于研究收集、数据采集，或任何通过内容分析（而非固定迭代次数）来确定结果是否“足够好”的流程。
+
+```python loop_steps_workflow.py
+from typing import List
+
+from agno.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+from agno.workflow import Loop, Step, Workflow
+from agno.workflow.types import StepOutput
+
+# Create agents for research
+research_agent = Agent(
+    name="Research Agent",
+    role="Research specialist",
+    tools=[HackerNewsTools(), DuckDuckGoTools()],
+    instructions="You are a research specialist. Research the given topic thoroughly.",
+    markdown=True,
+)
+
+content_agent = Agent(
+    name="Content Agent",
+    role="Content creator",
+    instructions="You are a content creator. Create engaging content based on research.",
+    markdown=True,
+)
+
+# Create research steps
+research_hackernews_step = Step(
+    name="Research HackerNews",
+    agent=research_agent,
+    description="Research trending topics on HackerNews",
+)
+
+research_web_step = Step(
+    name="Research Web",
+    agent=research_agent,
+    description="Research additional information from web sources",
+)
+
+content_step = Step(
+    name="Create Content",
+    agent=content_agent,
+    description="Create content based on research findings",
+)
+
+
+# End condition function
+def research_evaluator(outputs: List[StepOutput]) -> bool:
+    """
+    Evaluate if research results are sufficient
+    Returns True to break the loop, False to continue
+    """
+    # Check if any outputs are present
+    if not outputs:
+        return False
+
+    # Check if any output contains substantial content
+    for output in outputs:
+        if output.content and len(output.content) > 200:
+            print(
+                f"✅ Research evaluation passed - found substantial content ({len(output.content)} chars)"
+            )
+            return True
+
+    print("❌ Research evaluation failed - need more substantial research")
+    return False
+
+
+# Create workflow with loop
+workflow = Workflow(
+    name="Research and Content Workflow",
+    description="Research topics in a loop until conditions are met, then create content",
+    steps=[
+        Loop(
+            name="Research Loop",
+            steps=[research_hackernews_step, research_web_step],
+            end_condition=research_evaluator,
+            max_iterations=3,  # Maximum 3 iterations
+        ),
+        content_step,
+    ],
+)
+
+if __name__ == "__main__":
+    # Test the workflow
+    workflow.print_response(
+        input="Research the latest trends in AI and machine learning, then create a summary",
+    )
+```
+
+这是该模式的同步非流式传输示例。要查看异步和流式传输版本，请参阅Cookbook-
+- [循环步骤工作流 (同步流式传输)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_03_workflows_loop_execution/sync/loop_steps_workflow_stream.py)
+- [循环步骤工作流 (异步非流式传输)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_03_workflows_loop_execution/async/loop_steps_workflow.py)
+- [循环步骤工作流 (异步流式传输)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_03_workflows_loop_execution/async/loop_steps_workflow_stream.py)

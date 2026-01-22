@@ -1,0 +1,44 @@
+---
+title: 并行步骤工作流
+description: 本示例演示了 **Workflows 2.0** 对可同时运行的独立任务的并行执行。展示了如何通过并行执行不相互依赖的步骤来优化工作流性能，从而显著减少总执行时间。
+---
+
+本示例演示了 **Workflows 2.0** 对可同时运行的独立任务的并行执行。展示了如何通过并行执行不相互依赖的步骤来优化工作流性能，从而显著减少总执行时间。
+
+**何时使用**：当您拥有一组互不依赖对方输出、但可共同促成同一最终目标的独立任务时。非常适合用于多源研究、并行数据处理，或任何任务可同时运行的场景。
+
+```python parallel_steps_workflow.py
+from agno.agent import Agent
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.tools.hackernews import HackerNewsTools
+from agno.workflow import Step, Workflow
+from agno.workflow.parallel import Parallel
+
+# Create agents
+researcher = Agent(name="Researcher", tools=[HackerNewsTools(), DuckDuckGoTools()])
+writer = Agent(name="Writer")
+reviewer = Agent(name="Reviewer")
+
+# Create individual steps
+research_hn_step = Step(name="Research HackerNews", agent=researcher)
+research_web_step = Step(name="Research Web", agent=researcher)
+write_step = Step(name="Write Article", agent=writer)
+review_step = Step(name="Review Article", agent=reviewer)
+
+# Create workflow with direct execution
+workflow = Workflow(
+    name="Content Creation Pipeline",
+    steps=[
+        Parallel(research_hn_step, research_web_step, name="Research Phase"),
+        write_step,
+        review_step,
+    ],
+)
+
+workflow.print_response("Write about the latest AI developments")
+```
+
+这是该模式的同步非流式传输示例。要查看异步和流式传输版本，请参阅Cookbook-
+- [并行步骤工作流 (同步流式传输)](https://github.com/agno-agi/agno/blob/main/cookbook/05_workflows/_04_workflows_parallel_execution/sync/parallel_steps_workflow_stream.py)
+- [并行步骤工作流 (异步非流式传输)](https://github.com/agno-agi/agno/blob/main/cookbook/05_workflows/_04_workflows_parallel_execution/sync/parallel_steps_workflow.py)
+- [并行步骤工作流 (异步流式传输)](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows/_04_workflows_parallel_execution/async/parallel_steps_workflow_stream.py)
