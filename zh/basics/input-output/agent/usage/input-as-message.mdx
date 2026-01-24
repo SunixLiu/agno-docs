@@ -1,0 +1,83 @@
+---
+title: 以消息对象形式作为智能体输入
+---
+
+此示例演示了如何使用 Message 对象格式向智能体提供结构化的多模态内容输入。
+
+## 代码
+
+```python input_as_message.py
+from agno.agent import Agent, Message
+from agno.models.openai import OpenAIChat
+
+Agent(model=OpenAIChat(id="gpt-5-mini")).print_response(
+    Message(
+        role="user",
+        content=[
+            {"type": "text", "text": "What's in this image?"},
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+                },
+            },
+        ],
+    ),
+    stream=True,
+    markdown=True,
+    show_message=False
+)
+```
+
+## Usage
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装所需的库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建一个Python文件">
+    Create a Python file and add the above code.
+    ```bash
+    touch input_as_message.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python input_as_message.py
+    ```
+    
+    ```bash Windows
+    python input_as_message.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbook">
+  探索 Agno 仓库中所有可用的Cookbook。点击下方链接，在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/input_and_output" target="_blank">
+      Agno Cookbooks on GitHub
+    </Link>
+  </Step>
+</Steps>

@@ -1,0 +1,78 @@
+---
+title: 带输出模型的智能体
+---
+
+此示例演示了如何使用 `output_model` 参数指定一个不同的模型来生成最终响应，从而在智能体执行过程中实现模型切换。
+
+## 代码
+
+```python output_model.py
+"""
+This example shows how to use the output_model parameter to specify the model that will be used to generate the final response.
+"""
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4.1"),
+    output_model=OpenAIChat(id="gpt-5-mini"),
+    tools=[DuckDuckGoTools()],
+)
+
+agent.print_response("Latest news from France?", stream=True)
+```
+
+## 用法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装依赖项">
+    ```bash
+    pip install -U agno openai ddgs
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建 Python 文件">
+    Create a Python file and add the above code.
+    ```bash
+    touch output_model.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python output_model.py
+    ```
+    
+    ```bash Windows
+    python output_model.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbook">
+  探索 Agno 仓库中所有可用的Cookbook。点击下方链接，在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/input_and_output" target="_blank">
+      Agno Cookbooks on GitHub
+    </Link>
+  </Step>
+</Steps>

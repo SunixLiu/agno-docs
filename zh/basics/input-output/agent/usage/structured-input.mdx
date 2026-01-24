@@ -1,0 +1,96 @@
+---
+title: 使用 Pydantic 模型的结构化输入
+---
+
+此示例演示了如何将结构化的 Pydantic 模型作为输入传递给智能体，从而为复杂的调研任务提供类型安全且经过验证的输入参数。
+
+## 代码
+
+```python structured_input.py
+from typing import List
+
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.tools.hackernews import HackerNewsTools
+from pydantic import BaseModel, Field
+
+
+class ResearchTopic(BaseModel):
+    """Structured research topic with specific requirements"""
+
+    topic: str
+    focus_areas: List[str] = Field(description="Specific areas to focus on")
+    target_audience: str = Field(description="Who this research is for")
+    sources_required: int = Field(description="Number of sources needed", default=5)
+
+
+# Define agents
+hackernews_agent = Agent(
+    name="Hackernews Agent",
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[HackerNewsTools()],
+    role="Extract key insights and content from Hackernews posts",
+)
+
+hackernews_agent.print_response(
+    input=ResearchTopic(
+        topic="AI",
+        focus_areas=["AI", "Machine Learning"],
+        target_audience="Developers",
+        sources_required=5,
+    )
+)
+```
+
+## Usage
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装所需的库">
+    ```bash
+    pip install -U agno openai pydantic
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建一个Python文件">
+    Create a Python file and add the above code.
+    ```bash
+    touch structured_input.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python structured_input.py
+    ```
+    
+    ```bash Windows
+    python structured_input.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbook">
+  探索 Agno 仓库中所有可用的Cookbook。点击下方链接，在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/input_and_output" target="_blank">
+      Agno Cookbooks on GitHub
+    </Link>
+  </Step>
+</Steps>

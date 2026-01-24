@@ -1,0 +1,81 @@
+---
+title: JSON 模式输出
+description: 使用 JSON 字典模式实现智能体的结构化输出
+---
+
+在为智能体指定需遵循的结构化输出格式时，通常推荐使用 Pydantic 模型。关于结构化输出的更多内容，请参阅[此处](https://docs.agno.com/examples/getting-started/05-structured-output#structured-output)。
+
+如果你需要使用特定模型提供商的模式格式，也可以使用简单的 JSON 字典作为模式，而不必使用 Pydantic 模型。例如：
+
+<Steps>
+
+  <Step title="Add the following code to your Python file">
+    ```python json_schema_output.py
+    from agno.agent import Agent
+    from agno.models.openai import OpenAIChat
+    from rich.pretty import pprint
+
+    person_schema = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "PersonInfo",
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "Person's full name"},
+                    "age": {"type": "integer", "description": "Person's age"},
+                    "occupation": {"type": "string", "description": "Person's occupation"},
+                },
+                "required": ["name", "age", "occupation"],
+                "additionalProperties": False,
+            },
+        },
+    }
+
+    agent = Agent(model=OpenAIChat(id="gpt-4o-mini"), markdown=False)
+
+    response = agent.run(
+        "Tell me about Albert Einstein",
+        output_schema=person_schema,
+        stream=False,
+    )
+
+    pprint(response.content)
+    ```
+  </Step>
+
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装所需的库">
+    ```bash
+    pip install -U agno openai rich
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="运行示例">
+    <CodeGroup>
+    ```bash Mac
+    python json_schema_output.py
+    ```
+
+    ```bash Windows
+    python json_schema_output.py
+    ```
+    </CodeGroup>
+  </Step>
+
+</Steps>

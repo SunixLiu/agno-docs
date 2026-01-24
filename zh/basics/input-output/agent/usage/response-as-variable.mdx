@@ -1,0 +1,90 @@
+---
+title: 将智能体响应捕获为变量
+---
+
+此示例演示了如何将智能体的响应捕获并作为变量使用，从而以编程方式访问响应数据及其元数据。
+
+## 代码
+
+```python response_as_variable.py
+from typing import Iterator  # noqa
+from rich.pretty import pprint
+from agno.agent import Agent, RunOutput
+from agno.models.openai import OpenAIChat
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-5-mini"),
+    tools=[
+        DuckDuckGoTools(
+            stock_price=True,
+            analyst_recommendations=True,
+            company_info=True,
+            company_news=True,
+        )
+    ],
+    instructions=["Use tables where possible"],
+    markdown=True,
+)
+
+run_response: RunOutput = agent.run("What is the stock price of NVDA")
+pprint(run_response)
+
+# run_response_strem: Iterator[RunOutputEvent] = agent.run("What is the stock price of NVDA", stream=True)
+# for response in run_response_strem:
+#     pprint(response)
+```
+
+## 用法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装所需的库">
+    ```bash
+    pip install -U agno openai ddgs rich
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建一个Python文件">
+    Create a Python file and add the above code.
+    ```bash
+    touch response_as_variable.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python response_as_variable.py
+    ```
+    
+    ```bash Windows
+    python response_as_variable.py
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="查找所有Cookbook">
+  探索 Agno 仓库中所有可用的Cookbook。点击下方链接，在 GitHub 上查看代码：
+
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/input_and_output" target="_blank">
+      Agno Cookbooks on GitHub
+    </Link>
+  </Step>
+</Steps>

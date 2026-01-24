@@ -1,0 +1,89 @@
+---
+title: 以消息对象列表形式作为智能体输入
+---
+
+此示例演示了如何以 Message 对象列表的形式向智能体传递输入，从而支持多轮对话和上下文设置。
+
+## 代码
+
+```python input_as_messages_list.py
+from agno.agent import Agent, Message
+from agno.models.openai import OpenAIChat
+
+Agent(model=OpenAIChat(id="gpt-5-mini")).print_response(
+    input=[
+        Message(
+            role="user",
+            content="I'm preparing a presentation for my company about renewable energy adoption.",
+        ),
+        Message(
+            role="assistant",
+            content="I'd be happy to help with your renewable energy presentation. What specific aspects would you like me to focus on?",
+        ),
+        Message(
+            role="user",
+            content="Could you research the latest solar panel efficiency improvements in 2024?",
+        ),
+        Message(
+            role="user",
+            content="Also, please summarize the key findings in bullet points for my slides.",
+        ),
+    ],
+    stream=True,
+    markdown=True,
+)
+```
+
+## 用法
+
+<Steps>
+  <Snippet file="create-venv-step.mdx" />
+
+  <Step title="安装所需的库">
+    ```bash
+    pip install -U agno openai
+    ```
+  </Step>
+
+  <Step title="设置 OpenAI API key">
+
+    <CodeGroup>
+
+    ```bash Mac/Linux
+      export OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+
+    ```bash Windows
+      $Env:OPENAI_API_KEY="your_openai_api_key_here"
+    ```
+    </CodeGroup> 
+  </Step>
+
+  <Step title="创建一个Python文件">
+    Create a Python file and add the above code.
+    ```bash
+    touch input_as_messages_list.py
+    ```
+  </Step>
+
+  <Step title="运行智能体">
+    <CodeGroup>
+    ```bash Mac
+    python input_as_messages_list.py
+    ```
+    
+    ```bash Windows  
+    python input_as_messages_list.py
+    ```
+    </CodeGroup>
+  </Step>
+
+
+  <Step title="查找所有Cookbook">
+  探索 Agno 仓库中所有可用的Cookbook。点击下方链接，在 GitHub 上查看代码：
+  
+    <Link href="https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/input_and_output" target="_blank">
+      Agno Cookbooks on GitHub
+    </Link>
+  </Step>
+</Steps>
