@@ -1,0 +1,68 @@
+---
+title: "以图像列表作为团队输入"
+---
+
+此示例演示了如何以包含文本和图像的列表形式向团队传递输入。该团队可处理多模态输入，包括文本描述和用于分析的图像 URL。
+
+## 代码
+
+```python cookbook/02_examples/teams/basic/input_as_list.py
+from agno.agent import Agent
+from agno.team import Team
+
+team = Team(
+    members=[
+        Agent(
+            name="Sarah",
+            role="Data Researcher",
+            instructions="Focus on gathering and analyzing data",
+        ),
+        Agent(
+            name="Mike",
+            role="Technical Writer",
+            instructions="Create clear, concise summaries",
+        ),
+    ],
+)
+
+team.print_response(
+    [
+        {"type": "text", "text": "What's in this image?"},
+        {
+            "type": "image_url",
+            "image_url": {
+                "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+            },
+        },
+    ],
+    stream=True,
+    markdown=True,
+)
+```
+
+## 用法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装需要的库">
+        ```bash
+        pip install agno
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python cookbook/02_examples/teams/basic/input_as_list.py
+        ```
+    </Step>
+
+</Steps>
+

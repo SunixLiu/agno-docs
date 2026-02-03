@@ -1,0 +1,91 @@
+---
+title: "使用 Pydantic 模型作为团队输出"
+---
+
+此示例演示了如何将 Pydantic 模型用作团队的输出，展示如何以结构化数据形式返回响应，从而实现更精确且经过验证的输出处理。
+
+## 代码
+
+```python cookbook/02_examples/teams/structured_input_output/00_pydantic_model_output.py
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.utils.pprint import pprint_run_response
+from pydantic import BaseModel
+
+
+class StockAnalysis(BaseModel):
+    symbol: str
+    company_name: str
+    analysis: str
+
+
+class CompanyAnalysis(BaseModel):
+    company_name: str
+    analysis: str
+
+
+stock_searcher = Agent(
+    name="Stock Searcher",
+    model=OpenAIChat("gpt-5-mini"),
+    output_schema=StockAnalysis,
+    role="Searches for information on stocks and provides price analysis.",
+    tools=[DuckDuckGoTools()],
+)
+
+company_info_agent = Agent(
+    name="Company Info Searcher",
+    model=OpenAIChat("gpt-5-mini"),
+    role="Searches for information about companies and recent news.",
+    output_schema=CompanyAnalysis,
+    tools=[DuckDuckGoTools()],
+)
+
+
+class StockReport(BaseModel):
+    symbol: str
+    company_name: str
+    analysis: str
+
+
+team = Team(
+    name="Stock Research Team",
+    model=OpenAIChat("gpt-5-mini"),
+    members=[stock_searcher, company_info_agent],
+    output_schema=StockReport,
+    markdown=True,
+)
+
+# This should route to the stock_searcher
+response = team.run("What is the current stock price of NVDA?")
+assert isinstance(response.content, StockReport)
+pprint_run_response(response)
+```
+
+## 用法
+
+<Steps>
+
+    <Snippet file="create-venv-step.mdx" />
+
+    <Step title="安装需要的库">
+        ```bash
+        pip install agno openai ddgs pydantic
+        ```
+    </Step>
+
+    <Step title="设置环境变量">
+        ```bash
+        export OPENAI_API_KEY=****
+        ```
+    </Step>
+
+    <Step title="运行智能体">
+        ```bash
+        python cookbook/02_examples/teams/structured_input_output/00_pydantic_model_output.py
+        ```
+    </Step>
+
+</Steps>
+
