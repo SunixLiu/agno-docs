@@ -1,0 +1,239 @@
+---
+title: 工作流会话
+sidebarTitle: 工作流会话
+description: 了解工作流会话如何跟踪多步骤流水线的执行过程
+keywords: [会话, 工作流会话, 工作流历史, 工作流执行]
+---
+
+工作流会话用于跟踪你工作流的执行历史。与存储对话消息的智能体会话或团队会话不同，工作流会话存储的是完整的**工作流运行记录（workflow runs）**，其中每次运行都代表从输入到最终输出的整个工作流步骤的完整执行。
+
+可以这样理解：
+- **智能体/团队会话** = 对话历史（来回的消息）  
+- **工作流会话** = 执行历史（包含结果的完整流水线运行）
+
+## 何时使用工作流会话
+
+当你需要以下功能时，请使用工作流会话：
+
+- **跨多次运行追踪工作流执行历史**  
+- **在工作流步骤之间共享状态**（例如在流水线阶段间传递数据）  
+- **让工作流从先前运行中学习**，通过访问过去的输入和输出  
+- **持久化工作流结果**，便于分析和调试  
+- **在多次工作流执行之间保持上下文**
+
+<Tip>
+大多数情况下，建议为你的工作流启用会话持久化。
+</Tip>
+
+## 工作流会话的工作原理
+
+当你为工作流配置数据库后，Agno 会自动为你管理会话：
+
+```python
+from agno.workflow import Workflow
+from agno.db.sqlite import SqliteDb
+
+workflow = Workflow(
+    name="Research Pipeline",
+    db=SqliteDb(db_file="workflows.db"),
+    steps=[...],
+)
+
+# Each run creates or updates the workflow session
+result = workflow.run(input="AI trends", session_id="session_123")
+```
+
+每次运行工作流时，Agno 会：
+
+1. 为此执行创建一个唯一的 `run_id`  
+2. 存储输入、输出以及所有步骤的结果  
+3. 将此次运行更新到会话中  
+4. 使历史记录可用于未来的运行  
+
+### 工作流会话结构
+
+一个工作流会话存储以下内容：
+
+```python
+@dataclass
+class WorkflowSession:
+    session_id: str           # 唯一会话标识符
+    user_id: str | None       # 此会话所属的用户（可选）
+    workflow_id: str | None   # 所属工作流的 ID（可选）
+    workflow_name: str | None # 工作流名称（可选）
+    
+    # 所有工作流运行（执行）记录列表
+    runs: List[WorkflowRunOutput] | None
+    
+    # 会话专属数据
+    session_data: Dict | None    # 包含 session_name、session_state 等
+    workflow_data: Dict | None   # 工作流配置信息
+    metadata: Dict | None        # 自定义元数据
+    
+    created_at: int | None    # 创建时间（Unix 时间戳）
+    updated_at: int | None    # 最后更新时间（Unix 时间戳）
+```
+
+<Note>
+与智能体会话不同，工作流会话没有 `summary` 字段。工作流存储的是完整的运行结果，而非生成摘要。
+</Note>
+
+### 存储内容
+
+每次工作流运行会存储以下信息：
+
+- **输入（Input）**：传递给 `workflow.run()` 的数据  
+- **输出（Output）**：工作流的最终结果  
+- **步骤结果（Step results）**：流水线中每个步骤的输出  
+- **会话数据（Session Data）**：执行时间、状态、指标等  
+- **会话状态（Session state）**：步骤之间共享的数据（如使用）
+
+### 与智能体/团队会话的关键区别
+
+如果你熟悉智能体或团队会话，以下是主要差异：
+
+| 功能 | 智能体/团队会话 | 工作流会话 |
+|------|----------------|------------|
+| **存储内容** | 消息和对话轮次 | 完整的工作流运行记录（含各步骤结果） |
+| **历史类型** | 基于消息（聊天历史） | 基于运行（执行历史） |
+| **摘要支持** | 支持（通过 `enable_session_summaries`） | 不支持（直接存储完整运行） |
+| **历史格式** | 以消息形式注入 LLM 上下文 | 将先前运行结果前置到各步骤输入中 |
+
+### 数据库选项
+
+工作流会话需要数据库来持久化执行历史。Agno 支持多种数据库类型：
+
+```python
+from agno.db.sqlite import SqliteDb
+
+# Quick start - SQLite
+workflow = Workflow(
+    name="Research Pipeline",
+    db=SqliteDb(db_file="workflows.db"),
+    steps=[...],
+)
+```
+
+<Card title="数据库配置指南" icon="database" href="/zh/basics/database/overview">
+  查看所有支持的数据库、连接选项及生产环境建议
+</Card>
+
+## 工作流历史
+
+工作流历史功能允许工作流中的步骤访问先前运行的结果。启用后，Agno 会将之前运行的结果格式化，并前置到每个步骤的输入中，使后续执行能够基于这些上下文继续构建。
+
+### 为你的步骤启用历史功能
+
+```python
+from agno.workflow import Workflow
+from agno.db.sqlite import SqliteDb
+
+workflow = Workflow(
+    name="Content Pipeline",
+    db=SqliteDb(db_file="workflows.db"),
+    steps=[...],
+    add_workflow_history_to_steps=True,  # Include previous runs
+    num_history_runs=5,                  # Limit how many runs to load
+)
+```
+
+<Check>
+其优势包括：
+
+- **访问先前运行结果**，避免重复工作  
+- **参考历史决策**，保持输出一致性  
+- **在多次运行的工作流中维持上下文**  
+- **基于先前结果进行更深入的分析**
+</Check>
+
+### 历史格式
+
+Agno 会在将先前运行结果插入每个步骤输入前，将其封装在一个结构化的 XML 块中：
+
+```xml
+<workflow_history_context>
+[Workflow Run-1]
+User input: Create a blog post about AI
+Workflow output: [Full output from run]
+
+[Workflow Run-2]
+User input: Write about machine learning
+Workflow output: [Full output from run]
+</workflow_history_context>
+```
+
+有关高级控制、按步骤覆盖以及程序化访问模式，请参阅 [工作流历史实现指南](/basics/chat-history/workflow/overview)。
+
+## 会话命名
+
+为你的工作流会话设置有意义的名称，便于识别和管理：
+
+### 手动命名
+
+```python
+from agno.workflow import Workflow
+from agno.db.sqlite import SqliteDb
+
+workflow = Workflow(
+    name="Research Pipeline",
+    db=SqliteDb(db_file="workflows.db"),
+    steps=[...],
+)
+
+workflow.run(input="Analyze AI trends", session_id="session_123")
+workflow.set_session_name(session_id="session_123", session_name="AI Trends Analysis Q4 2024")
+
+# Retrieve the name
+name = workflow.get_session_name(session_id="session_123")
+print(name)  # "AI Trends Analysis Q4 2024"
+```
+
+### 自动生成名称
+
+工作流会话可自动生成基于时间戳的名称：
+
+```python
+workflow = Workflow(
+    name="Research Pipeline",
+    description="Automated research and analysis pipeline",
+    db=SqliteDb(db_file="workflows.db"),
+    steps=[...],
+)
+
+workflow.run(input="Research topic", session_id="session_123")
+workflow.set_session_name(session_id="session_123", autogenerate=True)
+
+name = workflow.get_session_name(session_id="session_123")
+print(name)  # "Automated research and analysis pipel - 2024-11-19 14:30"
+```
+
+## 后续步骤
+
+现在你已了解工作流会话，可以进一步探索以下功能：
+
+<CardGroup cols={2}>
+  <Card title="工作流历史" icon="clock-rotate-left" href="/zh/basics/chat-history/workflow/overview">
+    让工作流从先前运行中学习
+  </Card>
+  <Card title="会话状态" icon="database" href="/zh/basics/state/workflows/overview">
+    在多次运行的工作流步骤之间共享数据
+  </Card>
+  <Card title="会话管理" icon="tag" href="/zh/basics/sessions/session-management">
+    管理会话名称、ID 和组织方式
+  </Card>
+  <Card title="对话式工作流" icon="comments" href="/zh/basics/workflows/conversational-workflows">
+    通过 WorkflowAgent 实现交互式工作流
+  </Card>
+  <Card title="指标监控" icon="chart-line" href="/zh/basics/sessions/metrics/workflow">
+    跟踪工作流性能与使用情况
+  </Card>
+  <Card title="数据库设置" icon="database" href="/zh/basics/database/overview">
+    配置用于会话存储的数据库
+  </Card>
+</CardGroup>
+
+## 开发者资源
+
+- 查看 [工作流结构定义](/zh/reference/workflows/workflow)  
+- 查看 [WorkflowSession 结构定义](/zh/reference/workflows/session)  
+- 浏览 [工作流会话示例代码](https://github.com/agno-agi/agno/tree/main/cookbook/05_workflows)

@@ -1,0 +1,204 @@
+---
+title: 存储控制
+sidebarTitle: 存储控制
+description: 控制哪些会话数据被持久化到数据库中
+keywords: [会话, 存储, 数据库, 优化, store_media, store_tool_messages, store_history_messages]
+---
+
+随着会话不断积累数据，你的数据库可能会迅速膨胀。Agno 提供了三个存储标志（flags），让你能够精细控制哪些内容被持久化：
+
+- **`store_media`**：图像、视频、音频和文件上传  
+- **`store_tool_messages`**：工具调用及其结果  
+- **`store_history_messages`**：来自先前运行的历史消息  
+
+<Note>
+存储控制对智能体（Agents）和团队（Teams）的作用方式完全相同。本页同时提供两者的示例。
+</Note>
+
+## 存储控制的工作原理
+
+可以把这些标志理解为**数据库的过滤器，而非智能体的过滤器**。在一次运行过程中，你的智能体或团队仍然能看到所有内容：媒体、工具结果、历史记录——一切照常工作。过滤仅在运行结束后、将数据写入数据库时生效。
+
+因此，你可以安全地关闭媒体或工具消息的存储，而不会破坏任何功能。智能体仍能处理图像，工具仍会执行，历史记录也依然会传递给模型。你只是选择不把某些内容写入磁盘。即使未持久化全部数据，Token 消耗指标仍会如实反映实际使用情况。
+
+<Warning>
+当你优化数据库中存储的消息内容时，如果某些消息对对话历史至关重要，可能会导致大语言模型（LLM）产生幻觉。如果你的系统对历史依赖程度不高，则可以安全地优化存储。
+
+例如，如果你移除了工具调用消息，在后续启用了历史记录的运行中，这些消息将不可用，可能导致 LLM 认为该工具从未被调用过。
+</Warning>
+
+<Note>
+**重要提示：`store_tool_messages=False` 会同时移除工具调用及其结果**
+
+当你禁用工具消息存储时，Agno 不仅会移除工具结果，还会从对应的助手消息（即 LLM 生成的消息）中剥离工具调用部分。这是为了确保消息序列符合模型提供商所要求的有效格式。
+
+你的指标仍将显示实际使用的 Token 数量，包括那些已被移除的工具消息。
+</Note>
+
+## 存储标志参考
+
+| 标志 | 默认值 | 控制内容 | 禁用后的影响 |
+|------|--------|----------|--------------|
+| `store_media` | `True` | 用户上传的图像、视频、音频、文件 | 媒体内容不会持久化到数据库 |
+| `store_tool_messages` | `True` | 工具调用及其结果（同时移除对应的助手消息） | 不存储工具执行详情，可显著节省空间 |
+| `store_history_messages` | `True` | 来自先前运行的历史消息 | 旧历史不会存储，仅保留当前运行的数据 |
+
+## 禁用媒体存储
+
+大型媒体上传（如图像、PDF、音频）可能会占据会话表的大部分空间。通过设置 `store_media=False` 关闭媒体存储，并将原始文件保存到其他位置（如 S3、GCS 等）。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/agent.db"),
+    store_media=False,
+)
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/team.db"),
+    store_media=False,
+)
+```
+</CodeGroup>
+
+在运行过程中，模型仍然会接收到媒体内容（工具也仍可对其进行处理）；该标志仅影响运行结束后写入数据库的内容。
+
+### 推荐工作流
+
+1. 将文件上传至你偏好的存储服务，并保留其 URL 或 ID  
+2. 将该 URL 传递给智能体或团队，使其能够获取并处理文件  
+3. 通过设置 `store_media=False` 跳过原始媒体的持久化存储  
+
+## 禁用工具存储
+
+工具调用很容易导致存储膨胀（例如抓取的网页内容或大型 API 响应）。设置 `store_tool_messages=False` 后，持久化的运行记录中将同时移除工具结果和触发该结果的助手消息中的工具调用部分。指标仍会显示实际的 Token 消耗。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+from agno.tools.hackernews import HackerNewsTools
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    tools=[HackerNewsTools()],
+    db=SqliteDb(db_file="tmp/agent.db"),
+    store_tool_messages=False,
+)
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+from agno.tools.hackernews import HackerNewsTools
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    tools=[HackerNewsTools()],
+    db=SqliteDb(db_file="tmp/team.db"),
+    store_tool_messages=False,
+)
+```
+</CodeGroup>
+
+### 注意事项
+
+- 移除工具消息可保持符合模型提供商要求的消息顺序（避免出现孤立的 tool 角色）  
+- 若后续需要审计工具行为，请在运行结束前重新执行该工具，或将工具输出记录到其他日志系统中  
+- 当工具返回你不需要保存在会话记录中的二进制负载时，可将此设置与 `store_media=False` 结合使用  
+
+## 禁用历史消息存储
+
+设置 `store_history_messages=False` 不会影响运行时行为（历史消息仍会传递给 LLM），但在持久化之前会清除历史消息。只有非历史消息（即当前轮次的消息）会被写入数据库。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=SqliteDb(db_file="tmp/agent.db"),
+    add_history_to_context=True,
+    num_history_runs=3,
+    store_history_messages=False,
+)
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=SqliteDb(db_file="tmp/team.db"),
+    add_history_to_context=True,
+    num_history_runs=3,
+    store_history_messages=False,
+)
+```
+</CodeGroup>
+
+### 何时启用该选项
+
+- **成本 / 存储**：在高并发部署中减小数据库表体积  
+- **隐私**：避免长期存储包含敏感信息的完整对话记录  
+- **仅调试当前运行**：只保留最新一轮交互的记录  
+
+## 组合使用存储标志
+
+你可以同时使用多个标志，以优化你的存储策略：
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/agent.db"),
+    store_media=False,           # Media stored externally
+    store_tool_messages=False,   # Tool results not needed
+    store_history_messages=False, # Only current run persisted
+)
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/team.db"),
+    store_media=False,           # Media stored externally
+    store_tool_messages=False,   # Tool results not needed
+    store_history_messages=False, # Only current run persisted
+)
+```
+</CodeGroup>
+
+当你希望减少存储占用时（例如：可随时重新执行的大型工具负载、已存于 S3 的媒体文件、或不再需要的旧历史记录），请将相应标志**关闭**。  
+当你需要完整对话记录用于审计/合规、分析或智能体训练时，请保持标志**开启**。
+
+## 深入了解
+
+- [会话概述](/zh/basics/sessions/overview)  
+- [会话存储](/zh/basics/database/overview)

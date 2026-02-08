@@ -1,0 +1,77 @@
+---
+title: 智能体指标
+sidebarTitle: 概述
+description: 了解智能体的运行与会话指标。
+keywords: [指标, 智能体指标, 运行指标, 会话指标]
+---
+
+在 Agno 中运行智能体时，返回的响应（**RunOutput**）包含该次运行的详细指标。这些指标可帮助你了解资源使用情况（如 **Token 消耗** 和 **执行时间**）、性能表现，以及模型调用和工具调用的其他相关信息。
+
+指标在多个层级上提供：
+- **按消息（Per message）**：每条消息（助手消息、工具消息等）都有其独立的指标。  
+- **按运行（Per run）**：每个 `RunOutput` 对象都包含本次运行的指标。  
+- **按会话（Per session）**：`AgentSession` 包含聚合后的 `session_metrics`，即该会话中所有 `RunOutput.metrics` 的总和。
+
+## 示例用法
+
+假设你有一个执行某些任务的智能体，并希望在运行后分析其指标。以下是如何访问并打印这些指标的方法：
+
+你运行以下代码来创建一个智能体并执行它，配置如下：
+```python
+from agno.agent import Agent
+from agno.models.google import Gemini
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.db.sqlite import SqliteDb
+from rich.pretty import pprint
+
+agent = Agent(
+    model=Gemini(id="gemini-2.5-flash"),
+    tools=[DuckDuckGoTools()],
+    db=SqliteDb(db_file="tmp/agents.db"),
+    markdown=True,
+)
+
+run_response = agent.run(
+    "What is current news in the world?"
+)
+
+# Print metrics per message
+if run_response.messages:
+    for message in run_response.messages:
+        if message.role == "assistant":
+            if message.content:
+                print(f"Message: {message.content}")
+            elif message.tool_calls:
+                print(f"Tool calls: {message.tool_calls}")
+            print("---" * 5, "Metrics", "---" * 5)
+            pprint(message.metrics.to_dict())
+            print("---" * 20)
+
+# Print the aggregated metrics for the whole run
+print("---" * 5, "Run Metrics", "---" * 5)
+pprint(run_response.metrics.to_dict())
+# Print the aggregated metrics for the whole session
+print("---" * 5, "Session Metrics", "---" * 5)
+pprint(agent.get_session_metrics().to_dict())
+```
+
+你将看到包含以下信息的输出：
+
+- `input_tokens`：发送给模型的 Token 数量。  
+- `output_tokens`：从模型接收的 Token 数量。  
+- `total_tokens`：`input_tokens` 与 `output_tokens` 的总和。  
+- `audio_input_tokens`：用于音频输入发送给模型的 Token 数量。  
+- `audio_output_tokens`：从模型接收的音频输出 Token 数量。  
+- `audio_total_tokens`：`audio_input_tokens` 与 `audio_output_tokens` 的总和。  
+- `cache_read_tokens`：从缓存中读取的 Token 数量。  
+- `cache_write_tokens`：写入缓存的 Token 数量。  
+- `reasoning_tokens`：用于推理的 Token 数量。  
+- `duration`：本次运行的持续时间（秒）。  
+- `time_to_first_token`：生成首个 Token 所需的时间。  
+- `provider_metrics`：模型提供商返回的特定指标。
+
+## 开发者资源
+
+- 查看 [RunOutput 结构定义](/zh/reference/agents/run-response)  
+- 查看 [Metrics 结构定义](/zh/reference/agents/metrics)  
+- 参考 [示例代码（Cookbook）](https://github.com/agno-agi/agno/tree/main/cookbook/03_agents/other/agent_metrics.py)

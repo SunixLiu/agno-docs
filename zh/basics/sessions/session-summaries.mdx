@@ -1,0 +1,187 @@
+---
+title: 会话摘要
+description: 自动将长对话压缩为简洁摘要
+keywords: [会话, 会话摘要, 对话摘要, 记忆管理]
+---
+
+随着对话不断延长，将完整的聊天历史传递给大语言模型（LLM）会变得昂贵且缓慢。会话摘要通过自动将对话压缩为简洁的摘要来解决这一问题，保留关键信息，同时大幅减少上下文长度。
+
+这就像在长时间会议中做笔记——你不需要逐字记录所有内容，只需抓住重点即可。
+
+## 问题：Token 成本持续增长
+
+如果没有摘要，每条新消息都会累加到上下文窗口中：
+
+```
+Run 1: 100 tokens
+Run 2: 250 tokens (100 history + 150 new)
+Run 3: 450 tokens (250 history + 200 new)
+Run 4: 750 tokens (450 history + 300 new)
+...呈指数级增长
+```
+
+
+这很快会导致成本飙升，并触及模型的上下文长度限制。
+
+## 解决方案：自动生成摘要
+
+会话摘要会自动压缩你的对话历史：
+
+```
+Run 1: 100 tokens
+Run 2: 250 tokens
+[创建概要（summary）: 50 tokens]
+Run 3: 250 tokens (50 summary + 200 new)
+Run 4: 350 tokens (50 summary + 300 new)
+...线性增长
+```
+
+**优势：**
+- ✅ 显著降低 Token 成本  
+- ✅ 避免超出上下文窗口限制  
+- ✅ 保持对话连贯性  
+- ✅ 自动创建与更新  
+
+## 工作原理
+
+会话摘要遵循一个简单的三步模式：
+
+<Steps>
+    <Step title="启用摘要生成">
+        在你的智能体或团队上设置 `enable_session_summaries=True`。当会话中存在值得摘要的有意义消息时，系统会在运行结束后自动生成或更新摘要，并将其存储到数据库中。
+    </Step>
+    <Step title="在上下文中使用摘要">
+        设置 `add_session_summary_to_context=True`（默认在启用摘要生成时自动开启），即可在消息中包含摘要。这样就无需发送数十条历史消息，而只需传递压缩后的摘要，在大幅减少 Token 消耗的同时保留关键上下文。
+    </Step>
+    <Step title="自定义（可选）">
+        使用 [`SessionSummaryManager`](/zh/reference/session/summary_manager) 控制摘要生成过程——例如选用更便宜的模型、自定义提示词（prompt）或调整摘要格式。这让你能通过轻量级模型生成摘要来优化成本，同时保留主智能体的强大能力。
+    </Step>
+</Steps>
+
+
+## 启用会话摘要
+
+设置 `enable_session_summaries=True`，Agno 将为每个会话维护一个滚动更新的摘要。该摘要与存储的历史记录并存，可在后续运行中复用，从而节省 Token。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai"),
+    enable_session_summaries=True,
+)
+
+agent.print_response("Hi my name is John and I live in New York", session_id="conversation_123")
+
+# Retrieve the summary
+summary = agent.get_session_summary(session_id="conversation_123")
+if summary:
+    print(summary.summary, summary.topics)
+```
+
+```python Team
+from agno.team import Team
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai"),
+    enable_session_summaries=True,
+)
+
+team.print_response("Hi my name is John and I live in New York", session_id="conversation_123")
+
+# Retrieve the summary
+summary = team.get_session_summary(session_id="conversation_123")
+if summary:
+    print(summary.summary, summary.topics)
+```
+</CodeGroup>
+
+### 自定义摘要生成
+
+- 通过提供 [`SessionSummaryManager`](/zh/reference/session/summary_manager) 来指定更便宜的模型或自定义提示词（prompt）  
+- 通过实例化一个轻量级智能体，在后台批量调用 `get_session_summary`，实现异步（out-of-band）摘要生成  
+
+## 在上下文中使用摘要
+
+如果你启用了会话摘要生成，`add_session_summary_to_context=True` 默认会自动开启。  
+- 如果你**不希望生成新摘要**，但仍想在上下文中使用已存在的摘要，可单独设置 `add_session_summary_to_context=True`。  
+- 如果你**不想在上下文中使用摘要**，则可显式设置 `add_session_summary_to_context=False`。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+
+db = PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    add_session_summary_to_context=True,
+)
+
+agent.print_response("Hi my name is John and I live in New York", session_id="conversation_123")
+```
+
+```python Team
+from agno.team import Team
+from agno.db.postgres import PostgresDb
+from agno.models.openai import OpenAIChat
+
+db = PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai")
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    add_session_summary_to_context=True,
+)
+
+team.print_response("Hi my name is John and I live in New York", session_id="conversation_123")
+```
+</CodeGroup>
+
+Agno 会在每次运行前自动从存储中加载最新的摘要。你仍然可以同时混入近期的历史消息：
+
+<CodeGroup>
+```python Agent
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    add_session_summary_to_context=True,
+    add_history_to_context=True,
+    num_history_runs=2,  # Summary for long-term memory, last 2 runs for detail
+)
+```
+
+```python Team
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    add_session_summary_to_context=True,
+    add_history_to_context=True,
+    num_history_runs=2,  # Summary for long-term memory, last 2 runs for detail
+)
+```
+</CodeGroup>
+
+## 何时使用会话摘要
+
+**✅ 适用场景：**
+- 长周期的客服对话  
+- 持续数天或数周的交互  
+- 超过 10 轮的对话  
+- 对成本敏感的生产系统  
+
+**⚠️ 以下情况建议考虑替代方案：**
+- 短对话（少于 5 轮）  
+- 需要完整细节的场景  
+- 仅依赖最近上下文的实时聊天
+

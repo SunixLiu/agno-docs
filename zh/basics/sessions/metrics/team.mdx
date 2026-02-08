@@ -1,0 +1,110 @@
+---
+title: 团队指标
+sidebarTitle: 团队指标
+description: 了解团队的运行与会话指标。
+keywords: [指标, 团队指标, 运行指标, 会话指标]
+---
+
+在 Agno 中运行一个团队时，返回的响应（**TeamRunOutput**）包含该次运行的详细指标。这些指标可帮助你了解资源使用情况（如 **Token 消耗** 和 **执行时间**）、性能表现，以及团队负责人和成员在模型调用与工具调用方面的各项数据。
+
+指标在多个层级上提供：
+
+- **按消息（Per-message）**：每条消息（助手消息、工具消息等）都有其独立的指标。  
+- **按成员运行（Per-member run）**：每个团队成员的运行都有自己的指标。通过设置 `store_member_responses=True`，可将成员运行结果保留在 `TeamRunOutput` 中。  
+- **团队层级（Team-level）**：`TeamRunOutput` 会聚合团队负责人和所有成员消息的指标。  
+- **会话层级（Session-level）**：聚合整个会话中所有运行的指标，涵盖团队负责人及所有成员。
+
+## 示例用法
+
+假设你有一个执行某些任务的团队，并希望在运行后分析其指标。以下是如何访问并打印这些指标的方法：
+
+```python
+from typing import Iterator
+
+from agno.agent import Agent, RunOutput
+from agno.models.openai import OpenAIChat
+from agno.team.team import Team
+from agno.tools.duckduckgo import DuckDuckGoTools
+from agno.utils.pprint import pprint_run_response
+from rich.pretty import pprint
+
+# Create team members
+web_searcher = Agent(
+    name="Stock Searcher",
+    model=OpenAIChat(id="gpt-5-mini"),
+    role="Searches the web for information.",
+    tools=[DuckDuckGoTools()],
+)
+
+# Create the team
+team = Team(
+    name="Web Research Team",
+    model=OpenAIChat(id="gpt-5-mini"),
+    members=[web_searcher],
+    markdown=True,
+    store_member_responses=True,
+)
+
+# Run the team
+run_response: TeamRunOutput = team.run(
+    "What is going on in the world?"
+)
+pprint_run_response(run_response, markdown=True)
+
+# Print team leader message metrics
+print("---" * 5, "Team Leader Message Metrics", "---" * 5)
+if run_response.messages:
+    for message in run_response.messages:
+        if message.role == "assistant":
+            if message.content:
+                print(f"Message: {message.content}")
+            elif message.tool_calls:
+                print(f"Tool calls: {message.tool_calls}")
+            print("---" * 5, "Metrics", "---" * 5)
+            pprint(message.metrics)
+            print("---" * 20)
+
+# Print aggregated team leader metrics
+print("---" * 5, "Aggregated Metrics of Team", "---" * 5)
+pprint(run_response.metrics)
+
+# Print team leader session metrics
+print("---" * 5, "Session Metrics", "---" * 5)
+pprint(team.get_session_metrics().to_dict())
+
+# Print team member message metrics
+print("---" * 5, "Team Member Message Metrics", "---" * 5)
+if run_response.member_responses:
+    for member_response in run_response.member_responses:
+        if member_response.messages:
+            for message in member_response.messages:
+                if message.role == "assistant":
+                    if message.content:
+                        print(f"Member Message: {message.content}")
+                    elif message.tool_calls:
+                        print(f"Member Tool calls: {message.tool_calls}")
+                    print("---" * 5, "Member Metrics", "---" * 5)
+                    pprint(message.metrics)
+                    print("---" * 20)
+```
+
+你将看到包含以下信息的输出：
+
+- `input_tokens`：发送给模型的 Token 数量。  
+- `output_tokens`：从模型接收的 Token 数量。  
+- `total_tokens`：`input_tokens` 与 `output_tokens` 的总和。  
+- `audio_input_tokens`：用于音频输入发送给模型的 Token 数量。  
+- `audio_output_tokens`：从模型接收的音频输出 Token 数量。  
+- `audio_total_tokens`：`audio_input_tokens` 与 `audio_output_tokens` 的总和。  
+- `cache_read_tokens`：从缓存中读取的 Token 数量。  
+- `cache_write_tokens`：写入缓存的 Token 数量。  
+- `reasoning_tokens`：用于推理的 Token 数量。  
+- `duration`：本次运行的持续时间（秒）。  
+- `time_to_first_token`：生成首个 Token 所需的时间。  
+- `provider_metrics`：模型提供商返回的特定指标。
+
+## 开发者资源
+
+- 查看 [TeamRunOutput 结构定义](/reference/teams/team-response)  
+- 查看 [Metrics 结构定义](/reference/agents/metrics)  
+- 参考 [示例代码（Cookbook）](https://github.com/agno-agi/agno/tree/main/cookbook/04_teams/metrics/01_team_metrics.py)

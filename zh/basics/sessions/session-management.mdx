@@ -1,0 +1,189 @@
+---
+title: 会话管理
+sidebarTitle: 会话管理
+description: 管理会话标识符、名称及性能优化
+keywords: [会话, session_id, 会话命名, cache_session, 性能]
+---
+
+在 Agno 中，会话管理让你能够控制会话的标识方式、命名规则以及缓存策略，从而实现最佳性能。
+
+## 会话 ID
+
+每个会话都有一个唯一标识符（`session_id`），用于跨多次运行追踪对话：
+
+- **自动生成**：若未提供，Agno 会自动创建一个 UUID  
+- **手动指定**：你可以提供自定义的会话 ID，便于按业务逻辑追踪  
+- **按用户区分**：结合 `user_id` 使用，可分别追踪多个用户的会话
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    db=SqliteDb(db_file="tmp/agent.db"),
+)
+
+# Use your own session ID
+agent.run("Hello", session_id="user_123_session_456")
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+from agno.db.sqlite import SqliteDb
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    members=[...],
+    db=SqliteDb(db_file="tmp/team.db"),
+)
+
+# Use your own session ID
+team.run("Hello", session_id="user_123_session_789")
+```
+</CodeGroup>
+
+## 消息与聊天历史访问
+
+你可以使用 `get_messages` 方法访问会话中的消息：
+
+<CodeGroup>
+```python Agent
+session = agent.get_session(session_id="session_123")
+messages = session.get_messages()
+```
+
+```python Team
+session = team.get_session(session_id="session_456")
+messages = session.get_messages()
+```
+</CodeGroup>
+
+这将返回该会话中所有运行的全部消息，包括工具调用和系统消息。
+
+如果你只需要用户和助手消息的简化列表，可以使用 `get_chat_history` 方法：
+
+<CodeGroup>
+```python Agent
+messages = agent.get_chat_history(session_id="session_123")
+```
+
+```python Team
+messages = team.get_chat_history(session_id="session_456")
+```
+</CodeGroup>
+
+更多详细信息，请参阅完整的 [AgentSession 参考文档](/zh/reference/agents/session) 和 [TeamSession 参考文档](/zh/reference/teams/session)。
+
+## 会话命名
+
+会话名称是便于人类阅读的标签，有助于更轻松地识别和管理对话——非常适合用于收件箱式 UI、客服队列，或将会话关联到外部工单系统。
+
+### 手动命名
+
+使用 `set_session_name()` 设置自定义名称：
+
+<CodeGroup>
+```python Agent
+agent.set_session_name(session_id="session_001", session_name="Product Launch Planning")
+name = agent.get_session_name(session_id="session_001")
+```
+
+```python Team
+team.set_session_name(session_id="session_001", session_name="Product Launch Planning")
+name = team.get_session_name(session_id="session_001")
+```
+</CodeGroup>
+
+**提示：**
+- 将会话 ID 视为唯一真实来源；名称仅是供人类阅读的元数据  
+- 当对话主题发生变化时，可随时重命名——调用该方法的次数没有限制  
+- 需要命名规范或安全限制？在向最终用户暴露此功能前，可将 `set_session_name` 封装在你自己的辅助函数中  
+
+### 自动生成名称
+
+让 AI 根据对话内容自动生成有意义的名称：
+
+
+<CodeGroup>
+```python Agent
+session = agent.set_session_name(
+    session_id="session_123",
+    autogenerate=True,
+)
+# Access the generated name
+name = agent.get_session_name(session_id="session_123")
+print(name)  # e.g. "E-commerce API Planning"
+```
+
+```python Team
+session = team.set_session_name(
+    session_id="session_456",
+    autogenerate=True,
+)
+# Access the generated name
+name = team.get_session_name(session_id="session_456")
+print(name)  # e.g. "Product Launch Strategy"
+```
+</CodeGroup>
+
+调用 `set_session_name(autogenerate=True)` 会让模型读取会话中的前几条消息，并生成一个简短（≤5 个单词）的标签。该方法返回更新后的会话对象，可使用 `get_session_name()` 获取生成的名称。
+
+**最佳实践：**
+- **延迟生成**：等到对话具备有意义的上下文后再生成（例如，在 2–3 条消息之后）  
+- **提供备选方案**：将调用封装在你自己的辅助函数中，若自动生成失败，则回退到用户输入的名称或外部工单 ID  
+- **批量处理**：从数据库中遍历会话 ID 列表，对每个会话调用一次 `set_session_name(..., autogenerate=True)`。该 API 是同步的，请根据模型延迟合理安排执行计划  
+- **成本考量**：每次生成都会产生额外的模型调用。如对成本敏感，可通过 `session_summary_manager` 使用更便宜的模型，或将命名任务异步执行  
+
+## 会话缓存
+
+会话缓存将完整的会话对象存储在内存中，以提升性能。设置 `cache_session=True` 后，首次从数据库读取会话对象后，Agno 会将其保留在内存中，避免后续运行时重复查询数据库。
+
+<CodeGroup>
+```python Agent
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o"),
+    session_id="my_session",
+    cache_session=True,  # Enable in-memory caching
+)
+
+# First run loads from database and caches
+agent.run("First message")
+
+# Subsequent runs use cached session (faster)
+agent.run("Second message")
+```
+
+```python Team
+from agno.team import Team
+from agno.models.openai import OpenAIChat
+
+team = Team(
+    model=OpenAIChat(id="gpt-4o"),
+    session_id="team_session",
+    cache_session=True,  # Enable in-memory caching
+)
+
+# First run loads from database and caches
+team.run("First message")
+
+# Subsequent runs use cached session (faster)
+team.run("Second message")
+```
+</CodeGroup>
+
+### 适用场景
+
+- 同一会话中存在**大量连续交互轮次**（例如客服对话、智能副驾等）  
+- **对延迟敏感**的部署环境，其中每次数据库往返都会显著影响性能  
+- 使用**资源开销较大的数据库**（如远程 PostgreSQL、无服务器数据库驱动），其连接建立时间占整体耗时主导地位  
+
+<Warning>
+此功能仅适用于开发和测试目的，**不建议在生产环境中使用**。
+</Warning>

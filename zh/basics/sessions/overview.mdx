@@ -1,0 +1,85 @@
+---
+title: 会话（Sessions）
+sidebarTitle: 概述
+description: 了解 Agno 会话及其工作原理。
+keywords: [会话, session, 会话 ID, run]
+---
+
+当你调用 `Agent.run()` 时，会创建一次独立的、无状态的交互。智能体会对你的消息做出响应，仅此而已——不会记住刚刚发生过什么。
+
+但大多数实际应用需要的是**对话**，而不仅仅是一次性的交互。这时就需要会话（Sessions）了。
+
+## 什么是会话？
+
+可以把会话想象成一个对话线程。它是由用户与你的智能体（Agent）、团队（Team）或工作流（Workflow）之间多次来回交互（称为 “runs”）组成的一个集合。每个会话都有一个唯一的 `session_id`，用于关联该对话中的所有运行记录、聊天历史、状态和指标。
+
+具体说明如下：
+
+- **会话（Session）**：由一个 `session_id` 标识的多轮对话，包含该对话线程中的所有运行（runs）、历史记录、状态和指标。
+- **运行（Run）**：会话中的一次单独交互。每次调用 `Agent.run()`、`Team.run()` 或 `Workflow.run()` 时，都会生成一个新的 `run_id`。可以将其理解为对话中的一组“消息-回复”。
+
+<Note>
+会话需要数据库来存储历史记录和状态。设置详情请参阅 [会话存储（Session Storage）](/zh/basics/database/overview)。
+</Note>
+
+<Note>
+**工作流会话的工作方式有所不同**：与存储对话消息的智能体会话和团队会话不同，工作流会话跟踪的是完整的流水线执行（runs），包括输入和输出。由于这些独特特性，我们专门创建了[工作流会话章节](/zh/basics/sessions/workflow-sessions)，涵盖基于运行的历史记录、会话状态和工作流智能体等特有功能。
+</Note>
+
+## 单次运行示例
+
+当你运行智能体但未指定 `session_id` 时，Agno 会自动为你生成一个 `run_id` 和一个 `session_id`：
+
+```python
+from agno.agent import Agent
+from agno.models.openai import OpenAIChat
+
+agent = Agent(model=OpenAIChat(id="gpt-4o-mini"))
+
+# Run the agent - Agno auto-generates session_id and run_id
+response = agent.run("Tell me a 5 second short story about a robot")
+print(response.content)
+print(f"Run ID: {response.run_id}")        # Auto-generated UUID
+print(f"Session ID: {response.session_id}") # Auto-generated UUID
+```
+
+这会创建一个仅包含单次运行的新会话。但需要注意的是：如果没有配置数据库，就不会有任何持久化存储。虽然此次运行中存在 `session_id`，但由于没有任何内容被保存，你无法在之后继续该对话。若要真正使用会话实现多轮对话，你需要配置一个数据库（即使是 `InMemoryDb` 也可以）。
+
+## 多用户对话
+
+在生产环境中，多个用户通常会同时与同一个智能体或团队进行对话。会话机制可确保这些对话线程彼此隔离：
+
+- `user_id` 用于区分使用你产品的不同用户。
+- `session_id` 用于区分同一用户的多个对话线程（可类比为“聊天标签页”）。
+- 只有在通过 [`add_history_to_context`](/zh/basics/chat-history/agent/overview#add-history-to-the-agent-context) 显式启用时，对话历史才会被注入到当前运行的上下文中。
+
+如需完整的实践指南（包含持久化、历史记录和按用户分配的会话 ID），请参阅 [《持久化会话指南》](/zh/basics/sessions/persisting-sessions#multi-user-sessions) 或 [《聊天历史示例Cookbook》](/examples/basics/agent/session/05_chat_history)。
+
+## 了解更多
+
+<CardGroup cols={3}>
+  <Card
+    title="会话管理"
+    icon="tag"
+    iconType="duotone"
+    href="/zh/basics/sessions/session-management"
+  >
+   了解如何管理智能体和团队的会话 ID、会话名称，并优化会话性能。
+  </Card>
+  <Card
+    title="历史管理"
+    icon="clock-rotate-left"
+    iconType="duotone"
+    href="/zh/basics/sessions/history-management"
+  >
+    控制在会话中如何访问和使用对话历史。
+  </Card>
+  <Card
+    title="会话简介"
+    icon="file-lines"
+    iconType="duotone"
+    href="/zh/basics/sessions/session-summaries"
+  >
+    自动将长对话压缩为简洁摘要，以降低 Token 消耗。
+  </Card>
+</CardGroup>

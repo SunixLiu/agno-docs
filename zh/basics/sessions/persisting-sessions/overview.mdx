@@ -1,0 +1,122 @@
+---
+title: 持久化会话
+sidebarTitle: 概述
+description: 将会话数据存储在数据库中，以支持多轮对话
+keywords: [会话, 数据库, 持久化, PostgreSQL, SQLite]
+---
+
+要实现跨多次运行的会话功能，你需要配置一个数据库。配置完成后，Agno 会自动存储对话历史、会话状态和运行元数据。
+
+<Note>
+关于数据库选型、连接字符串、凭证管理及运维指南，请参阅 [数据库概述](/basics/database/overview)。此处直接复用该页面中的配置——本页仅补充与会话相关的特定注意事项。
+</Note>
+
+## 快速开始
+
+按照存储文档配置好 `db` 对象（如 PostgreSQL、SQLite、DynamoDB 等）后，只需将其传入你的智能体（Agent）、团队（Team）或工作流（Workflow），即可启用持久化功能：
+
+```python
+db = PostgresDb(db_url="postgresql+psycopg://...")
+
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,                 # Enables persistence
+    session_id="user_123", # Same ID = same conversation
+)
+```
+
+## 支持的数据库
+
+此处无需新内容——复用 `/basics/storage` 中提供的数据库驱动和配置指南：
+
+- **PostgreSQL**（推荐）：适用于生产环境，支持自定义 `session_table` 表名，便于隔离不同工作负载。
+- **SQLite**：非常适合本地开发；只需像在其他场景中一样更换文件路径即可。
+- **InMemoryDb**：仅适用于测试或演示。进程退出后，数据将丢失。
+
+如果你需要调整索引、数据保留策略或连接池等设置，请在共享的存储层中进行配置，这样所有功能（会话、记忆、知识库等）都能受益于统一的优化。
+
+## 会话 ID
+
+会话通过 `session_id` 进行标识。使用相同的 ID 即可继续之前的对话：
+
+```python
+# First run
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    session_id="conversation_123",
+)
+agent.run("My name is Alice")
+
+# Later run with same session_id
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+    session_id="conversation_123",  # Same ID
+    add_history_to_context=True,     # Enable history
+)
+agent.run("What's my name?")  # Agent remembers "Alice"
+```
+
+需要自定义命名规范、缓存策略或用户界面友好的标签？请继续阅读 [《会话管理指南》](/zh/basics/sessions/session-management)。
+
+## 存储内容
+
+配置数据库后，Agno 会自动存储以下内容：
+
+- ✅ **消息**：用户输入和智能体回复  
+- ✅ **运行元数据**：时间戳、Token 使用量、模型信息  
+- ✅ **会话状态**：自定义的键值对数据  
+- ✅ **工具调用**：工具使用记录及结果（可选）  
+- ✅ **媒体文件**：图像、音频、文件等（可选）
+
+如需自定义保存的内容，请参阅 [《存储控制》](/zh/basics/sessions/persisting-sessions/storage-control)。
+
+## 多用户会话
+
+使用 `user_id` 来区分不同用户：
+
+```python
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=db,
+)
+
+# Specify the user_id and session_id on run to start or continue the conversation
+agent.print_response("Hello!", session_id="session_456", user_id="alice@example.com")
+```
+
+## 会话存储结构
+
+配置数据库后，Agno 会以结构化格式存储会话。以下是每个会话保存的字段详情：
+
+| 字段             | 类型   | 描述                                               |
+| ---------------- | ------ | -------------------------------------------------- |
+| `session_id`     | `str`  | 该对话线程的唯一标识符                             |
+| `session_type`   | `str`  | 会话类型（智能体、团队或工作流）                   |
+| `agent_id`       | `str`  | 智能体 ID（若为智能体会话）                        |
+| `team_id`        | `str`  | 团队 ID（若为团队会话）                            |
+| `workflow_id`    | `str`  | 工作流 ID（若为工作流会话）                        |
+| `user_id`        | `str`  | 此会话所属的用户 ID                                |
+| `session_data`   | `dict` | 会话专属的数据与状态                               |
+| `agent_data`     | `dict` | 智能体的配置与元数据                               |
+| `team_data`      | `dict` | 团队的配置与元数据                                 |
+| `workflow_data`  | `dict` | 工作流的配置与元数据                               |
+| `metadata`       | `dict` | 额外的自定义元数据                                 |
+| `runs`           | `list` | 该会话中的所有运行记录（交互）                     |
+| `summary`        | `dict` | 会话摘要（若已启用）                               |
+| `created_at`     | `int`  | 会话创建时的 Unix 时间戳                           |
+| `updated_at`     | `int`  | 最近一次更新的 Unix 时间戳                         |
+
+<Tip>
+想直观地查看你的会话？欢迎访问 [AgentOS UI 会话页面](https://os.agno.com/sessions)，通过美观的界面浏览和管理所有对话线程。
+</Tip>
+
+## 后续步骤
+
+现在你已配置好持久化功能，可以进一步探索会话的高级用法：
+
+- [存储控制](/zh/basics/sessions/persisting-sessions/storage-control)：优化保存的内容  
+- [历史管理](/zh/basics/sessions/history-management)：控制对话历史的使用方式  
+- [会话摘要](/zh/basics/sessions/session-summaries)：压缩长对话以节省成本  
+- [会话管理](/zh/basics/sessions/session-management)：自定义命名、缓存策略等更多功能

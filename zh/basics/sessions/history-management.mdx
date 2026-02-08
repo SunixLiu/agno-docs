@@ -1,0 +1,107 @@
+---
+title: 历史管理
+sidebarTitle: 历史管理
+description: 控制对话历史的访问与使用方式
+keywords: [会话, 历史, 对话历史, 聊天历史, 上下文管理]
+---
+
+配置了数据库的智能体（Agents）和团队（Teams）会自动记录消息和运行历史。你可以通过多种方式访问并利用这些历史，为你的智能体和团队赋予对过往对话的“记忆”能力。
+
+## 常见模式
+
+### 自动注入历史（最常用）
+
+启用 `add_history_to_context=True`，即可在每次运行时自动将最近的消息包含到上下文中：
+
+<CodeGroup>
+```python Agent
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=SqliteDb(db_file="tmp/data.db"),
+    add_history_to_context=True,
+    num_history_runs=3,  # Last 3 conversation turns
+)
+```
+
+```python Team
+team = Team(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=SqliteDb(db_file="tmp/data.db"),
+    add_history_to_context=True,
+    num_history_runs=3,  # Last 3 conversation turns
+)
+```
+</CodeGroup>
+
+**适用场景**：聊天类产品、快速原型开发，或任何需要在回复中引用前几轮上下文的场景。
+
+### 按需访问历史
+
+启用 `read_chat_history=True`，让模型自主决定何时查阅历史记录：
+
+```python
+agent = Agent(
+    model=OpenAIChat(id="gpt-4o-mini"),
+    db=SqliteDb(db_file="tmp/data.db"),
+    read_chat_history=True,  # Model can call get_chat_history() tool
+)
+```
+
+**适用场景**：用于分析、审计，或希望模型按需选择性访问历史，而非始终将其包含在上下文中。
+
+### 程序化访问
+
+在代码中直接获取历史记录：
+
+```python
+# All messages excluding those marked as from_history
+chat_history = agent.get_chat_history()
+
+# User-assistant message pairs from each run
+messages = agent.get_session_messages()
+
+# Last run output with metrics and tool calls
+last_run = agent.get_last_run_output()
+```
+
+**适用场景**：构建自有 UI、分析、调试，或需要原始对话记录时。
+
+## 模式选择建议
+
+- **短对话**：保持默认（不启用历史），或开启 `add_history_to_context` 并设置 `num_history_runs=3`  
+- **长周期对话线程**：结合有限历史（如 `num_history_runs=2`）与 [会话摘要](/zh/basics/sessions/session-summaries)，以控制 Token 消耗  
+- **重度依赖工具的智能体**：使用 `max_tool_calls_from_history` 限制上下文中工具调用带来的干扰  
+- **审计/按需查询流程**：启用 `read_chat_history=True`，让模型仅在必要时查阅历史  
+- **跨会话记忆**：启用 `search_session_history=True` 并设置较小的 `num_history_sessions=2`（值不宜过高，以免超出上下文限制）  
+- **程序化工作流**：在代码中直接调用 `get_session_messages()` 或 `get_chat_history()`  
+
+## 深入学习
+
+如需全面指南、详细示例和高级用法，请参阅：
+
+<CardGroup cols={3}>
+  <Card
+    title="智能体中的对话历史"
+    icon="robot"
+    iconType="duotone"
+    href="/zh/basics/chat-history/agent/overview"
+  >
+    智能体历史管理完整指南，包含详细示例和高级模式。
+  </Card>
+  <Card
+    title="团队对话历史"
+    icon="users"
+    iconType="duotone"
+    href="/zh/basics/chat-history/team/overview"
+  >
+    团队专属的历史功能、成员协同机制与共享上下文模式。
+  </Card>
+  <Card
+    title="对话历史概览"
+    icon="book"
+    iconType="duotone"
+    href="/zh/basics/chat-history/overview"
+  >
+    智能体、团队和工作流中所有历史功能的全面概览。
+  </Card>
+</CardGroup>

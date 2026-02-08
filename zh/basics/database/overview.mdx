@@ -1,0 +1,315 @@
+---
+title: 数据库支持
+sidebarTitle: 概述
+description: 为你的智能体启用会话历史、记忆等功能的持久化存储。
+keywords: [数据库, 存储]
+---
+
+为你的智能体（Agents）添加数据库支持可实现持久化能力，使其能够记住先前的消息、用户记忆等内容。
+
+其工作原理是为你的智能体和团队配备一个数据库，用于存储和检索以下内容：
+
+- [会话（Sessions）](/zh/basics/sessions/overview)  
+- [用户记忆（User Memories）](/zh/basics/memory/overview)  
+- [知识库（Knowledge）](/zh/basics/knowledge/content-db)  
+- [评估（Evals）](/zh/basics/evals/overview)  
+- [文化（Culture）](/zh/basics/culture/overview)  
+
+<Note>
+“文化（Culture）”是一项实验性功能。
+</Note>
+
+<img 
+  className="block dark:hidden" 
+  src="/images/storage-overview-light.png" 
+  alt="Team structure"
+  style={{ maxWidth: '100%', transform: 'scale(1.1)' }}
+/>
+
+<img 
+  className="hidden dark:block" 
+  src="/images/storage-overview-dark.png" 
+  alt="Team structure"
+  style={{ maxWidth: '100%', transform: 'scale(1.1)' }}
+/>
+
+## 为你的智能体添加数据库
+
+要为智能体启用会话持久化，需先创建一个数据库实例，并将其传入智能体：
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SQLiteDb
+
+# Set up your database
+db = SQLiteDb(id="my_agent_db", db_file="agno.db")
+
+# Initialize your Agent passing the database
+agent = Agent(db=db)
+```
+<Note>
+建议为数据库配置一个 `id`，以便更好地管理和识别。你可以在数据库配置中这样添加：
+</Note>
+
+<Tip>
+**何时应为智能体启用存储？**
+
+默认情况下，智能体是临时的（ephemeral），不会记住之前的对话。
+
+但在生产环境中，你通常需要在多个请求之间延续同一个会话。通过存储，可将完整的会话历史和状态持久化到数据库中，让你和用户能够从中断处继续对话。
+
+此外，存储还允许你检查和评估智能体会话、提取少样本（few-shot）示例，并构建内部监控工具。总的来说，它能帮助你**有效追踪数据**，从而构建更强大的智能体。
+</Tip>
+
+### 将会话历史注入上下文
+
+接入数据库的智能体会自动将其 [会话](/basics/sessions/overview) 持久化到数据库中。你可以将这些已保存的历史加载到上下文中，以在多次会话之间保持连续性。
+
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SQLiteDb
+
+# Setup your database
+db = SQLiteDb(db_file="agno.db")
+
+# Setup your Agent with the database and add the session history to the context
+agent = Agent(
+    db=db,
+    add_history_to_context=True, # Automatically add the persisted session history to the context
+    num_history_runs=3, # Specify how many messages to add to the context
+)
+```
+
+### 会话存储位置
+
+默认情况下，会话存储在数据库的 `agno_sessions` 表中。
+
+如果该表不存在，系统会在首次存储会话时自动创建。
+
+你可以通过 `session_table` 参数精确指定会话的存储位置：
+
+```python
+from agno.agent import Agent
+from agno.db.postgres import PostgresDb
+
+# Setup your database
+db = PostgresDb(
+    db_url="postgresql://user:password@localhost:5432/my_database",
+    session_table="my_session_table", # Specify the table to store sessions
+)
+
+# Setup your Agent with the database
+agent = Agent(db=db)
+
+# Run the Agent. This will store a session in our "my_session_table"
+agent.print_response("What is the capital of France?")
+```
+
+## 检索会话
+
+你可以使用 `get_session` 方法手动获取已存储的会话。该方法同样适用于 `Teams`（团队）和 `Workflows`（工作流）：
+
+```python
+from agno.agent import Agent
+from agno.db.sqlite import SQLiteDb
+
+# Setup your database
+db = SQLiteDb(db_file="agno.db")
+
+# Setup your Agent with the database
+agent = Agent(db=db)
+
+# Run the Agent, effectively creating and persisting a session
+agent.print_response("What is the capital of France?", session_id="123")
+
+# Retrieve our freshly created session
+session_history = agent.get_session(session_id="123")
+```
+
+## 使用会话存储的优势
+
+在构建生产级智能体应用时，存储通常是至关重要的功能。它使系统能够：
+
+- **延续会话**：检索历史消息，让用户从中断处继续对话  
+- **保留会话记录**：允许用户查看过往的对话历史  
+- **数据自主权**：将会话存储在你自己的数据库中，可完全掌控数据  
+
+<Warning>
+  存储是你智能体基础设施的关键组成部分。我们建议  
+  切勿将其外包给第三方服务。你几乎总是应该为你的  
+  智能体使用自有存储层。
+</Warning>
+
+## 团队与工作流的存储支持
+
+存储功能同样适用于团队（Teams）和工作流（Workflows），为更复杂的智能体应用提供持久化记忆能力。
+
+与智能体类似，你只需为团队或工作流提供一个数据库实例，即可自动持久化其会话：
+
+```python
+from agno.team import Team
+from agno.workflow import Workflow
+from agno.db.sqlite import SQLiteDb
+
+# Set up your database
+db = SQLiteDb(db_file="agno.db")
+
+# Setup your Team
+team = Team(db=db, ...)
+
+# Setup your Workflow
+workflow = Workflow(db=db, ...)
+```
+
+<Note>
+  了解更多关于 [团队（Teams）](/zh/basics/teams/overview) 和  
+  [工作流（Workflows）](/zh/basics/workflows/overview) 的信息——它们是 Agno 提供的用于构建多智能体系统的抽象。
+</Note>
+
+## 异步数据库支持
+
+Agno 在使用 `AsyncPostgresDb` 和 `AsyncSqliteDb` 类时支持异步数据库操作。
+
+例如：
+```python async_postgres_for_agent.py
+from agno.agent import Agent
+from agno.db.postgres import AsyncPostgresDb
+
+db_url = "postgresql+psycopg_async://ai:ai@localhost:5532/ai"
+
+db = AsyncPostgresDb(db_url=db_url)
+
+agent = Agent(db=db)
+```
+
+
+## 支持的数据库
+
+当前支持用于存储的数据库包括：
+
+<CardGroup cols={3}>
+  <Card
+    title="DynamoDB"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/dynamodb/overview"
+  >
+    Amazon 的 NoSQL 数据库服务
+  </Card>
+  <Card
+    title="FireStore"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/firestore/overview"
+  >
+    Google 的 NoSQL 文档数据库
+  </Card>
+  <Card
+    title="JSON"
+    icon="file-code"
+    iconType="duotone"
+    href="/zh/integrations/database/json/overview"
+  >
+    基于文件的简单 JSON 存储
+  </Card>
+  <Card
+    title="JSON on GCS"
+    icon="cloud"
+    iconType="duotone"
+    href="/zh/integrations/database/gcs/overview"
+  >
+    存储在 Google Cloud Storage 上的 JSON
+  </Card>
+  <Card
+    title="MongoDB"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/mongo/overview"
+  >
+    流行的 NoSQL 文档数据库
+  </Card>
+  <Card
+    title="MySQL"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/mysql/overview"
+  >
+    广泛使用的开源关系型数据库
+  </Card>
+  <Card
+    title="Neon"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/neon/overview"
+  >
+    无服务器 PostgreSQL 平台
+  </Card>
+  <Card
+    title="PostgreSQL"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/postgres/overview"
+  >
+    功能强大的开源关系型数据库
+  </Card>
+  <Card
+    title="Redis"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/redis/overview"
+  >
+    内存数据结构存储
+  </Card>
+  <Card
+    title="SurrealDB"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/surrealdb/overview"
+  >
+    开源多模态数据库
+  </Card>
+  <Card
+    title="SingleStore"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/singlestore/overview"
+  >
+    实时分析型数据库
+  </Card>
+  <Card
+    title="SQLite"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/sqlite/overview"
+  >
+    轻量级嵌入式数据库
+  </Card>
+  <Card
+    title="Supabase"
+    icon="database"
+    iconType="duotone"
+    href="/zh/integrations/database/supabase/overview"
+  >
+    开源的 Firebase 替代方案
+  </Card>
+</CardGroup>
+
+<Note>
+也支持 [内存数据库（In-Memory）](/zh/integrations/database/in-memory/overview)。虽然不推荐用于生产环境，但非常适合演示和测试。
+</Note>
+
+你可以在 [数据库集成示例页面](/zh/integrations/database) 查看所有支持数据库的详细示例。
+
+## 故障排查
+
+<Tabs>
+  <Tab title="`MissingGreenlet` 异常">
+    如果你遇到 `sqlalchemy.exc.MissingGreenlet: greenlet_spawn has not been called ...` 错误，说明你在使用 `AsyncPostgresDb` 或 `AsyncSqliteDb` 时错误地传入了同步的 `db_engine`。
+
+    你可以通过 `sqlalchemy.ext.asyncio` 中的 `create_async_engine` 函数创建异步数据库引擎。
+  </Tab>
+  <Tab title="`AsyncContextNotStarted` 异常">
+    如果你看到 `sqlalchemy.ext.asyncio.exc.AsyncContextNotStarted: AsyncConnection context ...` 错误，说明你在使用 `PostgresDb` 或 `SqliteDb` 时错误地传入了异步的 `db_engine`。
+
+    你可以通过 `sqlalchemy` 中的 `create_engine` 函数创建同步数据库引擎。
+  </Tab>
+</Tabs>
