@@ -1,0 +1,11 @@
+{
+  "name": "my-mint-site",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "mint run dev",
+    "build": "mint build"
+  },
+  "dependencies": {
+    "mint": "^latest"
+  }
+}
