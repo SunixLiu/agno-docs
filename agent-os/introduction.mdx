@@ -1,40 +1,142 @@
 ---
 title: "What is AgentOS?"
 sidebarTitle: "Introduction"
-description: "The production runtime and control plane for your agentic systems"
+description: "The runtime and control plane for multi-agent systems."
 ---
 
-AgentOS is Agno's production-ready runtime that runs entirely within your own infrastructure, ensuring complete data privacy and control of your agentic system.
-Agno also provides a beautiful web interface for managing, monitoring, and interacting with your AgentOS, with no data ever being persisted outside of your environment.
+**Turn agents into production APIs.** AgentOS provides a pre-built backend for AI products.
+Add agent logic, build the frontend, and ship.
 
-<Check>
-Behind the scenes, AgentOS is a FastAPI app that you can run locally or in your cloud. It is designed to be easy to deploy and scale.
-</Check>
+## Create AgentOS
 
-## Getting Started
+<Tabs>
+<Tab title="Basic AgentOS">
 
-Ready to get started with AgentOS? Here's what you need to do:
+Serve a single agent with memory and tools. Connect to the UI to monitor and debug.
 
-<CardGroup cols={2}>
-  <Card
-    title="Create Your First OS"
-    icon="plus"
-    href="/agent-os/creating-your-first-os"
+```python agno_agent.py
+from agno.os import AgentOS
+from agno.agent import Agent
+from agno.db.sqlite import SqliteDb
+from agno.models.anthropic import Claude
+
+agent = Agent(
+    name="Agno Agent",
+    model=Claude(id="claude-sonnet-4-5"),
+    db=SqliteDb(db_file="agno.db"),
+    add_history_to_context=True,
+    markdown=True,
+)
+
+agent_os = AgentOS(agents=[agent])
+app = agent_os.get_app()
+
+if __name__ == "__main__":
+    agent_os.serve(app="agno_agent:app", reload=True)
+```
+
+</Tab>
+<Tab title="AgentOS with Builder Components">
+Pre-register components (agents, tools, workflows) to use them in the visual builder.
+
+```python agent_os_registry.py
+from agno.agent.agent import Agent
+from agno.db.postgres import PostgresDb
+from agno.models.anthropic import Claude
+from agno.models.openai import OpenAIChat
+from agno.os import AgentOS
+from agno.registry import Registry
+from agno.tools.calculator import CalculatorTools
+from agno.tools.duckduckgo import DuckDuckGoTools
+
+db = PostgresDb(db_url="postgresql+psycopg://ai:ai@localhost:5532/ai", id="postgres_db")
+
+
+def sample_tool():
+    return "Hello, world!"
+
+
+registry = Registry(
+    name="Agno Registry",
+    tools=[DuckDuckGoTools(), sample_tool, CalculatorTools()],
+    models=[
+        OpenAIChat(id="gpt-5-mini"),
+        OpenAIChat(id="gpt-5"),
+        Claude(id="claude-sonnet-4-5"),
+    ],
+    dbs=[db],
+)
+
+agent = Agent(
+    id="registry-agent",
+    model=Claude(id="claude-sonnet-4-5"),
+    db=db,
+)
+
+agent_os = AgentOS(
+    agents=[agent],
+    id="registry-agent-os",
+    registry=registry,
+    db=db,
+)
+
+app = agent_os.get_app()
+
+if __name__ == "__main__":
+    agent_os.serve(app="agent_os_registry:app", reload=True)
+```
+
+</Tab>
+</Tabs>
+
+## Architecture
+
+<img
+  className="block dark:hidden"
+  src="/images/agent-os/agentos-architecture-light.png"
+  alt="AgentOS Architecture"
+/>
+
+<img
+  className="hidden dark:block"
+  src="/images/agent-os/agentos-architecture-dark.png"
+  alt="AgentOS Architecture"
+/>
+
+AgentOS consists of two parts:
+
+1. **Runtime**: Runs agents built with the Agno SDK.
+2. **User Interface**: Manages, monitors, and debugs the system.
+
+Runs as a container in your cloud. The UI connects directly from the browser.
+No proxies. No data relays.
+
+FastAPI Compatible: Add routes, workers, and middleware without configuration.
+
+<Frame>
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    controls
+    style={{ borderRadius: "0.5rem", width: "100%", height: "auto" }}
   >
-    Set up a new AgentOS instance from scratch using our templates
-  </Card>
-  <Card
-    title="Connect Your AgentOS"
-    icon="link"
-    href="/agent-os/connecting-your-os"
-  >
-    Learn how to connect your local development environment to the platform
-  </Card>
-</CardGroup>
+    <source src="/videos/agentos-agent-chat.mp4" type="video/mp4" />
+  </video>
+</Frame>
 
-## Security & Privacy First
+## Private by Design
 
-AgentOS is designed with enterprise security and data privacy as foundational principles, not afterthoughts.
+Your data, your infrastructure.
+
+Most tooling stores data centrally. AgentOS keeps it local.
+
+- **Database**: Sessions, memory, and traces stay with you.
+- **Zero Transmission**: No conversations or logs sent to Agno.
+- **Client-Side UI**: The control plane reads directly from your database, displays in your browser, stores nothing.
+
+See [AgentOS Security](/agent-os/security) for more details.
 
 <Frame>
   <img
@@ -44,30 +146,32 @@ AgentOS is designed with enterprise security and data privacy as foundational pr
   />
 </Frame>
 
-### Complete Data Ownership
+## Features
 
-- **Your Infrastructure, Your Data**: AgentOS runs entirely within your cloud environment
-- **Zero Data Transmission**: No conversations, logs, or metrics are sent to external services
-- **Private by Default**: All processing, storage, and analytics happen locally
+- **Production API**: 50+ endpoints with SSE streaming.
+- **Data Sovereignty**: Sessions, memory, and traces stored in your database.
+- **Isolation**: Request-level isolation for users and sessions.
+- **Security**: JWT-based RBAC with hierarchical scopes.
+- **Observability**: Built-in tracing without third-party egress.
+- **Full Framework**: Guardrails, human-in-the-loop, and learning machines.
 
-To learn more about AgentOS Security, check out the [AgentOS Security](/agent-os/security) page.
-
-## Learn more
+## Next Steps
 
 <CardGroup cols={2}>
-  <Card
-    title="Control Plane"
-    icon="desktop"
-    href="/agent-os/control-plane"
-  >
-    Learn how to use the AgentOS control plane to manage and monitor your OSs
+  <Card title="Run Your First AgentOS" icon="plus" href="/agent-os/run-your-os">
+    Initialize and serve a basic agent.
   </Card>
   <Card
-    title="Create Your First OS"
-    icon="rocket"
-    href="/agent-os/creating-your-first-os"
+    title="Connect AgentOS to UI"
+    icon="link"
+    href="/agent-os/connect-your-os"
   >
-    Get started by creating your first AgentOS instance
+    Connect your AgentOS to the Control Plane and Builder UI
+  </Card>
+  <Card title="Control Plane" icon="desktop" href="/agent-os/control-plane">
+    Inspect sessions and debug traces.
+  </Card>
+  <Card title="Learn More" icon="book" href="/agent-os/overview">
+    Learn more about AgentOS
   </Card>
 </CardGroup>
-
