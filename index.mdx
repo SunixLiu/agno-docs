@@ -1,6 +1,11 @@
 ---
+<<<<<<< HEAD
 title: 欢迎来到 Agno
 description: 用Agno构建，运行和管理多代理系统. 用于创建AI智能体、团队和工作流的领先框架，配备强大的工具和部署选项。
+=======
+title: Welcome to Agno
+description: Build, run, and manage agentic software at scale.
+>>>>>>> main
 mode: custom
 ---
 
@@ -109,6 +114,7 @@ export const CodeTabs = ({ tabs, defaultTab }) => {
 };
 
 export const codeTabs = [
+<<<<<<< HEAD
     {
         id: 'agents',
         label: 'Agents',
@@ -197,6 +203,164 @@ export const codeTabs = [
           </>
         ),
     },
+=======
+  {
+    id: "agents",
+    label: "Agents",
+    language: "python",
+    code: (
+      <>
+        <span style={{ color: "#ff4017" }}>from</span> agno.agent{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Agent{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.models.anthropic{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Claude{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.tools.coding{" "}
+        <span style={{ color: "#ff4017" }}>import</span> CodingTools{"\n"}
+        {"\n"}
+        agent = Agent({"\n"}
+        {"    "}model=Claude(id=
+        <span style={{ color: "#c3e88d" }}>"claude-sonnet-4-5"</span>),{"\n"}
+        {"    "}tools=[CodingTools()],{"\n"}
+        {"    "}add_history_to_context=
+        <span style={{ color: "#ff4017" }}>True</span>,{"\n"}
+        {"    "}markdown=<span style={{ color: "#ff4017" }}>True</span>,{"\n"}
+        ){"\n"}
+        {"\n"}
+        agent.print_response(
+        <span style={{ color: "#c3e88d" }}>
+          "Build a todo app with tests."
+        </span>
+        , stream=<span style={{ color: "#ff4017" }}>True</span>)
+      </>
+    ),
+  },
+  {
+    id: "teams",
+    label: "Teams",
+    language: "python",
+    code: (
+      <>
+        <span style={{ color: "#ff4017" }}>from</span> agno.team{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Team{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.agent{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Agent{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.models.anthropic{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Claude{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.tools.hackernews{" "}
+        <span style={{ color: "#ff4017" }}>import</span> HackerNewsTools{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.tools.newspaper4k{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Newspaper4kTools{"\n"}
+        {"\n"}
+        hn_researcher = Agent(name=
+        <span style={{ color: "#c3e88d" }}>"HackerNews Researcher"</span>,
+        tools=[HackerNewsTools()]){"\n"}
+        article_reader = Agent(name=
+        <span style={{ color: "#c3e88d" }}>"Article Reader"</span>,
+        tools=[Newspaper4kTools()]){"\n"}
+        {"\n"}
+        team = Team({"\n"}
+        {"    "}model=Claude(id=
+        <span style={{ color: "#c3e88d" }}>"claude-sonnet-4-5"</span>),{"\n"}
+        {"    "}members=[hn_researcher, article_reader],{"\n"}
+        {"    "}add_history_to_context=
+        <span style={{ color: "#ff4017" }}>True</span>,{"\n"}){"\n"}
+        team.print_response(
+        <span style={{ color: "#c3e88d" }}>
+          "Research AI trends and summarize the top articles"
+        </span>
+        )
+      </>
+    ),
+  },
+  {
+    id: "workflows",
+    label: "Workflows",
+    language: "python",
+    code: (
+      <>
+        <span style={{ color: "#ff4017" }}>from</span> agno.agent{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Agent{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.workflow{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Workflow{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.models.anthropic{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Claude{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.tools.duckduckgo{" "}
+        <span style={{ color: "#ff4017" }}>import</span> DuckDuckGoTools{"\n"}
+        {"\n"}
+        researcher = Agent(name=
+        <span style={{ color: "#c3e88d" }}>"Researcher"</span>, model=Claude(id=
+        <span style={{ color: "#c3e88d" }}>"claude-sonnet-4-5"</span>),
+        tools=[DuckDuckGoTools()]){"\n"}
+        writer = Agent(name=<span style={{ color: "#c3e88d" }}>"Writer"</span>,
+        model=Claude(id=
+        <span style={{ color: "#c3e88d" }}>"claude-sonnet-4-5"</span>),
+        instructions=
+        <span style={{ color: "#c3e88d" }}>"Write engaging content"</span>)
+        {"\n"}
+        {"\n"}
+        workflow = Workflow({"\n"}
+        {"    "}name=
+        <span style={{ color: "#c3e88d" }}>"Content Workflow"</span>,{"\n"}
+        {"    "}steps=[researcher, writer],{"\n"}){"\n"}
+        workflow.print_response(
+        <span style={{ color: "#c3e88d" }}>
+          "Create a blog post about AI agents"
+        </span>
+        , stream=<span style={{ color: "#ff4017" }}>True</span>)
+      </>
+    ),
+  },
+  {
+    id: "agentos",
+    label: "AgentOS",
+    language: "python",
+    code: (
+      <>
+        <span style={{ color: "#ff4017" }}>from</span> agno.os{" "}
+        <span style={{ color: "#ff4017" }}>import</span> AgentOS{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.agent{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Agent{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.db.sqlite{" "}
+        <span style={{ color: "#ff4017" }}>import</span> SqliteDb{"\n"}
+        <span style={{ color: "#ff4017" }}>from</span> agno.tools.mcp{" "}
+        <span style={{ color: "#ff4017" }}>import</span> MCPTools{"\n"}
+        <span style={{ color: "#ff4017" }}>
+          from
+        </span> agno.models.anthropic{" "}
+        <span style={{ color: "#ff4017" }}>import</span> Claude{"\n"}
+        {"\n"}
+        agent = Agent({"\n"}
+        {"    "}name=<span style={{ color: "#c3e88d" }}>"Support Agent"</span>,
+        {"\n"}
+        {"    "}model=Claude(id=
+        <span style={{ color: "#c3e88d" }}>"claude-sonnet-4-5"</span>),{"\n"}
+        {"    "}db=SqliteDb(db_file=
+        <span style={{ color: "#c3e88d" }}>"agno.db"</span>),{"\n"}
+        {"    "}tools=[MCPTools(url=
+        <span style={{ color: "#c3e88d" }}>"https://docs.agno.com/mcp"</span>)],
+        {"\n"}
+        {"    "}add_history_to_context=
+        <span style={{ color: "#ff4017" }}>True</span>,{"\n"}
+        {"    "}markdown=<span style={{ color: "#ff4017" }}>True</span>,{"\n"})
+        {"\n"}
+        {"\n"}
+        agent_os = AgentOS(agents=[agent]){"\n"}
+        app = agent_os.get_app(){" "}
+        <span style={{ color: "#71717a" }}># FastAPI app ready to deploy</span>
+      </>
+    ),
+  },
+>>>>>>> main
 ];
 
 <div className="relative mx-[calc(50%-50vw)] bg-[#f6f7f9] dark:bg-[#111113] py-16 md:py-16 border-y border-[#e5e7eb] dark:border-zinc-800 overflow-hidden">
@@ -243,8 +407,14 @@ export const codeTabs = [
         HERO SECTION
         ============================================ */}
     <section className="mt-20 flex flex-col items-center gap-6 text-center">
+<<<<<<< HEAD
       <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] text-zinc-900 dark:text-zinc-100 sm:text-5xl md:text-[64px]">
         构建，运行，管理. <br />多模态智能体系统
+=======
+      <h1 className="text-4xl font-semibold leading-[1.05] text-zinc-900 dark:text-zinc-100 sm:text-5xl md:text-[64px]">
+        Build. Run. Manage.<br />
+        Agentic Software at Scale
+>>>>>>> main
         {/* Blinking Cursor Animation */}
         {(() => {
           const [visible, setVisible] = React.useState(true);
@@ -301,7 +471,11 @@ export const codeTabs = [
 
           <h3 className="text-base font-semibold text-start text-zinc-900 dark:text-zinc-100">AgentOS</h3>
           <p className="text-xs leading-relaxed text-start text-zinc-500 dark:text-zinc-400">
+<<<<<<< HEAD
             在您的云环境中大规模部署和管理智能体
+=======
+            Turn your Agents into a production API.
+>>>>>>> main
           </p>
         </a>
 
@@ -315,7 +489,11 @@ export const codeTabs = [
           <span className="pointer-events-none absolute -bottom-2 -left-2 h-4 w-4 border-b-2 border-l-2 border-[#ff4017] opacity-0 transition-opacity group-hover:opacity-100" />
           <span className="pointer-events-none absolute -bottom-2 -right-2 h-4 w-4 border-b-2 border-r-2 border-[#ff4017] opacity-0 transition-opacity group-hover:opacity-100" />
 
+<<<<<<< HEAD
           <h3 className="text-base font-semibold text-start text-zinc-900 dark:text-zinc-100">参考文档</h3>
+=======
+          <h3 className="text-base font-semibold text-start text-zinc-900 dark:text-zinc-100">Deploy</h3>
+>>>>>>> main
           <p className="text-xs leading-relaxed text-start text-zinc-500 dark:text-zinc-400">
             面向开发者的完整 SDK 和 API 参考文档
           </p>

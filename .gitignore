@@ -6,5 +6,27 @@ tmp
 .DS_Store
 .mintlify-last
 .cursor
+<<<<<<< HEAD
 docs.json.bak
 update_json.py
+=======
+.claude
+.agent
+.envrc
+.agents/
+.commandcode/
+.prettierrc
+.codex
+.conductor
+.context
+.cspell.json
+
+agno
+projects
+specs
+
+agno-docs-style/styles/alex
+agno-docs-style/styles/write-good
+agno-docs-style/styles/Google
+agno-docs-style/styles/Readability
+>>>>>>> main

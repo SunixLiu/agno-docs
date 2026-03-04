@@ -1,61 +1,54 @@
 ---
 title: Introduction
 sidebarTitle: Introduction
-description: "Build multi-agent systems that learn."
+description: "**Build, run, and manage agentic software at scale.**"
 keywords: [introduction, agno]
 mode: "wide"
 ---
 
-## What is Agno?
+## What is Agno
 
-**A framework for building multi-agent systems that learn and improve with every interaction.**
+Agno is the runtime for agentic software. Build agents, teams, and workflows. Run them as scalable services. Monitor and manage them in production.
 
-Most agents are stateless. They reason, respond, forget. Session history helps, but they're exactly as capable on day 1000 as they were on day 1.
+| Layer | What it does |
+|-------|--------------|
+| **Framework** | Build agents, teams, and workflows with memory, knowledge, guardrails, and 100+ integrations. |
+| **Runtime** | Serve your system in production with a stateless, session-scoped FastAPI backend. |
+| **Control Plane** | Test, monitor, and manage your system using the [AgentOS UI](https://os.agno.com). |
 
-Agno agents are different. They remember users across sessions, accumulate knowledge across conversations, and learn from decisions. Insights from one user benefit everyone. The system gets smarter over time.
+## What You Can Build
 
-Everything runs in your cloud. Your data never leaves your environment.
+Agno powers real agentic systems built from the same primitives above.
 
-## Quick Example
+- [**Pal →**](https://github.com/agno-agi/pal) A personal agent that learns your preferences.
+- [**Dash →**](https://github.com/agno-agi/dash) A self-learning data agent grounded in six layers of context.
+- [**Scout →**](https://github.com/agno-agi/scout) A self-learning context agent that manages enterprise context knowledge.
+- [**Gcode →**](https://github.com/agno-agi/gcode) A post-IDE coding agent that improves over time.
+- [**Investment Team →**](https://github.com/agno-agi/investment-team) A multi-agent investment committee that debates and allocates capital.
 
-```python {8}
-from agno.agent import Agent
-from agno.db.sqlite import SqliteDb
-from agno.models.openai import OpenAIResponses
+Single agents. Coordinated teams. Structured workflows. All built on one architecture.
 
-agent = Agent(
-    model=OpenAIResponses(id="gpt-5.2"),
-    db=SqliteDb(db_file="tmp/agents.db"),
-    learning=True,
-)
-```
+## Start Building
 
-One line. Now your agent remembers users, accumulates knowledge, and improves over time.
+Agno is designed to scale with you.
 
-## Production Stack
+- **[Quickstart →](/first-agent)** Build your first agent with memory, knowledge, and tools.
+- **[Agents →](/agents/overview)** Build intelligent programs that reason, use tools, and take action.
+- **[Teams →](/teams/overview)** Coordinate multiple agents to collaborate and reach decisions.
+- **[Workflows →](/workflows/overview)** Orchestrate deterministic and agentic steps into structured systems.
+- **[AgentOS →](/agent-os/introduction)** Deploy, govern, and operate agents in production.
 
-Agno provides the complete infrastructure for building multi-agent systems that learn:
+Start small with a single agent. Or build distributed, governed multi-agent systems from day one.
 
-| Component                                      | What it does                                                                                                |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **[Agno SDK](https://pypi.org/project/agno/)** | Open source framework to build agents and multi-agent teams with learning, tools, knowledge, and guardrails |
-| **[AgentOS](agent-os/introduction)**           | Enterprise grade runtime to run your Agno SDK based agents in production                                    |
-| **[AgentOS UI](https://os.agno.com)**          | Control plane to build, monitor, and manage your agentic system                                             |
+## Built for Production
 
-## Next Steps
+Agno runs in your infrastructure, not ours.
 
-<CardGroup cols={3}>
-  <Card title="Your First Agent" icon="user-robot" href="/first-agent">
-    Build your first learning agent.
-  </Card>
-  <Card
-    title="First Multi-Agent System"
-    icon="code-branch"
-    href="/first-multi-agent-system"
-  >
-    Build your first multi-agent system.
-  </Card>
-  <Card title="Run in Production" icon="server" href="/production/overview">
-    Deploy your system to production.
-  </Card>
-</CardGroup>
+- Stateless, horizontally scalable runtime.
+- 50+ APIs and background execution.
+- Per-user and per-session isolation.
+- Runtime approval enforcement.
+- Native tracing and full auditability.
+- Sessions, memory, knowledge, and traces stored in your database.
+
+You own the system. You own the data. You define the rules.

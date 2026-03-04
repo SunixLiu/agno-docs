@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: Agno AgentOS
-  description: Your multi-agent operating system.
-  version: 1.0.0
+  title: Agno API Reference
+  description: 'The all-in-one, private, secure agent platform that runs in your cloud.'
+  version: 2.5.6
 paths:
   /:
     get:
@@ -411,9 +411,11 @@ paths:
         **Use Cases:**
         - Resume execution after tool approval/rejection
         - Provide manual tool execution results
+        - Resume after admin approval (tools can be empty; resolution fetched from DB)
 
         **Tools Parameter:**
         JSON string containing array of tool execution objects with results.
+        Can be empty when an admin-required approval has been resolved.
       operationId: continue_agent_run
       security:
         - HTTPBearer: []
@@ -431,7 +433,6 @@ paths:
             type: string
             title: Run Id
       requestBody:
-        required: true
         content:
           application/x-www-form-urlencoded:
             schema:
@@ -459,6 +460,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthenticatedResponse'
+        '403':
+          description: Run has a pending admin approval and cannot be continued by the user yet.
         '404':
           description: Agent not found
           content:
@@ -1523,7 +1526,7 @@ paths:
         - Slack
       summary: Slack Events
       description: Process incoming Slack events
-      operationId: slack_events_agent
+      operationId: slack_events_simple_team
       responses:
         '200':
           description: Event processed successfully
@@ -1533,7 +1536,7 @@ paths:
                 anyOf:
                   - $ref: '#/components/schemas/SlackChallengeResponse'
                   - $ref: '#/components/schemas/SlackEventResponse'
-                title: Response Slack Events Agent
+                title: Response Slack Events Simple Team
         '400':
           description: Missing Slack headers
         '403':
@@ -2356,6 +2359,16 @@ paths:
       security:
         - HTTPBearer: []
       parameters:
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: User ID to scope deletion to
+            title: User Id
+          description: User ID to scope deletion to
         - name: db_id
           in: query
           required: false
@@ -2596,6 +2609,16 @@ paths:
             description: Session ID to delete
             title: Session Id
           description: Session ID to delete
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: User ID to scope deletion to
+            title: User Id
+          description: User ID to scope deletion to
         - name: db_id
           in: query
           required: false
@@ -3119,6 +3142,16 @@ paths:
             description: 'Session type (agent, team, or workflow)'
             default: agent
           description: 'Session type (agent, team, or workflow)'
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: User ID to scope rename to
+            title: User Id
+          description: User ID to scope rename to
         - name: db_id
           in: query
           required: false
@@ -5904,6 +5937,211 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
+  '/knowledge/{knowledge_id}/sources':
+    get:
+      tags:
+        - Knowledge
+      summary: List Content Sources
+      description: 'List all registered content sources (S3, GCS, SharePoint, GitHub) for the knowledge base.'
+      operationId: list_content_sources
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: knowledge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: ID of the knowledge base
+            title: Knowledge Id
+          description: ID of the knowledge base
+        - name: db_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The ID of the database to use
+            title: Db Id
+          description: The ID of the database to use
+      responses:
+        '200':
+          description: Content sources retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RemoteContentSourceSchema'
+                title: Response List Content Sources
+              example:
+                - id: company-s3
+                  name: Company Documents
+                  type: s3
+                  prefix: documents/
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedResponse'
+        '404':
+          description: Knowledge base not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+  '/knowledge/{knowledge_id}/sources/{source_id}/files':
+    get:
+      tags:
+        - Knowledge
+      summary: List Files in Source
+      description: List available files and folders in a specific content source. Supports pagination and folder navigation.
+      operationId: list_source_files
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: knowledge_id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: ID of the knowledge base
+            title: Knowledge Id
+          description: ID of the knowledge base
+        - name: source_id
+          in: path
+          required: true
+          schema:
+            type: string
+            description: ID of the content source
+            title: Source Id
+          description: ID of the content source
+        - name: prefix
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: Path prefix to filter files
+            title: Prefix
+          description: Path prefix to filter files
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 1000
+            minimum: 1
+            description: Number of files per page
+            default: 100
+            title: Limit
+          description: Number of files per page
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Page number (1-indexed)
+            default: 1
+            title: Page
+          description: Page number (1-indexed)
+        - name: delimiter
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Folder delimiter (enables folder grouping)
+            default: /
+            title: Delimiter
+          description: Folder delimiter (enables folder grouping)
+        - name: db_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: The ID of the database to use
+            title: Db Id
+          description: The ID of the database to use
+      responses:
+        '200':
+          description: Files listed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceFilesResponseSchema'
+              example:
+                source_id: company-s3
+                source_name: Company Documents
+                prefix: reports/
+                folders:
+                  - prefix: reports/2024/
+                    name: '2024'
+                    is_empty: false
+                files:
+                  - key: reports/annual-summary.pdf
+                    name: annual-summary.pdf
+                    size: 102400
+                    last_modified: '2024-01-15T10:30:00Z'
+                    content_type: application/pdf
+                meta:
+                  page: 1
+                  limit: 100
+                  total_pages: 1
+                  total_count: 1
+        '400':
+          description: Unsupported source type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedResponse'
+        '404':
+          description: Knowledge base or content source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
   /traces:
     get:
       tags:
@@ -6111,6 +6349,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
+  /traces/filter-schema:
+    get:
+      tags:
+        - Traces
+        - Traces
+      summary: Get Trace Filter Schema
+      description: |-
+        Returns the available filterable fields, their types, valid operators, and enum values.
+
+        The frontend uses this to dynamically build the filter bar UI:
+        - Field dropdown populated from `fields[].key`
+        - Operator dropdown changes per field type
+        - Value input shows autocomplete for enum fields (e.g., status)
+        - Logical operators (AND, OR) for combining clauses
+      operationId: get_traces_filter_schema
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilterSchemaResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+      security:
+        - HTTPBearer: []
   '/traces/{trace_id}':
     get:
       tags:
@@ -6427,6 +6719,107 @@ paths:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         '500':
           description: Failed to retrieve statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+  /traces/search:
+    post:
+      tags:
+        - Traces
+        - Traces
+      summary: Search Traces with Advanced Filters
+      description: |-
+        Search traces using the FilterExpr DSL for complex, composable queries.
+
+        **Group By Mode:**
+        - `run` (default): Returns `PaginatedResponse[TraceDetail]` with full span trees
+        - `session`: Returns `PaginatedResponse[TraceSessionStats]` with aggregated session stats
+
+        **Supported Operators:**
+        - Comparison: `EQ`, `NEQ`, `GT`, `GTE`, `LT`, `LTE`
+        - Inclusion: `IN`
+        - String matching: `CONTAINS` (case-insensitive substring), `STARTSWITH` (prefix)
+        - Logical: `AND`, `OR`, `NOT`
+
+        **Filterable Fields:**
+        trace_id, name, status, start_time, end_time, duration_ms, run_id, session_id, user_id, agent_id, team_id, workflow_id, created_at
+
+        **Example Request Body (runs):**
+        ```json
+        {
+          "filter": {"op": "EQ", "key": "status", "value": "OK"},
+          "group_by": "run",
+          "page": 1,
+          "limit": 20
+        }
+        ```
+
+        **Example Request Body (sessions):**
+        ```json
+        {
+          "filter": {"op": "CONTAINS", "key": "agent_id", "value": "stock"},
+          "group_by": "session",
+          "page": 1,
+          "limit": 20
+        }
+        ```
+      operationId: search_traces
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: db_id
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: Database ID to query traces from
+            title: Db Id
+          description: Database ID to query traces from
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraceSearchRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/PaginatedResponse_TraceDetail_'
+                  - $ref: '#/components/schemas/PaginatedResponse_TraceSessionStats_'
+                title: Response Search Traces
+        '400':
+          description: Invalid filter expression
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -7280,94 +7673,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
-  /registry:
-    get:
-      tags:
-        - Registry
-      summary: List Registry
-      description: List all resources in the registry with optional filtering.
-      operationId: list_registry
-      security:
-        - HTTPBearer: []
-      parameters:
-        - name: resource_type
-          in: query
-          required: false
-          schema:
-            anyOf:
-              - $ref: '#/components/schemas/RegistryResourceType'
-              - type: 'null'
-            description: Filter by resource type
-            title: Resource Type
-          description: Filter by resource type
-        - name: name
-          in: query
-          required: false
-          schema:
-            anyOf:
-              - type: string
-              - type: 'null'
-            description: Filter by name (partial match)
-            title: Name
-          description: Filter by name (partial match)
-        - name: page
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            description: Page number
-            default: 1
-            title: Page
-          description: Page number
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            maximum: 100
-            minimum: 1
-            description: Items per page
-            default: 20
-            title: Limit
-          description: Items per page
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse_RegistryContentResponse_'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequestResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthenticatedResponse'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFoundResponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationErrorResponse'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
   /schedules:
     get:
       tags:
@@ -7846,6 +8151,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  '/approvals/{approval_id}/status':
+    get:
+      tags:
+        - Approvals
+      summary: Get Approval Status
+      operationId: get_approval_status_approvals__approval_id__status_get
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            title: Approval Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalStatusResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   '/approvals/{approval_id}':
     get:
       tags:
@@ -7931,6 +8264,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /registry:
+    get:
+      tags:
+        - Registry
+      summary: List Registry
+      description: List all resources in the registry with optional filtering.
+      operationId: list_registry
+      security:
+        - HTTPBearer: []
+      parameters:
+        - name: resource_type
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/RegistryResourceType'
+              - type: 'null'
+            description: Filter by resource type
+            title: Resource Type
+          description: Filter by resource type
+        - name: name
+          in: query
+          required: false
+          schema:
+            anyOf:
+              - type: string
+              - type: 'null'
+            description: Filter by name (partial match)
+            title: Name
+          description: Filter by name (partial match)
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            description: Page number
+            default: 1
+            title: Page
+          description: Page number
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            minimum: 1
+            description: Items per page
+            default: 20
+            title: Limit
+          description: Items per page
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_RegistryContentResponse_'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
 components:
   schemas:
     ActivityMessage:
@@ -8066,6 +8487,20 @@ components:
               type: object
             - type: 'null'
           title: Input Schema
+        is_component:
+          type: boolean
+          title: Is Component
+          default: false
+        current_version:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Current Version
+        stage:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Stage
       type: object
       title: AgentResponse
     AgentSessionDetailSchema:
@@ -8343,6 +8778,10 @@ components:
             - type: integer
             - type: 'null'
           title: Updated At
+        run_status:
+          anyOf:
+            - $ref: '#/components/schemas/RunStatus'
+            - type: 'null'
       type: object
       required:
         - id
@@ -8352,6 +8791,34 @@ components:
         - source_type
       title: ApprovalResponse
       description: Response model for a single approval.
+    ApprovalStatusResponse:
+      properties:
+        approval_id:
+          type: string
+          title: Approval Id
+        status:
+          type: string
+          title: Status
+        run_id:
+          type: string
+          title: Run Id
+        resolved_at:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Resolved At
+        resolved_by:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Resolved By
+      type: object
+      required:
+        - approval_id
+        - status
+        - run_id
+      title: ApprovalStatusResponse
+      description: Lightweight response model for polling approval status.
     Artifact:
       properties:
         artifactId:
@@ -8489,6 +8956,7 @@ components:
         tools:
           type: string
           title: Tools
+          default: ''
         session_id:
           anyOf:
             - type: string
@@ -8504,8 +8972,6 @@ components:
           title: Stream
           default: true
       type: object
-      required:
-        - tools
       title: Body_continue_agent_run
     Body_create_agent_run:
       properties:
@@ -8530,7 +8996,7 @@ components:
           anyOf:
             - items:
                 type: string
-                format: binary
+                contentMediaType: application/octet-stream
               type: array
             - type: 'null'
           title: Files
@@ -8574,7 +9040,7 @@ components:
           anyOf:
             - items:
                 type: string
-                format: binary
+                contentMediaType: application/octet-stream
               type: array
             - type: 'null'
           title: Files
@@ -8686,7 +9152,7 @@ components:
         file:
           anyOf:
             - type: string
-              format: binary
+              contentMediaType: application/octet-stream
             - type: 'null'
           title: File
           description: File to upload for processing
@@ -9331,6 +9797,12 @@ components:
       description: Enumeration of possible content processing statuses.
     ContentStatusResponse:
       properties:
+        id:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Id
+          description: Content ID
         status:
           $ref: '#/components/schemas/ContentStatus'
           description: Current processing status of the content
@@ -10017,6 +10489,64 @@ components:
         - uri
       title: FileWithUri
       description: Represents a file with its content located at a specific URI.
+    FilterFieldSchema:
+      properties:
+        key:
+          type: string
+          title: Key
+          description: Column/field name used in filter expressions
+        label:
+          type: string
+          title: Label
+          description: Human-readable display label for the UI
+        type:
+          type: string
+          title: Type
+          description: 'Field data type: string, number, datetime, enum'
+        operators:
+          items:
+            type: string
+          type: array
+          title: Operators
+          description: List of valid filter operators for this field
+        values:
+          anyOf:
+            - items:
+                type: string
+              type: array
+            - type: 'null'
+          title: Values
+          description: Allowed enum values (for autocomplete/dropdown)
+      type: object
+      required:
+        - key
+        - label
+        - type
+        - operators
+      title: FilterFieldSchema
+      description: Schema describing a single filterable field for the frontend filter bar.
+    FilterSchemaResponse:
+      properties:
+        fields:
+          items:
+            $ref: '#/components/schemas/FilterFieldSchema'
+          type: array
+          title: Fields
+          description: Available filterable fields
+        logical_operators:
+          items:
+            type: string
+          type: array
+          title: Logical Operators
+          description: Logical operators for combining filter clauses
+          default:
+            - AND
+            - OR
+      type: object
+      required:
+        - fields
+      title: FilterSchemaResponse
+      description: 'Response for the filter schema endpoint. Tells the FE what fields, operators, and values are available.'
     FunctionCall:
       properties:
         name:
@@ -10581,6 +11111,22 @@ components:
         - data
         - meta
       title: 'PaginatedResponse[SessionSchema]'
+    PaginatedResponse_TraceDetail_:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/TraceDetail'
+          type: array
+          title: Data
+          description: List of items for the current page
+        meta:
+          $ref: '#/components/schemas/PaginationInfo'
+          description: Pagination metadata
+      type: object
+      required:
+        - data
+        - meta
+      title: 'PaginatedResponse[TraceDetail]'
     PaginatedResponse_TraceSessionStats_:
       properties:
         data:
@@ -10763,6 +11309,11 @@ components:
           title: Name
         type:
           $ref: '#/components/schemas/RegistryResourceType'
+        id:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Id
         description:
           anyOf:
             - type: string
@@ -10788,6 +11339,8 @@ components:
         - vector_db
         - schema
         - function
+        - agent
+        - team
       title: RegistryResourceType
       description: Types of resources that can be stored in a registry.
     RemoteContentSourceSchema:
@@ -10811,6 +11364,12 @@ components:
             - type: 'null'
           title: Metadata
           description: Custom metadata for the content source
+        prefix:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Prefix
+          description: Default path prefix for this source
       type: object
       required:
         - id
@@ -11078,6 +11637,17 @@ components:
       required:
         - run_id
       title: RunSchema
+    RunStatus:
+      type: string
+      enum:
+        - PENDING
+        - RUNNING
+        - COMPLETED
+        - PAUSED
+        - CANCELLED
+        - ERROR
+      title: RunStatus
+      description: State of the main run response
     ScheduleCreate:
       properties:
         name:
@@ -11483,23 +12053,114 @@ components:
       required:
         - challenge
       title: SlackChallengeResponse
-      description: Response model for Slack URL verification challenge
     SlackEventResponse:
       properties:
         status:
           type: string
           title: Status
-          description: Processing status
           default: ok
       type: object
       title: SlackEventResponse
-      description: Response model for Slack event processing
     SortOrder:
       type: string
       enum:
         - asc
         - desc
       title: SortOrder
+    SourceFileSchema:
+      properties:
+        key:
+          type: string
+          title: Key
+          description: Full path/key of the file
+        name:
+          type: string
+          title: Name
+          description: Display name (filename)
+        size:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Size
+          description: File size in bytes
+        last_modified:
+          anyOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          title: Last Modified
+          description: ISO 8601 timestamp of last modification
+        content_type:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Content Type
+          description: MIME type of the file
+      type: object
+      required:
+        - key
+        - name
+      title: SourceFileSchema
+      description: Schema for a file in a content source.
+    SourceFilesResponseSchema:
+      properties:
+        source_id:
+          type: string
+          title: Source Id
+          description: ID of the content source
+        source_name:
+          type: string
+          title: Source Name
+          description: Name of the content source
+        prefix:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Prefix
+          description: Prefix filter that was applied
+        folders:
+          items:
+            $ref: '#/components/schemas/SourceFolderSchema'
+          type: array
+          title: Folders
+          description: Subfolders at this level
+        files:
+          items:
+            $ref: '#/components/schemas/SourceFileSchema'
+          type: array
+          title: Files
+          description: List of files at this level
+        meta:
+          $ref: '#/components/schemas/PaginationInfo'
+          description: Pagination metadata
+      type: object
+      required:
+        - source_id
+        - source_name
+        - meta
+      title: SourceFilesResponseSchema
+      description: Response schema for listing files in a content source.
+    SourceFolderSchema:
+      properties:
+        prefix:
+          type: string
+          title: Prefix
+          description: Full prefix to use for navigating into this folder
+        name:
+          type: string
+          title: Name
+          description: Display name of the folder
+        is_empty:
+          type: boolean
+          title: Is Empty
+          description: Whether the folder contains any files
+          default: false
+      type: object
+      required:
+        - prefix
+        - name
+      title: SourceFolderSchema
+      description: Schema for a folder in a content source.
     SystemMessage:
       properties:
         id:
@@ -11633,6 +12294,11 @@ components:
             - type: string
             - type: 'null'
           title: Role
+        mode:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Mode
         model:
           anyOf:
             - $ref: '#/components/schemas/ModelResponse'
@@ -11717,6 +12383,20 @@ components:
               type: object
             - type: 'null'
           title: Input Schema
+        is_component:
+          type: boolean
+          title: Is Component
+          default: false
+        current_version:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Current Version
+        stage:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Stage
       type: object
       title: TeamResponse
     TeamRunSchema:
@@ -12022,6 +12702,12 @@ components:
             - type: 'null'
           title: Db Id
           description: Database identifier
+        mode:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Mode
+          description: 'Team execution mode (coordinate, route, broadcast, tasks)'
       type: object
       title: TeamSummaryResponse
     TextInputContent:
@@ -12341,6 +13027,68 @@ components:
         - status
       title: TraceNode
       description: Recursive node structure for rendering trace hierarchy in the frontend
+    TraceSearchGroupBy:
+      type: string
+      enum:
+        - run
+        - session
+      title: TraceSearchGroupBy
+      description: Grouping options for trace search results.
+    TraceSearchRequest:
+      properties:
+        filter:
+          anyOf:
+            - additionalProperties: true
+              type: object
+            - type: 'null'
+          title: Filter
+          description: 'FilterExpr DSL as JSON dict. Supports operators: EQ, NEQ, GT, GTE, LT, LTE, IN, CONTAINS, STARTSWITH, AND, OR, NOT.'
+        group_by:
+          $ref: '#/components/schemas/TraceSearchGroupBy'
+          description: 'Grouping mode: ''run'' returns individual TraceDetail, ''session'' returns aggregated TraceSessionStats.'
+          default: run
+        page:
+          type: integer
+          minimum: 1
+          title: Page
+          description: Page number (1-indexed)
+          default: 1
+        limit:
+          type: integer
+          maximum: 100
+          minimum: 1
+          title: Limit
+          description: Number of traces per page (max 100)
+          default: 20
+      type: object
+      title: TraceSearchRequest
+      description: |-
+        Request body for POST /traces/search with advanced filtering.
+
+        The filter field accepts a FilterExpr DSL dict supporting composable queries
+        with AND/OR/NOT logic and operators like EQ, NEQ, GT, GTE, LT, LTE, IN, CONTAINS, STARTSWITH.
+
+        Example for run grouping (default):
+            {
+                "filter": {
+                    "op": "AND",
+                    "conditions": [
+                        {"op": "EQ", "key": "status", "value": "OK"},
+                        {"op": "CONTAINS", "key": "user_id", "value": "admin"}
+                    ]
+                },
+                "group_by": "run",
+                "page": 1,
+                "limit": 20
+            }
+
+        Example for session grouping:
+            {
+                "filter": {"op": "EQ", "key": "agent_id", "value": "my-agent"},
+                "group_by": "session",
+                "page": 1,
+                "limit": 20
+            }
     TraceSessionStats:
       properties:
         session_id:
@@ -12977,6 +13725,23 @@ components:
           title: Workflow Agent
           description: Whether this workflow uses a WorkflowAgent
           default: false
+        is_component:
+          type: boolean
+          title: Is Component
+          description: Whether this workflow was created via Builder
+          default: false
+        current_version:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Current Version
+          description: Current published version number
+        stage:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Stage
+          description: Stage of the loaded config (draft/published)
       type: object
       title: WorkflowResponse
     WorkflowRunSchema:
@@ -13252,6 +14017,23 @@ components:
             - type: 'null'
           title: Db Id
           description: Database identifier
+        is_component:
+          type: boolean
+          title: Is Component
+          description: Whether this workflow was created via Builder
+          default: false
+        current_version:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Current Version
+          description: Current published version number
+        stage:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Stage
+          description: Stage of the loaded config (draft/published)
       type: object
       title: WorkflowSummaryResponse
   securitySchemes:
